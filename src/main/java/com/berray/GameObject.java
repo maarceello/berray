@@ -9,34 +9,42 @@ import com.berray.components.SpriteComponent;
 import com.raylib.Jaylib;
 import com.raylib.Raylib;
 
-import java.util.HashMap;
+
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class GameObject {
   int id;
-  private final Map<Integer, Component> components;
+  private final Map<Class<?>,Component> components;
 
   public GameObject(int id) {
     this.id = id;
-    this.components = new HashMap<>();
+    this.components = new LinkedHashMap<>();
   }
 
   public void addComponent(Component component) {
-    this.components.put(component.getType(), component);
+    this.components.put(component.getClass(), component);
   }
 
   public void update() {
   }
 
   public void draw() {
-    PosComponent posComponent = (PosComponent) components.get(1);
-    SpriteComponent spriteComponent = (SpriteComponent) components.get(2);
-
-    if (posComponent != null && spriteComponent != null) {
-
-      Jaylib.Vector2 pos = posComponent.getPos();
-      Raylib.Texture texture = spriteComponent.getTexture();
-      DrawTextureV(texture, pos, RAYWHITE);
+    for (Component c : components.values()) {
+      c.draw(this);
     }
   }
+
+  public <E extends Component> E getComponent(Class<E> type) {
+    // TODO: Refactor me please in simple
+//    return (E) components.values().stream().filter(
+//        component -> type.isInstance(component)
+//    ).findFirst().orElse(null);
+
+    return (E) components.get(type);
+
+  }
+
+
+
 }

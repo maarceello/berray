@@ -9,6 +9,11 @@ public class Game {
   private int nextGameObjectId = 0;
   private final LinkedList<GameObject> gameObjects;
 
+
+
+  private int width;
+  private int height;
+
   // Constructor
   public Game() {
     this.gameObjects = new LinkedList<>();
@@ -19,13 +24,14 @@ public class Game {
   }
 
   // Add a game object to the game
-  public void add(Component... components) {
+  public GameObject add(Component... components) {
     GameObject gameObject = new GameObject(nextGameObjectId++);
     for (Component component : components) {
       component.setId(nextGameObjectId++);
       gameObject.addComponent(component);
     }
     gameObjects.add(gameObject);
+    return gameObject;
   }
 
   // Update all game objects

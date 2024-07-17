@@ -1,22 +1,19 @@
 package com.berray.components;
 
+import com.berray.GameObject;
+
 public class Component {
   private int id;
-  private final int type;
-
-  public Component(int type) {
-    this.type = type;
-  }
 
   public void setId(int id) {
     this.id = id;
   }
-
-  public int getType() {
-    return type;
-  }
-
   public int getId() {
     return id;
   }
+
+  // Static methods have no this in their scope
+
+  public void draw(GameObject gameObject) {}
+  public void update(float deltaTime) {}
 }

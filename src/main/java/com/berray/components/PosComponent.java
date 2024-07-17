@@ -1,6 +1,6 @@
 package com.berray.components;
 
-import com.raylib.Jaylib.Vector2;
+import static com.raylib.Jaylib.Vector2;
 
 public class PosComponent extends Component {
   private final Vector2 pos;

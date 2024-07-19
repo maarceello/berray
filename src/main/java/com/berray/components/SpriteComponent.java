@@ -15,6 +15,7 @@ public class SpriteComponent extends Component {
 
   // Construct
   public SpriteComponent(Texture texture) {
+    super("sprite");
     this.texture = texture;
   }
 

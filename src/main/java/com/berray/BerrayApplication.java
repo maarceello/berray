@@ -38,7 +38,7 @@ public abstract class BerrayApplication {
   }
 
 
-  public GameObject add(Component... component) {
+  public GameObject add(Object... component) {
     return game.add(component);
   }
 

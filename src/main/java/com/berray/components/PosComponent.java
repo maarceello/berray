@@ -1,5 +1,7 @@
 package com.berray.components;
 
+import com.berray.GameObject;
+
 import static com.raylib.Jaylib.Vector2;
 
 public class PosComponent extends Component {
@@ -7,6 +9,7 @@ public class PosComponent extends Component {
 
   // Constructor
   public PosComponent(Vector2 pos) {
+    super("pos");
     this.pos = pos;
   }
 
@@ -20,4 +23,8 @@ public class PosComponent extends Component {
     return new PosComponent(new Vector2(x, y));
   }
 
+  @Override
+  public void add(GameObject gameObject) {
+    gameObject.addMethod("pos", this::getPos);
+  }
 }

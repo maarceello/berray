@@ -7,6 +7,7 @@ public class RotateComponent extends Component {
   private final float angle;
 
   public RotateComponent(float angle) {
+    super("rotate");
     this.angle = angle;
   }
 

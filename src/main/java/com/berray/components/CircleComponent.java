@@ -10,6 +10,7 @@ public class CircleComponent extends Component {
   private final int radius;
 
   public CircleComponent(int radius) {
+    super("circle");
     this.radius = radius;
   }
 

@@ -9,6 +9,7 @@ public class TextComponent extends Component {
   private final String text;
 
   public TextComponent(String text) {
+    super("text");
     this.text = text;
   }
 

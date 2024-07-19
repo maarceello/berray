@@ -12,6 +12,7 @@ public class RectComponent extends Component {
   private final int height;
 
   public RectComponent(int width, int height) {
+    super("rect");
     this.width = width;
     this.height = height;
   }

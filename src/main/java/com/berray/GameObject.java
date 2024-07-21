@@ -31,6 +31,7 @@ public class GameObject {
    * registered setter methods from components.
    */
   private final Map<String, Consumer<?>> setterMethods = new HashMap<>();
+  private final Map<String, Object> properties = new HashMap<>();
   /**
    * event manager for game object local event.
    */
@@ -165,6 +166,14 @@ public class GameObject {
     }
   }
 
+  public void setProperty(String property, Object value) {
+    properties.put(property, value);
+  }
+
+  public <E> E getProperty(String property) {
+    return (E) properties.get(property);
+  }
+
   public <E extends Component> E getComponent(Class<E> type) {
     return (E) components.get(type);
   }
@@ -187,4 +196,17 @@ public class GameObject {
   public void trigger(String eventName, Object... params) {
     eventManager.trigger(eventName, Arrays.asList(params));
   }
+
+  /** Update all game objects */
+  public void onCollide(String tag, EventListener eventListener) {
+    on("collide", event -> {
+      GameObject gameObject = event.getParameter(0);
+      // only propagate event when the object has the required tag
+      if (gameObject.is(tag)) {
+        eventListener.onEvent(event);
+      }
+    });
+
+  }
+
 }

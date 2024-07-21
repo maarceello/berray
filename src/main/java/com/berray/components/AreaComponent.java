@@ -6,9 +6,10 @@ import com.berray.math.Rect;
 
 public class AreaComponent extends Component {
 
-  public AreaComponent() {
+  public AreaComponent(Rect shape) {
     super("area");
   }
+
 
   @Override
   public void add(GameObject gameObject) {
@@ -39,6 +40,10 @@ public class AreaComponent extends Component {
   }
 
   public static AreaComponent area() {
-    return new AreaComponent();
+    return new AreaComponent(null);
+  }
+
+  public static AreaComponent area(Rect shape) {
+    return new AreaComponent(shape);
   }
 }

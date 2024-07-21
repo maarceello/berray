@@ -136,12 +136,20 @@ public abstract class BerrayApplication {
     return RectComponent.rect(width, height);
   }
 
+  public static CircleComponent circle(float radius) {
+    return CircleComponent.circle(radius);
+  }
+
   public static AnchorComponent anchor(AnchorType anchorType) {
     return AnchorComponent.anchor(anchorType);
   }
 
   public static AreaComponent area() {
     return AreaComponent.area();
+  }
+
+  public static AreaComponent area(Rect shape) {
+    return AreaComponent.area(shape);
   }
 
   public TextComponent text(String text) {

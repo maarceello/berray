@@ -8,14 +8,14 @@ import com.raylib.Jaylib.Vector2;
 import static com.raylib.Jaylib.*;
 
 public class CircleComponent extends Component {
-  private final int radius;
+  private final float radius;
 
-  public CircleComponent(int radius) {
+  public CircleComponent(float radius) {
     super("circle");
     this.radius = radius;
   }
 
-  public int getRadius() {
+  public float getRadius() {
     return radius;
   }
 
@@ -33,7 +33,7 @@ public class CircleComponent extends Component {
         WHITE);
   }
 
-  public static CircleComponent circle(int radius) {
+  public static CircleComponent circle(float radius) {
     return new CircleComponent(radius);
   }
 

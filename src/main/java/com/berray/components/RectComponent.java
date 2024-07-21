@@ -1,6 +1,10 @@
 package com.berray.components;
 
 import com.berray.GameObject;
+import com.berray.math.Rect;
+import com.berray.math.Vec2;
+
+import java.util.function.Supplier;
 
 import static com.raylib.Jaylib.Vector2;
 import static com.raylib.Jaylib.Rectangle;
@@ -23,7 +27,7 @@ public class RectComponent extends Component {
     RotateComponent rotate = gameObject.getComponent(RotateComponent.class);
 
     DrawRectanglePro(
-        pos != null ? new Rectangle(pos.getPos().x(), pos.getPos().y(), width, height) : new Rectangle(0, 0, width, height),
+        pos != null ? new Rectangle(pos.getPos().getX(), pos.getPos().getY(), width, height) : new Rectangle(0, 0, width, height),
         new Vector2((float) width / 2, (float) height / 2),
         rotate != null ? rotate.getAngle() : 0,
         WHITE);
@@ -40,5 +44,18 @@ public class RectComponent extends Component {
 
   public static RectComponent rect(int width, int height) {
     return new RectComponent(width, height);
+  }
+
+  @Override
+  public void add(GameObject gameObject) {
+    gameObject.addMethod("localArea", this::localArea);
+  }
+
+  private Rect localArea() {
+    Vec2 pos = gameObject.get("pos");
+    if (pos == null) {
+      return null;
+    }
+    return new Rect(pos.getX(), pos.getY(), width, height);
   }
 }

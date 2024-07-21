@@ -24,7 +24,7 @@ public class CircleComponent extends Component {
     PosComponent pos = gameObject.getComponent(PosComponent.class);
 
     DrawCircleV(
-        pos != null ? pos.getPos() : new Vector2(0, 0),
+        pos != null ? pos.getPos().toVecor2() : new Vector2(0, 0),
         radius,
         WHITE);
 

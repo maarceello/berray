@@ -1,26 +1,25 @@
 package com.berray.components;
 
 import com.berray.GameObject;
-
-import static com.raylib.Jaylib.Vector2;
+import com.berray.math.Vec2;
 
 public class PosComponent extends Component {
-  private final Vector2 pos;
+  private final Vec2 pos;
 
   // Constructor
-  public PosComponent(Vector2 pos) {
+  public PosComponent(Vec2 pos) {
     super("pos");
     this.pos = pos;
   }
 
   // Getter
-  public Vector2 getPos() {
+  public Vec2 getPos() {
     return pos;
   }
 
   // Static method to just call "pos()"
   public static PosComponent pos(int x, int y) {
-    return new PosComponent(new Vector2(x, y));
+    return new PosComponent(new Vec2(x, y));
   }
 
   @Override

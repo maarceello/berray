@@ -1,6 +1,9 @@
 package com.berray;
 
-import com.berray.components.Component;
+import com.berray.components.AreaComponent;
+import com.berray.math.Collision;
+import com.berray.math.Rect;
+import com.berray.math.Vec2;
 
 import java.util.LinkedList;
 
@@ -8,7 +11,6 @@ public class Game {
   private int gravity;
   private int nextGameObjectId = 0;
   private final LinkedList<GameObject> gameObjects;
-
 
 
   private int width;
@@ -45,89 +47,49 @@ public class Game {
     }
   }
 
+  private Vec2 collides(Rect a, Rect b) {
+    if (
+        a.getX() > b.getX() + b.getWidth() || // a is to the right of b
+            a.getY() > b.getY() + b.getHeight() || // a is below b
+            b.getX() > a.getX() + a.getWidth() || // a is to the left of b
+            b.getY() > a.getY() + a.getHeight() // a is above b
+    ) {
+      // not colliding
+      return null;
+    }
+    // todo: how to calculate displacement?
+    return new Vec2(a.getX() - b.getX(), a.getY() - b.getY());
+  }
 
   public void checkFrame() {
     // checkObj(game.root);
     gameObjects.forEach(this::checkObj);
   }
 
-  public void checkObj(GameObject gameObject) {
-    /*
-    stack.push(tr.clone());
-
-    // Update object transform here. This will be the transform later used in rendering.
-    if (obj.pos) tr.translate(obj.pos);
-    if (obj.scale) tr.scale(obj.scale);
-    if (obj.angle) tr.rotate(obj.angle);
-    obj.transform = tr.clone();
-
-    if (obj.c("area") && !obj.paused) {
+  public void checkObj(GameObject obj) {
+    AreaComponent aobj = obj.getComponent(AreaComponent.class);
+    if (aobj != null && !obj.isPaused()) {
       // TODO: only update worldArea if transform changed
-                const aobj = obj as GameObj<AreaComp>;
-                const area = aobj.worldArea();
-                const bbox = area.bbox();
+      Rect area = aobj.worldArea();
 
-      // Get spatial hash grid coverage
-                const xmin = Math.floor(bbox.pos.x / cellSize);
-                const ymin = Math.floor(bbox.pos.y / cellSize);
-                const xmax = Math.ceil((bbox.pos.x + bbox.width) / cellSize);
-                const ymax = Math.ceil((bbox.pos.y + bbox.height) / cellSize);
+      for (GameObject other : gameObjects) {
+        if (other.isPaused()) continue;
+        // if (!other.exists()) continue;
 
-      // Cache objs that are already checked
-                const checked = new Set();
+        // TODO: if (checked.has(other.id)) continue;
+        // TODO: check collisionIgnore: should other ignore collisions with objects with specific tags
 
-      // insert & check against all covered grids
-      for (let x = xmin; x <= xmax; x++) {
-        for (let y = ymin; y <= ymax; y++) {
-          if (!grid[x]) {
-            grid[x] = {};
-            grid[x][y] = [aobj];
-          } else if (!grid[x][y]) {
-            grid[x][y] = [aobj];
-          } else {
-                            const cell = grid[x][y];
-            check: for (const other of cell) {
-              if (other.paused) continue;
-              if (!other.exists()) continue;
-              if (checked.has(other.id)) continue;
-              for (const tag of aobj.collisionIgnore) {
-                if (other.is(tag)) {
-                  continue check;
-                }
-              }
-              for (const tag of other.collisionIgnore) {
-                if (aobj.is(tag)) {
-                  continue check;
-                }
-              }
-              // TODO: cache the world area here
-                                const res = sat(
-                  aobj.worldArea(),
-                  other.worldArea(),
-                  );
-              if (res) {
-                // TODO: rehash if the object position is changed after resolution?
-                                    const col1 = new Collision(
-                    aobj,
-                    other,
-                    res,
-                    );
-                aobj.trigger("collideUpdate", other, col1);
-                                    const col2 = col1.reverse();
-                // resolution only has to happen once
-                col2.resolved = col1.resolved;
-                other.trigger("collideUpdate", aobj, col2);
-              }
-              checked.add(other.id);
-            }
-            cell.push(aobj);
-          }
+        Vec2 res = collides(area, other.get("worldArea"));
+        if (res != null) {
+          // TODO: rehash if the object position is changed after resolution?
+          Collision col1 = new Collision(obj, other, res);
+          obj.trigger("collideUpdate", other, col1);
+          Collision col2 = col1.reverse();
+          // resolution only has to happen once
+          col2.setResolved(col1.isResolved());
+          other.trigger("collideUpdate", aobj, col2);
         }
       }
     }
-
-    obj.children.forEach(checkObj);
-    tr = stack.pop();*/
   }
-
 }

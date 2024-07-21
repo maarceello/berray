@@ -34,7 +34,7 @@ public class SpriteComponent extends Component {
     DrawTexturePro(
         this.texture,
         new Rectangle(0, 0, this.texture.width(), this.texture.height()),
-        pos != null ? new Rectangle(pos.getPos().x(), pos.getPos().y(), texture.width(), texture.height()) : new Rectangle(0, 0, texture.width(), texture.height()),
+        pos != null ? new Rectangle(pos.getPos().getX(), pos.getPos().getY(), texture.width(), texture.height()) : new Rectangle(0, 0, texture.width(), texture.height()),
         new Vector2((float) this.texture.width() / 2, (float) this.texture.height() / 2),
         rotate != null ? rotate.getAngle() : 0,
         WHITE);

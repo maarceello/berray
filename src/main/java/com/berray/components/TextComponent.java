@@ -18,12 +18,10 @@ public class TextComponent extends Component {
     PosComponent pos = gameObject.getComponent(PosComponent.class);
 
     if (pos != null) {
-      DrawText(text, (int) pos.getPos().x(), (int) pos.getPos().y(), 20, BLACK);
+      DrawText(text, (int) pos.getPos().getX(), (int) pos.getPos().getY(), 20, BLACK);
     } else {
       DrawText(text, 0, 0, 20, BLACK);
     }
-
-
   }
 
   public static TextComponent text(String text) {

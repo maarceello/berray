@@ -3,10 +3,10 @@ package com.berray;
 import com.berray.components.Component;
 import com.berray.event.EventListener;
 import com.berray.event.EventManager;
+import com.berray.math.Collision;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class GameObject {
@@ -18,6 +18,8 @@ public class GameObject {
 
   private final Map<String, Supplier<?>> providedMethods = new HashMap<>();
   private final EventManager eventManager = new EventManager();
+
+  private boolean paused;
 
   public GameObject(int id) {
     this.id = id;
@@ -67,6 +69,12 @@ public class GameObject {
     providedMethods.put(name, method);
   }
 
+  /** calls component method registered with */
+  public <E> E get(String method) {
+    Supplier<?> supplier = providedMethods.get(method);
+    return supplier == null ? null : (E) supplier.get();
+  }
+
   public <E extends Component> E getComponent(Class<E> type) {
     return (E) components.get(type);
   }
@@ -78,5 +86,13 @@ public class GameObject {
   /** add event listener. */
   public void on(String event, EventListener listener) {
     eventManager.addEventListener(event, listener);
+  }
+
+  public boolean isPaused() {
+    return paused;
+  }
+
+  public void trigger(String eventName, Object ... params) {
+    eventManager.trigger(eventName, Arrays.asList(params));
   }
 }

@@ -1,5 +1,8 @@
 package com.berray.math;
 
+import com.raylib.Jaylib;
+import com.raylib.Raylib;
+
 public class Rect {
   private float x;
   private float y;
@@ -46,5 +49,9 @@ public class Rect {
 
   public void setHeight(float height) {
     this.height = height;
+  }
+
+  public Raylib.Rectangle toRectangle() {
+    return new Jaylib.Rectangle(x,y,width,height);
   }
 }

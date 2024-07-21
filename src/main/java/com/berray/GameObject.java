@@ -4,6 +4,7 @@ import com.berray.components.Component;
 import com.berray.event.EventListener;
 import com.berray.event.EventManager;
 
+
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
@@ -28,6 +29,7 @@ public class GameObject {
 
   /** child game objects. */
   private List<GameObject> children = new LinkedList<>();
+  private GameObject parent;
 
 
   public GameObject() {
@@ -35,8 +37,14 @@ public class GameObject {
     this.id = nextGameObjectId.incrementAndGet();
   }
 
+  public GameObject(GameObject parent) {
+    this();
+    this.parent = parent;
+  }
+
+
   public GameObject add(Object... components) {
-    GameObject gameObject = new GameObject();
+    GameObject gameObject = new GameObject(this);
     gameObject.addComponents(components);
     children.add(gameObject);
     // trigger add event for all other interested parties
@@ -57,6 +65,8 @@ public class GameObject {
         Component component = (Component) c;
         component.setId(nextComponentId.incrementAndGet());
         this.components.put(component.getClass(), component);
+        this.tags.add(component.getTag());
+        component.setGameObject(this);
       } else {
         throw new IllegalArgumentException("Component of type "+c.getClass()+" not supported. Either add a tag (String) or a component (Component)");
       }
@@ -69,7 +79,10 @@ public class GameObject {
         component.add(this);
       }
     }
+  }
 
+  public GameObject getParent() {
+    return parent;
   }
 
   public void addComponent(Component component) {
@@ -88,7 +101,7 @@ public class GameObject {
 
   public void draw() {
     for (Component c : components.values()) {
-      c.draw(this);
+      c.draw();
     }
     for (GameObject child : children) {
       child.draw();

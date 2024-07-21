@@ -1,16 +1,18 @@
 package com.berray.components;
 
 import com.berray.GameObject;
+import com.berray.math.Rect;
+import com.berray.math.Vec2;
 
-import static com.raylib.Jaylib.DrawTexturePro;
-import static com.raylib.Jaylib.Rectangle;
-import static com.raylib.Jaylib.Texture;
-import static com.raylib.Jaylib.Vector2;
-import static com.raylib.Jaylib.WHITE;
 import static com.berray.AssetManager.getSprite;
+import static com.raylib.Jaylib.Rectangle;
+import static com.raylib.Jaylib.Vector2;
+import static com.raylib.Jaylib.Texture;
+import static com.raylib.Jaylib.DrawTexturePro;
+import static com.raylib.Jaylib.WHITE;
 
 public class SpriteComponent extends Component {
-  public  Texture texture;
+  public Texture texture;
   private String anim = "none";
 
   // Construct
@@ -26,7 +28,7 @@ public class SpriteComponent extends Component {
   }
 
   @Override
-  public void draw(GameObject gameObject) {
+  public void draw() {
 
     PosComponent pos = gameObject.getComponent(PosComponent.class);
     RotateComponent rotate = gameObject.getComponent(RotateComponent.class);
@@ -40,9 +42,24 @@ public class SpriteComponent extends Component {
         WHITE);
 
   }
+
+  @Override
+  public void add(GameObject gameObject) {
+    gameObject.registerGetter("localArea", this::localArea);
+  }
+
+  private Rect localArea() {
+    Vec2 pos = gameObject.get("pos");
+    if (pos == null) {
+      return null;
+    }
+    int w = texture.width();
+    int h = texture.height();
+    return new Rect(pos.getX() - w / 2, pos.getY() - h / 2, w, h);
+  }
+
   // Static method to just call "sprite()" get the sprite from the asset manager and put in into the texture for the sprite component
   public static SpriteComponent sprite(String name) {
     return new SpriteComponent(getSprite(name));
   }
-
 }

@@ -21,9 +21,17 @@ public class Component {
     return id;
   }
 
+  public void setGameObject(GameObject gameObject) {
+    this.gameObject = gameObject;
+  }
+
+  public String getTag() {
+    return tag;
+  }
+
   // Static methods have no this in their scope
 
-  public void draw(GameObject gameObject) {}
+  public void draw() {}
   public void update(float deltaTime) {}
 
   public void add(GameObject gameObject) {

@@ -6,8 +6,7 @@ import com.berray.event.EventListener;
 import com.berray.math.Rect;
 import com.berray.math.Vec2;
 
-import static com.berray.components.PosComponent.pos;
-import static com.berray.components.RectComponent.rect;
+import static com.berray.components.DebugComponent.debug;
 import static com.raylib.Jaylib.*;
 import static com.raylib.Raylib.Color;
 
@@ -46,12 +45,13 @@ public abstract class BerrayApplication {
   public GameObject add(Object... component) {
     return game.add(component);
   }
+
   public void on(String event, EventListener listener) {
     game.on(event, listener);
   }
 
 
-  public void trigger(String event, Object...params) {
+  public void trigger(String event, Object... params) {
     game.trigger(event, params);
   }
 
@@ -82,12 +82,13 @@ public abstract class BerrayApplication {
     CloseWindow();
   }
 
-  /** Event callback which adds debug Infos to game objects. */
+  /**
+   * Event callback which adds debug Infos to game objects.
+   */
   private void addDebugInfos(Event event) {
     if (!debug) {
       return;
     }
-    GameObject parent = event.getParameter(0);
     GameObject gameObject = event.getParameter(1);
     // if the game object is already a debug object, ignore it
     if (gameObject.is("debug")) {
@@ -97,8 +98,7 @@ public abstract class BerrayApplication {
     Rect area = gameObject.get("worldArea");
     if (area != null) {
       gameObject.add(
-          pos(area.getX(), area.getY()),
-          rect(area.getWidth(), area.getHeight())
+          debug()
       );
     }
   }

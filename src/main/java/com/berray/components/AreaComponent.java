@@ -6,7 +6,7 @@ import com.berray.math.Rect;
 
 public class AreaComponent extends Component {
 
-  public AreaComponent(String tag) {
+  public AreaComponent() {
     super("area");
   }
 
@@ -36,5 +36,9 @@ public class AreaComponent extends Component {
       return null;
     }
     return rect;
+  }
+
+  public static AreaComponent area() {
+    return new AreaComponent();
   }
 }

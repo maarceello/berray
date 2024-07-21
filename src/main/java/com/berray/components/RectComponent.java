@@ -19,7 +19,7 @@ public class RectComponent extends Component {
   }
 
   @Override
-  public void draw(GameObject gameObject) {
+  public void draw() {
     PosComponent pos = gameObject.getComponent(PosComponent.class);
     RotateComponent rotate = gameObject.getComponent(RotateComponent.class);
 
@@ -45,6 +45,6 @@ public class RectComponent extends Component {
     if (pos == null) {
       return null;
     }
-    return new Rect(pos.getX(), pos.getY(), width, height);
+    return new Rect(pos.getX() - width / 2, pos.getY() - height / 2, width, height);
   }
 }

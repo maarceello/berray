@@ -15,6 +15,10 @@ public class Vec2 {
     this.y = y;
   }
 
+  public static Vec2 origin() {
+    return new Vec2(0.0f, 0.0f);
+  }
+
   public float getX() {
     return x;
   }

@@ -20,13 +20,20 @@ public class RectComponent extends Component {
 
   @Override
   public void draw() {
-    PosComponent pos = gameObject.getComponent(PosComponent.class);
-    RotateComponent rotate = gameObject.getComponent(RotateComponent.class);
+    Vec2 pos = gameObject.getOrDefault("pos", Vec2.origin());
+    Float angle = gameObject.getOrDefault("angle", 0f);
+    AnchorType anchor = gameObject.getOrDefault("anchor", AnchorType.CENTER);
+
+    float w2 = width/2;
+    float h2 = height/2;
+
+    float anchorX = w2 + anchor.getX() * w2;
+    float anchorY = h2 + anchor.getY() * h2;
 
     DrawRectanglePro(
-        pos != null ? new Jaylib.Rectangle(pos.getPos().getX(), pos.getPos().getY(), width, height) : new Jaylib.Rectangle(0, 0, width, height),
-        new Jaylib.Vector2((float) width / 2, (float) height / 2),
-        rotate != null ? rotate.getAngle() : 0,
+        new Jaylib.Rectangle(pos.getX(), pos.getY(), width, height),
+        new Jaylib.Vector2(anchorX, anchorY),
+        angle,
         WHITE);
 
   }

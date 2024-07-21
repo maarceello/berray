@@ -21,11 +21,14 @@ public class CircleComponent extends Component {
 
   @Override
   public void draw() {
+    Vec2 pos = gameObject.getOrDefault("pos", Vec2.origin());
+    AnchorType anchor = gameObject.getOrDefault("anchor", AnchorType.CENTER);
 
-    PosComponent pos = gameObject.getComponent(PosComponent.class);
+    float anchorX = anchor.getX() * radius;
+    float anchorY = anchor.getY() * radius;
 
     DrawCircleV(
-        pos != null ? pos.getPos().toVecor2() : new Vector2(0, 0),
+        new Vector2(pos.getX()-anchorX, pos.getY()-anchorY),
         radius,
         WHITE);
   }

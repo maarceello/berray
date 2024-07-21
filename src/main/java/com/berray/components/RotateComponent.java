@@ -15,6 +15,11 @@ public class RotateComponent extends Component {
     return angle;
   }
 
+  @Override
+  public void add(GameObject gameObject) {
+    gameObject.registerGetter("angle", this::getAngle);
+  }
+
   public static RotateComponent rotate(float angle) {
     return new RotateComponent(angle);
   }

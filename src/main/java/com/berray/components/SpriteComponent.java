@@ -5,10 +5,9 @@ import com.berray.math.Rect;
 import com.berray.math.Vec2;
 
 import static com.berray.AssetManager.getSprite;
-import static com.raylib.Jaylib.Rectangle;
 import static com.raylib.Jaylib.Vector2;
 import static com.raylib.Jaylib.Texture;
-import static com.raylib.Jaylib.DrawTexturePro;
+import static com.raylib.Jaylib.DrawTextureEx;
 import static com.raylib.Jaylib.WHITE;
 
 public class SpriteComponent extends Component {
@@ -29,16 +28,21 @@ public class SpriteComponent extends Component {
 
   @Override
   public void draw() {
+    Vec2 pos = gameObject.getOrDefault("pos", Vec2.origin());
+    Float angle = gameObject.getOrDefault("angle", 0f);
+    AnchorType anchor = gameObject.getOrDefault("anchor", AnchorType.CENTER);
 
-    PosComponent pos = gameObject.getComponent(PosComponent.class);
-    RotateComponent rotate = gameObject.getComponent(RotateComponent.class);
+    float w2 = texture.width() / 2.0f;
+    float h2 = texture.height() / 2.0f;
 
-    DrawTexturePro(
+    float anchorX = w2 + anchor.getX() * w2;
+    float anchorY = h2 + anchor.getY() * h2;
+
+    DrawTextureEx(
         this.texture,
-        new Rectangle(0, 0, this.texture.width(), this.texture.height()),
-        pos != null ? new Rectangle(pos.getPos().getX(), pos.getPos().getY(), texture.width(), texture.height()) : new Rectangle(0, 0, texture.width(), texture.height()),
-        new Vector2((float) this.texture.width() / 2, (float) this.texture.height() / 2),
-        rotate != null ? rotate.getAngle() : 0,
+        new Vector2(pos.getX() - anchorX, pos.getY() - anchorY),
+        angle,
+        1.0f,
         WHITE);
 
   }

@@ -1,10 +1,12 @@
 package com.berray;
 
 
+import com.berray.components.*;
 import com.berray.event.Event;
 import com.berray.event.EventListener;
 import com.berray.math.Rect;
 import com.berray.math.Vec2;
+import org.w3c.dom.Text;
 
 import static com.berray.components.DebugComponent.debug;
 import static com.raylib.Jaylib.*;
@@ -26,9 +28,21 @@ public abstract class BerrayApplication {
     return this;
   }
 
+  public int width() {
+    return width;
+  }
+
   public BerrayApplication height(int height) {
     this.height = height;
     return this;
+  }
+
+  public int height() {
+    return height;
+  }
+
+  public Vec2 center() {
+    return new Vec2(width / 2.0f, height / 2.0f);
   }
 
   public BerrayApplication title(String title) {
@@ -95,7 +109,7 @@ public abstract class BerrayApplication {
       return;
     }
     // add frame around the object
-    Rect area = gameObject.get("worldArea");
+    Rect area = gameObject.get("localArea");
     if (area != null) {
       gameObject.add(
           debug()
@@ -109,4 +123,29 @@ public abstract class BerrayApplication {
       game.trigger("mousePress", new Vec2(pos.x(), pos.y()));
     }
   }
+
+  // Shortcuts to some common base components
+  public PosComponent pos(float x, float y) {
+    return PosComponent.pos(x, y);
+  }
+  public PosComponent pos(Vec2 pos) {
+    return PosComponent.pos(pos);
+  }
+
+  public static RectComponent rect(float width, float height) {
+    return RectComponent.rect(width, height);
+  }
+
+  public static AnchorComponent anchor(AnchorType anchorType) {
+    return AnchorComponent.anchor(anchorType);
+  }
+
+  public static AreaComponent area() {
+    return AreaComponent.area();
+  }
+
+  public TextComponent text(String text) {
+    return TextComponent.text(text);
+  }
+
 }

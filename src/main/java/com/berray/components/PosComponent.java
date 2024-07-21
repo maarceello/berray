@@ -27,6 +27,9 @@ public class PosComponent extends Component {
   public static PosComponent pos(float x, float y) {
     return new PosComponent(new Vec2(x, y));
   }
+  public static PosComponent pos(Vec2 pos) {
+    return new PosComponent(pos);
+  }
 
   @Override
   public void add(GameObject gameObject) {

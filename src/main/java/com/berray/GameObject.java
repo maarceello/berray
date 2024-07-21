@@ -131,6 +131,10 @@ public class GameObject {
     getterMethods.put(name, method);
   }
 
+  public void registerSetter(String name, Consumer<?> setter) {
+    setterMethods.put(name, setter);
+  }
+
   public void addMethod(String name, Supplier<?> getter, Consumer<?> setter) {
     getterMethods.put(name, getter);
     setterMethods.put(name, setter);
@@ -144,6 +148,13 @@ public class GameObject {
     return getterMethid == null ? null : (E) getterMethid.get();
   }
 
+  /**
+   * returns registered component property
+   */
+  public <E> E getOrDefault(String property, E defaultValue) {
+    E value = get(property);
+    return value == null ? defaultValue : value;
+  }
   /**
    * sets registered component property
    */

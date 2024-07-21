@@ -36,7 +36,7 @@ public class GameObject {
    * event manager for game object local event.
    */
   private final EventManager eventManager = new EventManager();
-  private boolean paused;
+  private boolean paused = false;
 
   /**
    * child game objects.
@@ -56,6 +56,9 @@ public class GameObject {
     this.parent = parent;
   }
 
+  public int getId() {
+    return id;
+  }
 
   public GameObject add(Object... components) {
     GameObject gameObject = new GameObject(game, this);

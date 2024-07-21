@@ -8,7 +8,8 @@ import com.berray.math.Rect;
 import com.berray.math.Vec2;
 import com.raylib.Jaylib;
 
-import java.util.Arrays;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class Game {
   private int gravity;
@@ -62,17 +63,35 @@ public class Game {
   }
 
   public void checkFrame() {
-    // checkObj(game.root);
-    root.getChildren().forEach(this::checkObj);
+    // linearize the object tree
+    List<GameObject> gameObjects = new ArrayList<>();
+    for (GameObject gameObject : root.getChildren()) {
+      addGameObjects(gameObject, gameObjects);
+    }
+    // only keep game objects with area component
+    List<GameObject> areaObjects = gameObjects.stream().filter(gameObject -> gameObject.is("area")).collect(Collectors.toList());
+
+    for (int i = 0; i < areaObjects.size()-1; i++) {
+      checkObj(areaObjects.get(0), areaObjects.subList(i+1, areaObjects.size()));
+    }
+
   }
 
-  public void checkObj(GameObject obj) {
+  public void addGameObjects(GameObject current, List<GameObject> allGameObjects) {
+    allGameObjects.add(current);
+    for (GameObject gameObject : current.getChildren()) {
+      addGameObjects(gameObject, allGameObjects);
+    }
+  }
+
+
+  public void checkObj(GameObject obj, List<GameObject> others) {
     AreaComponent aobj = obj.getComponent(AreaComponent.class);
     if (aobj != null && !obj.isPaused()) {
       // TODO: only update worldArea if transform changed
       Rect area = aobj.worldArea();
 
-      for (GameObject other : root.getChildren()) {
+      for (GameObject other : others) {
         if (other.isPaused()) continue;
         // if (!other.exists()) continue;
 
@@ -87,7 +106,7 @@ public class Game {
           Collision col2 = col1.reverse();
           // resolution only has to happen once
           col2.setResolved(col1.isResolved());
-          other.trigger("collideUpdate", aobj, col2);
+          other.trigger("collideUpdate", obj, col2);
         }
       }
     }

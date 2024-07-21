@@ -57,4 +57,8 @@ public class Vec2 {
   public Raylib.Vector2 toVecor2() {
     return new Jaylib.Vector2(x, y);
   }
+
+  public Vec2 negate() {
+    return new Vec2(-x, -y);
+  }
 }

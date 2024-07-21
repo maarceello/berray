@@ -6,7 +6,6 @@ import com.berray.event.Event;
 import com.berray.event.EventListener;
 import com.berray.math.Rect;
 import com.berray.math.Vec2;
-import org.w3c.dom.Text;
 
 import static com.berray.components.DebugComponent.debug;
 import static com.raylib.Jaylib.*;
@@ -86,6 +85,7 @@ public abstract class BerrayApplication {
 
     SetTargetFPS(60);
     while (!WindowShouldClose()) {
+      game.checkFrame();
       game.update();
       BeginDrawing();
       ClearBackground(background);

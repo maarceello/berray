@@ -88,9 +88,11 @@ public abstract class BerrayApplication {
       game.checkFrame();
       game.update();
       BeginDrawing();
-      ClearBackground(background);
-      game.draw();
-      processInputs();
+      {
+        ClearBackground(background);
+        game.draw();
+        processInputs();
+      }
       EndDrawing();
     }
     CloseWindow();
@@ -155,5 +157,6 @@ public abstract class BerrayApplication {
   public TextComponent text(String text) {
     return TextComponent.text(text);
   }
+
 
 }

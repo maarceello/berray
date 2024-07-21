@@ -52,7 +52,7 @@ public class AreaComponent extends Component {
 
   public void onUpdate(Event event) {
     // check each object which is in the collision set.
-    Iterator<Integer> iterator = collidingThisFrame.iterator();
+    Iterator<Integer> iterator = colliding.keySet().iterator();
     while (iterator.hasNext()) {
       Integer id = iterator.next();
       // does this object collided this frame also?

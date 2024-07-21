@@ -72,7 +72,7 @@ public class Game {
     List<GameObject> areaObjects = gameObjects.stream().filter(gameObject -> gameObject.is("area")).collect(Collectors.toList());
 
     for (int i = 0; i < areaObjects.size()-1; i++) {
-      checkObj(areaObjects.get(0), areaObjects.subList(i+1, areaObjects.size()));
+      checkObj(areaObjects.get(i), areaObjects.subList(i+1, areaObjects.size()));
     }
 
   }

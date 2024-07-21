@@ -11,20 +11,42 @@ import java.util.function.Supplier;
 
 public class GameObject {
   private static final AtomicInteger nextComponentId = new AtomicInteger(0);
+  private static final AtomicInteger nextGameObjectId = new AtomicInteger( 0);
   private int id;
-  /** Custom Tags. */
+  /** Tags. */
   private Set<String> tags = new HashSet<>();
+  /** Components for this game object. */
   private final Map<Class<?>,Component> components;
 
+  /** registered getter methods from components. */
   private final Map<String, Supplier<?>> getterMethods = new HashMap<>();
+  /** registered setter methods from components. */
   private final Map<String, Consumer<?>> setterMethods = new HashMap<>();
+  /** event manager for game object local event. */
   private final EventManager eventManager = new EventManager();
-
   private boolean paused;
 
-  public GameObject(int id) {
-    this.id = id;
+  /** child game objects. */
+  private List<GameObject> children = new LinkedList<>();
+
+
+  public GameObject() {
     this.components = new LinkedHashMap<>();
+    this.id = nextGameObjectId.incrementAndGet();
+  }
+
+  public GameObject add(Object... components) {
+    GameObject gameObject = new GameObject();
+    gameObject.addComponents(components);
+    children.add(gameObject);
+    // trigger add event for all other interested parties
+    trigger("add", this, gameObject);
+
+    return gameObject;
+  }
+
+  public List<GameObject> getChildren() {
+    return children;
   }
 
   public void addComponents(Object[] components) {
@@ -43,6 +65,7 @@ public class GameObject {
     for (Object c : components) {
       if (c instanceof Component) {
         Component component = (Component) c;
+        // trigger add event for the current component
         component.add(this);
       }
     }
@@ -53,12 +76,22 @@ public class GameObject {
     this.components.put(component.getClass(), component);
   }
 
-  public void update() {
+  public void update(float frameTime) {
+    for (Component component : components.values()) {
+      component.update(frameTime);
+    }
+
+    for (GameObject child : children) {
+      child.update(frameTime);
+    }
   }
 
   public void draw() {
     for (Component c : components.values()) {
       c.draw(this);
+    }
+    for (GameObject child : children) {
+      child.draw();
     }
   }
 

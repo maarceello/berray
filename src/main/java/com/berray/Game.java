@@ -6,50 +6,43 @@ import com.berray.event.EventManager;
 import com.berray.math.Collision;
 import com.berray.math.Rect;
 import com.berray.math.Vec2;
+import com.raylib.Jaylib;
 
 import java.util.Arrays;
-import java.util.LinkedList;
 
 public class Game {
   private int gravity;
-  private int nextGameObjectId = 0;
-  private final LinkedList<GameObject> gameObjects;
+  private final GameObject root;
 
   private EventManager eventManager = new EventManager();
 
-
-  private int width;
-  private int height;
-
   // Constructor
   public Game() {
-    this.gameObjects = new LinkedList<>();
+    root = new GameObject();
     init();
   }
 
   public void init() {
+    // forward game objects adds to game event manager
+    root.on("add", event -> eventManager.trigger(event.getName(), event.getParameters()));
   }
 
-  // Add a game object to the game
+  /** Add a game object to the game */
   public GameObject add(Object... components) {
-    GameObject gameObject = new GameObject(nextGameObjectId++);
-    gameObject.addComponents(components);
-    gameObjects.add(gameObject);
-    return gameObject;
+    GameObject newGameObject = root.add(components);
+    // forward add events from the new game object to game event manager
+    newGameObject.on("add", event -> eventManager.trigger(event.getName(), event.getParameters()));
+    return newGameObject;
   }
 
-  // Update all game objects
+  /** Update all game objects */
   public void update() {
-    for (GameObject gameObject : gameObjects) {
-      gameObject.update();
-    }
+    root.update(Jaylib.GetFrameTime());
   }
 
   // Draw all game objects
   public void draw() {
-    for (GameObject gameObject : gameObjects) {
-      gameObject.draw();
-    }
+    root.draw();
   }
 
   private Vec2 collides(Rect a, Rect b) {
@@ -68,7 +61,7 @@ public class Game {
 
   public void checkFrame() {
     // checkObj(game.root);
-    gameObjects.forEach(this::checkObj);
+    root.getChildren().forEach(this::checkObj);
   }
 
   public void checkObj(GameObject obj) {
@@ -77,7 +70,7 @@ public class Game {
       // TODO: only update worldArea if transform changed
       Rect area = aobj.worldArea();
 
-      for (GameObject other : gameObjects) {
+      for (GameObject other : root.getChildren()) {
         if (other.isPaused()) continue;
         // if (!other.exists()) continue;
 

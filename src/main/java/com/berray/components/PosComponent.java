@@ -24,7 +24,7 @@ public class PosComponent extends Component {
   }
 
   // Static method to just call "pos()"
-  public static PosComponent pos(int x, int y) {
+  public static PosComponent pos(float x, float y) {
     return new PosComponent(new Vec2(x, y));
   }
 

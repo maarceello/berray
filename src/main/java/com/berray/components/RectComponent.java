@@ -3,17 +3,16 @@ package com.berray.components;
 import com.berray.GameObject;
 import com.berray.math.Rect;
 import com.berray.math.Vec2;
+import com.raylib.Jaylib;
 
-import static com.raylib.Jaylib.Vector2;
-import static com.raylib.Jaylib.Rectangle;
 import static com.raylib.Jaylib.DrawRectanglePro;
 import static com.raylib.Jaylib.WHITE;
 
 public class RectComponent extends Component {
-  private final int width;
-  private final int height;
+  private final float width;
+  private final float height;
 
-  public RectComponent(int width, int height) {
+  public RectComponent(float width, float height) {
     super("rect");
     this.width = width;
     this.height = height;
@@ -25,22 +24,14 @@ public class RectComponent extends Component {
     RotateComponent rotate = gameObject.getComponent(RotateComponent.class);
 
     DrawRectanglePro(
-        pos != null ? new Rectangle(pos.getPos().getX(), pos.getPos().getY(), width, height) : new Rectangle(0, 0, width, height),
-        new Vector2((float) width / 2, (float) height / 2),
+        pos != null ? new Jaylib.Rectangle(pos.getPos().getX(), pos.getPos().getY(), width, height) : new Jaylib.Rectangle(0, 0, width, height),
+        new Jaylib.Vector2((float) width / 2, (float) height / 2),
         rotate != null ? rotate.getAngle() : 0,
         WHITE);
 
   }
 
-  public int getWidth() {
-    return width;
-  }
-
-  public int getHeight() {
-    return height;
-  }
-
-  public static RectComponent rect(int width, int height) {
+  public static RectComponent rect(float width, float height) {
     return new RectComponent(width, height);
   }
 

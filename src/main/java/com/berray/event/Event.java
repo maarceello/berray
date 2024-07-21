@@ -21,4 +21,8 @@ public class Event {
   public List<Object> getParameters() {
     return parameters;
   }
+
+  public <E> E getParameter(int i) {
+    return (E) parameters.get(i);
+  }
 }

@@ -1,11 +1,11 @@
 package com.berray;
 
 
+import com.berray.event.EventListener;
+import com.berray.math.Vec2;
+
 import static com.raylib.Jaylib.*;
 import static com.raylib.Raylib.Color;
-
-
-import com.berray.components.Component;
 
 
 public abstract class BerrayApplication {
@@ -37,10 +37,18 @@ public abstract class BerrayApplication {
     return this;
   }
 
-
   public GameObject add(Object... component) {
     return game.add(component);
   }
+  public void on(String event, EventListener listener) {
+    game.on(event, listener);
+  }
+
+
+  public void trigger(String event, Object...params) {
+    game.trigger(event, params);
+  }
+
 
   public abstract void initGame();
 
@@ -61,8 +69,16 @@ public abstract class BerrayApplication {
       BeginDrawing();
       ClearBackground(background);
       game.draw();
+      processInputs();
       EndDrawing();
     }
     CloseWindow();
+  }
+
+  private void processInputs() {
+    if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+      com.raylib.Raylib.Vector2 pos = GetMousePosition();
+      game.trigger("mousePress", new Vec2(pos.x(), pos.y()));
+    }
   }
 }

@@ -4,8 +4,6 @@ import com.berray.GameObject;
 import com.berray.math.Rect;
 import com.berray.math.Vec2;
 
-import java.util.function.Supplier;
-
 import static com.raylib.Jaylib.Vector2;
 import static com.raylib.Jaylib.Rectangle;
 import static com.raylib.Jaylib.DrawRectanglePro;
@@ -48,7 +46,7 @@ public class RectComponent extends Component {
 
   @Override
   public void add(GameObject gameObject) {
-    gameObject.addMethod("localArea", this::localArea);
+    gameObject.registerGetter("localArea", this::localArea);
   }
 
   private Rect localArea() {

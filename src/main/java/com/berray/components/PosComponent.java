@@ -3,8 +3,10 @@ package com.berray.components;
 import com.berray.GameObject;
 import com.berray.math.Vec2;
 
+import java.util.function.Consumer;
+
 public class PosComponent extends Component {
-  private final Vec2 pos;
+  private Vec2 pos;
 
   // Constructor
   public PosComponent(Vec2 pos) {
@@ -17,6 +19,10 @@ public class PosComponent extends Component {
     return pos;
   }
 
+  public void setPos(Vec2 pos) {
+    this.pos = pos;
+  }
+
   // Static method to just call "pos()"
   public static PosComponent pos(int x, int y) {
     return new PosComponent(new Vec2(x, y));
@@ -24,6 +30,7 @@ public class PosComponent extends Component {
 
   @Override
   public void add(GameObject gameObject) {
-    gameObject.addMethod("pos", this::getPos);
+    Consumer<Vec2> consumer = this::setPos;
+    gameObject.addMethod("pos", this::getPos, consumer);
   }
 }

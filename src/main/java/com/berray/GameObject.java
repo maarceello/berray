@@ -3,10 +3,10 @@ package com.berray;
 import com.berray.components.Component;
 import com.berray.event.EventListener;
 import com.berray.event.EventManager;
-import com.berray.math.Collision;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public class GameObject {
@@ -16,7 +16,8 @@ public class GameObject {
   private Set<String> tags = new HashSet<>();
   private final Map<Class<?>,Component> components;
 
-  private final Map<String, Supplier<?>> providedMethods = new HashMap<>();
+  private final Map<String, Supplier<?>> getterMethods = new HashMap<>();
+  private final Map<String, Consumer<?>> setterMethods = new HashMap<>();
   private final EventManager eventManager = new EventManager();
 
   private boolean paused;
@@ -65,14 +66,26 @@ public class GameObject {
     return tags.contains(tag);
   }
 
-  public void addMethod(String name, Supplier<?> method) {
-    providedMethods.put(name, method);
+  public void registerGetter(String name, Supplier<?> method) {
+    getterMethods.put(name, method);
+  }
+  public void addMethod(String name, Supplier<?> getter, Consumer<?> setter) {
+    getterMethods.put(name, getter);
+    setterMethods.put(name, setter);
   }
 
-  /** calls component method registered with */
-  public <E> E get(String method) {
-    Supplier<?> supplier = providedMethods.get(method);
-    return supplier == null ? null : (E) supplier.get();
+  /** returns registered component property */
+  public <E> E get(String property) {
+    Supplier<?> getterMethid = getterMethods.get(property);
+    return getterMethid == null ? null : (E) getterMethid.get();
+  }
+
+  /** sets registered component property */
+  public <E> void set(String property, E value) {
+    Consumer<E> setterMethod = (Consumer<E>) setterMethods.get(property);
+    if (setterMethod != null) {
+      setterMethod.accept(value);
+    }
   }
 
   public <E extends Component> E getComponent(Class<E> type) {

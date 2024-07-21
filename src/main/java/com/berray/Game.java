@@ -1,16 +1,21 @@
 package com.berray;
 
 import com.berray.components.AreaComponent;
+import com.berray.event.EventListener;
+import com.berray.event.EventManager;
 import com.berray.math.Collision;
 import com.berray.math.Rect;
 import com.berray.math.Vec2;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 
 public class Game {
   private int gravity;
   private int nextGameObjectId = 0;
   private final LinkedList<GameObject> gameObjects;
+
+  private EventManager eventManager = new EventManager();
 
 
   private int width;
@@ -91,5 +96,14 @@ public class Game {
         }
       }
     }
+  }
+
+  public void on(String event, EventListener listener) {
+    eventManager.addEventListener(event, listener);
+  }
+
+
+  public void trigger(String event, Object...params) {
+    eventManager.trigger(event, Arrays.asList(params));
   }
 }

@@ -1,7 +1,6 @@
 package com.berray.event;
 
-import com.berray.GameObject;
-
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -9,7 +8,7 @@ import java.util.Map;
 public class EventManager {
 
   /** event-name -> registered event listeners. */
-  private Map<String, EventListeners> eventListenersMap;
+  private Map<String, EventListeners> eventListenersMap = new HashMap<>();
 
 
   public void addEventListener(String event, EventListener eventListener) {

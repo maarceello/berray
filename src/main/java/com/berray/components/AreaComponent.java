@@ -16,7 +16,7 @@ public class AreaComponent extends Component {
     gameObject.on("hover", this::onHover);
     gameObject.on("collideUpdate", this::onCollideUpdate);
 
-    gameObject.addMethod("worldArea", this::worldArea);
+    gameObject.registerGetter("worldArea", this::worldArea);
   }
 
   public void onHover(Event event) {

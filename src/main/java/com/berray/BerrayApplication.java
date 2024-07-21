@@ -12,7 +12,7 @@ import static com.raylib.Raylib.Color;
 
 
 public abstract class BerrayApplication {
-  private Game game;
+  protected Game game;
   private int width = 800;
   private int height = 640;
   private Color background = WHITE;

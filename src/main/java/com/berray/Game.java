@@ -18,13 +18,15 @@ public class Game {
 
   // Constructor
   public Game() {
-    root = new GameObject();
+    root = new GameObject(this);
     init();
   }
 
   public void init() {
     // forward game objects adds to game event manager
     root.on("add", event -> eventManager.trigger(event.getName(), event.getParameters()));
+    // forward update events down the object tree
+    on("update", event -> root.trigger(event.getName(), event.getParameters()));
   }
 
   /** Add a game object to the game */
@@ -99,4 +101,18 @@ public class Game {
   public void trigger(String event, Object...params) {
     eventManager.trigger(event, Arrays.asList(params));
   }
+
+  /** Update all game objects */
+  public void onUpdate(String tag, EventListener eventListener) {
+    on("update", event -> {
+      GameObject gameObject = event.getParameter(0);
+      // only propagate event when the object has the required tag
+      if (gameObject.is(tag)) {
+        eventListener.onEvent(event);
+      }
+    });
+
+  }
+
+
 }

@@ -12,45 +12,70 @@ import java.util.function.Supplier;
 
 public class GameObject {
   private static final AtomicInteger nextComponentId = new AtomicInteger(0);
-  private static final AtomicInteger nextGameObjectId = new AtomicInteger( 0);
+  private static final AtomicInteger nextGameObjectId = new AtomicInteger(0);
   private int id;
-  /** Tags. */
+  /**
+   * Tags.
+   */
   private Set<String> tags = new HashSet<>();
-  /** Components for this game object. */
-  private final Map<Class<?>,Component> components;
+  /**
+   * Components for this game object.
+   */
+  private final Map<Class<?>, Component> components;
 
-  /** registered getter methods from components. */
+  /**
+   * registered getter methods from components.
+   */
   private final Map<String, Supplier<?>> getterMethods = new HashMap<>();
-  /** registered setter methods from components. */
+  /**
+   * registered setter methods from components.
+   */
   private final Map<String, Consumer<?>> setterMethods = new HashMap<>();
-  /** event manager for game object local event. */
+  /**
+   * event manager for game object local event.
+   */
   private final EventManager eventManager = new EventManager();
   private boolean paused;
 
-  /** child game objects. */
+  /**
+   * child game objects.
+   */
   private List<GameObject> children = new LinkedList<>();
   private GameObject parent;
+  private final Game game;
 
-
-  public GameObject() {
+  public GameObject(Game game) {
     this.components = new LinkedHashMap<>();
     this.id = nextGameObjectId.incrementAndGet();
+    this.game = game;
   }
 
-  public GameObject(GameObject parent) {
-    this();
+  public GameObject(Game game, GameObject parent) {
+    this(game);
     this.parent = parent;
   }
 
 
   public GameObject add(Object... components) {
-    GameObject gameObject = new GameObject(this);
+    GameObject gameObject = new GameObject(game, this);
     gameObject.addComponents(components);
     children.add(gameObject);
     // trigger add event for all other interested parties
     trigger("add", this, gameObject);
 
     return gameObject;
+  }
+
+  public void update(float frameTime) {
+    // skip paused objects (and all of their children
+    if (this.paused) {
+      return;
+    }
+    // first update all children, then the object itself (depth first traversal)
+    this.children.forEach((child) -> child.update(frameTime));
+    this.trigger("update", frameTime);
+    // trigger game also, to tag bases listeners get notified
+    this.game.trigger("update", this, frameTime);
   }
 
   public List<GameObject> getChildren() {
@@ -68,7 +93,7 @@ public class GameObject {
         this.tags.add(component.getTag());
         component.setGameObject(this);
       } else {
-        throw new IllegalArgumentException("Component of type "+c.getClass()+" not supported. Either add a tag (String) or a component (Component)");
+        throw new IllegalArgumentException("Component of type " + c.getClass() + " not supported. Either add a tag (String) or a component (Component)");
       }
     }
     // notify component that it was added
@@ -89,16 +114,6 @@ public class GameObject {
     this.components.put(component.getClass(), component);
   }
 
-  public void update(float frameTime) {
-    for (Component component : components.values()) {
-      component.update(frameTime);
-    }
-
-    for (GameObject child : children) {
-      child.update(frameTime);
-    }
-  }
-
   public void draw() {
     for (Component c : components.values()) {
       c.draw();
@@ -115,18 +130,23 @@ public class GameObject {
   public void registerGetter(String name, Supplier<?> method) {
     getterMethods.put(name, method);
   }
+
   public void addMethod(String name, Supplier<?> getter, Consumer<?> setter) {
     getterMethods.put(name, getter);
     setterMethods.put(name, setter);
   }
 
-  /** returns registered component property */
+  /**
+   * returns registered component property
+   */
   public <E> E get(String property) {
     Supplier<?> getterMethid = getterMethods.get(property);
     return getterMethid == null ? null : (E) getterMethid.get();
   }
 
-  /** sets registered component property */
+  /**
+   * sets registered component property
+   */
   public <E> void set(String property, E value) {
     Consumer<E> setterMethod = (Consumer<E>) setterMethods.get(property);
     if (setterMethod != null) {
@@ -142,7 +162,9 @@ public class GameObject {
     tags.add(tag);
   }
 
-  /** add event listener. */
+  /**
+   * add event listener.
+   */
   public void on(String event, EventListener listener) {
     eventManager.addEventListener(event, listener);
   }
@@ -151,7 +173,7 @@ public class GameObject {
     return paused;
   }
 
-  public void trigger(String eventName, Object ... params) {
+  public void trigger(String eventName, Object... params) {
     eventManager.trigger(eventName, Arrays.asList(params));
   }
 }

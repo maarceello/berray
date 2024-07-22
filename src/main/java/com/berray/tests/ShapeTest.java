@@ -23,7 +23,7 @@ public class ShapeTest  extends BerrayApplication {
   }
 
   @Override
-  public void initGame() {
+  public void game() {
 
     loadSprite("berry", "resources/berry.png");
     loadMusic("wind", "resources/wind.mp3");
@@ -31,8 +31,7 @@ public class ShapeTest  extends BerrayApplication {
     debug = true;
 
     GameObject infoTxt = add(
-        text("Hello im a berry"),
-        area()
+        text("Hello im a berry")
     );
 
     GameObject startTxt = add(

@@ -69,7 +69,7 @@ public abstract class BerrayApplication {
   }
 
 
-  public abstract void initGame();
+  public abstract void game();
 
   public abstract void initWindow();
 
@@ -81,7 +81,7 @@ public abstract class BerrayApplication {
     this.game = new Game();
     game.on("add", this::addDebugInfos);
 
-    initGame();
+    game();
 
     SetTargetFPS(60);
     while (!WindowShouldClose()) {

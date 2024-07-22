@@ -43,11 +43,15 @@ public class GameObject {
    */
   private List<GameObject> children = new LinkedList<>();
   private GameObject parent;
-  private final Game game;
+  private Game game;
 
-  public GameObject(Game game) {
+  public GameObject() {
     this.components = new LinkedHashMap<>();
     this.id = nextGameObjectId.incrementAndGet();
+  }
+
+  public GameObject(Game game) {
+    this();
     this.game = game;
   }
 
@@ -63,12 +67,18 @@ public class GameObject {
   public GameObject add(Object... components) {
     GameObject gameObject = new GameObject(game, this);
     gameObject.addComponents(components);
-    children.add(gameObject);
     // trigger add event for all other interested parties
-    trigger("add", this, gameObject);
-
+    addChild(gameObject);
     return gameObject;
   }
+
+  public void addChild(GameObject other) {
+    children.add(other);
+    other.parent = this;
+    other.game = this.game;
+    trigger("add", this, other);
+  }
+
 
   public void update(float frameTime) {
     // skip paused objects (and all of their children
@@ -86,7 +96,7 @@ public class GameObject {
     return children;
   }
 
-  public void addComponents(Object[] components) {
+  public void addComponents(Object... components) {
     for (Object c : components) {
       if (c instanceof String) {
         addTag(c.toString());
@@ -148,8 +158,8 @@ public class GameObject {
    * returns registered component property
    */
   public <E> E get(String property) {
-    Supplier<?> getterMethid = getterMethods.get(property);
-    return getterMethid == null ? null : (E) getterMethid.get();
+    Supplier<?> getterMethod = getterMethods.get(property);
+    return getterMethod == null ? null : (E) getterMethod.get();
   }
 
   /**

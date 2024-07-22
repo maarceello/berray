@@ -10,7 +10,7 @@ import static com.berray.components.SpriteComponent.sprite;
 
 public class AnchorTest extends BerrayApplication {
   @Override
-  public void initGame() {
+  public void game() {
     loadSprite("berry", "resources/berry.png");
 
     debug = true;

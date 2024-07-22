@@ -38,6 +38,12 @@ public class Game {
     return newGameObject;
   }
 
+  /** Add a game object to the game */
+  public void addChild(GameObject child) {
+    root.addChild(child);
+  }
+
+
   /** Update all game objects */
   public void update() {
     root.update(Jaylib.GetFrameTime());

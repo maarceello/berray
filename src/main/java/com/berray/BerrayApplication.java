@@ -1,35 +1,162 @@
 package com.berray;
 
-import static com.raylib.Jaylib.RAYWHITE;
-import static com.raylib.Raylib.*;
 
-import com.berray.components.Component;
+import com.berray.components.*;
+import com.berray.event.Event;
+import com.berray.event.EventListener;
+import com.berray.math.Rect;
+import com.berray.math.Vec2;
+
+import static com.berray.components.DebugComponent.debug;
+import static com.raylib.Jaylib.*;
+import static com.raylib.Raylib.Color;
+
 
 public abstract class BerrayApplication {
-  private Game game;
+  protected Game game;
+  private int width = 800;
+  private int height = 640;
+  private Color background = WHITE;
+  private String title = "Berry Application";
 
-  public void add(Component... component) {
-    game.add(component);
+  protected boolean debug = false;
+
+
+  public BerrayApplication width(int width) {
+    this.width = width;
+    return this;
   }
 
-  public abstract void init();
+  public int width() {
+    return width;
+  }
 
-  public void run() {
-    int screenWidth = 800;
-    int screenHeight = 450;
-    InitWindow(screenWidth, screenHeight, "Raylib Java");
+  public BerrayApplication height(int height) {
+    this.height = height;
+    return this;
+  }
+
+  public int height() {
+    return height;
+  }
+
+  public Vec2 center() {
+    return new Vec2(width / 2.0f, height / 2.0f);
+  }
+
+  public BerrayApplication title(String title) {
+    this.title = title;
+    return this;
+  }
+
+  // TODO: Accept a Ray Color or an Array [r, g, b, a]
+  public BerrayApplication background(Color background) {
+    this.background = background;
+    return this;
+  }
+
+  public GameObject add(Object... component) {
+    return game.add(component);
+  }
+
+  public void on(String event, EventListener listener) {
+    game.on(event, listener);
+  }
+
+
+  public void trigger(String event, Object... params) {
+    game.trigger(event, params);
+  }
+
+
+  public abstract void initGame();
+
+  public abstract void initWindow();
+
+
+  public void runGame() {
+    initWindow();
+    InitWindow(width, height, title);
 
     this.game = new Game();
-    init();
+    game.on("add", this::addDebugInfos);
+
+    initGame();
 
     SetTargetFPS(60);
     while (!WindowShouldClose()) {
+      game.checkFrame();
       game.update();
       BeginDrawing();
-      ClearBackground(RAYWHITE);
-      game.draw();
+      {
+        ClearBackground(background);
+        game.draw();
+        processInputs();
+      }
       EndDrawing();
     }
     CloseWindow();
   }
+
+  /**
+   * Event callback which adds debug Infos to game objects.
+   */
+  private void addDebugInfos(Event event) {
+    if (!debug) {
+      return;
+    }
+    GameObject gameObject = event.getParameter(1);
+    // if the game object is already a debug object, ignore it
+    if (gameObject.is("debug")) {
+      return;
+    }
+    // add frame around the object
+    Rect area = gameObject.get("localArea");
+    if (area != null) {
+      gameObject.add(
+          debug()
+      );
+    }
+  }
+
+  private void processInputs() {
+    if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+      com.raylib.Raylib.Vector2 pos = GetMousePosition();
+      game.trigger("mousePress", new Vec2(pos.x(), pos.y()));
+    }
+  }
+
+  // Shortcuts to some common base components
+  public PosComponent pos(float x, float y) {
+    return PosComponent.pos(x, y);
+  }
+  public PosComponent pos(Vec2 pos) {
+    return PosComponent.pos(pos);
+  }
+
+  public static RectComponent rect(float width, float height) {
+    return RectComponent.rect(width, height);
+  }
+
+  public static CircleComponent circle(float radius) {
+    return CircleComponent.circle(radius);
+  }
+
+  public static AnchorComponent anchor(AnchorType anchorType) {
+    return AnchorComponent.anchor(anchorType);
+  }
+
+  public static AreaComponent area() {
+    return AreaComponent.area();
+  }
+
+  public static AreaComponent area(Rect shape) {
+    return AreaComponent.area(shape);
+  }
+
+  public TextComponent text(String text) {
+    return TextComponent.text(text);
+  }
+
+
 }

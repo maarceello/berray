@@ -1,22 +1,40 @@
 package com.berray.components;
 
-public class Component {
-  private int id;
-  private final int type;
+import com.berray.GameObject;
 
-  public Component(int type) {
-    this.type = type;
+public class Component {
+  /** "name" of the component, also used as a tag. */
+  private String tag;
+  private int id;
+
+  /** Gameobject this component is added to. */
+  protected GameObject gameObject;
+
+  public Component(String tag) {
+    this.tag = tag;
   }
 
   public void setId(int id) {
     this.id = id;
   }
-
-  public int getType() {
-    return type;
-  }
-
   public int getId() {
     return id;
+  }
+
+  public void setGameObject(GameObject gameObject) {
+    this.gameObject = gameObject;
+  }
+
+  public String getTag() {
+    return tag;
+  }
+
+  // Static methods have no this in their scope
+
+  public void draw() {}
+  public void update(float deltaTime) {}
+
+  public void add(GameObject gameObject) {
+    this.gameObject = gameObject;
   }
 }

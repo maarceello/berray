@@ -3,6 +3,8 @@ package com.berray;
 import com.berray.components.Component;
 import com.berray.event.EventListener;
 import com.berray.event.EventManager;
+import com.berray.math.Matrix4;
+import com.berray.math.Vec2;
 
 
 import java.util.*;
@@ -44,6 +46,19 @@ public class GameObject {
   private List<GameObject> children = new LinkedList<>();
   private GameObject parent;
   protected Game game;
+  /**
+   * local transformation relative to the parent.
+   */
+  protected Matrix4 localTransform = Matrix4.identity();
+  /**
+   * transformation relative to the world.
+   */
+  protected Matrix4 worldTransform;
+  /**
+   * true when the local transformation is changed and therefore the world transformation
+   * must be recalculated.
+   */
+  protected boolean transformDirty = true;
 
   public GameObject() {
     this.components = new LinkedHashMap<>();
@@ -96,7 +111,9 @@ public class GameObject {
     return children;
   }
 
-  /** only for classes extending GameObject: add components to this game object and trigger "add" event. */
+  /**
+   * only for classes extending GameObject: add components to this game object and trigger "add" event.
+   */
   protected void addComponents(Object... components) {
     for (Object c : components) {
       if (c instanceof String) {
@@ -170,6 +187,7 @@ public class GameObject {
     E value = get(property);
     return value == null ? defaultValue : value;
   }
+
   /**
    * sets registered component property
    */
@@ -211,7 +229,9 @@ public class GameObject {
     eventManager.trigger(eventName, Arrays.asList(params));
   }
 
-  /** Update all game objects */
+  /**
+   * Update all game objects
+   */
   public void onCollide(String tag, EventListener eventListener) {
     on("collide", event -> {
       GameObject gameObject = event.getParameter(0);
@@ -220,7 +240,39 @@ public class GameObject {
         eventListener.onEvent(event);
       }
     });
+  }
 
+  /**
+   * marks the objects that the world transformation should be recalculated .
+   */
+  public void setTransformDirty() {
+    transformDirty = true;
+  }
+
+  /**
+   * Returns true when this object or a parent is dirty.
+   */
+  public boolean isTransformDirty() {
+    // do we have a parent and are *not* dirty?
+    if (parent != null && !transformDirty) {
+      // yes. if the parent is dirty, set us dirty too.
+      boolean parentDirty = parent.isTransformDirty();
+      if (parentDirty) {
+        this.transformDirty = true;
+      }
+    }
+    // return dirty flag which may be copied from parent
+    return transformDirty;
+  }
+
+  public Matrix4 getWorldTransform() {
+    if (transformDirty) {
+      Vec2 pos = getOrDefault("pos", Vec2.origin());
+      localTransform = Matrix4.fromTranslate(pos.getX(), pos.getY(), 0);
+      worldTransform = parent == null ? localTransform : localTransform.multiply(parent.getWorldTransform());
+      transformDirty = false;
+    }
+    return worldTransform;
   }
 
 }

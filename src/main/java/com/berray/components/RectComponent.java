@@ -24,8 +24,8 @@ public class RectComponent extends Component {
     Float angle = gameObject.getOrDefault("angle", 0f);
     AnchorType anchor = gameObject.getOrDefault("anchor", AnchorType.CENTER);
 
-    float w2 = width/2;
-    float h2 = height/2;
+    float w2 = width / 2;
+    float h2 = height / 2;
 
     float anchorX = w2 + anchor.getX() * w2;
     float anchorY = h2 + anchor.getY() * h2;

@@ -30,6 +30,17 @@ public class Game {
     on("update", event -> root.trigger(event.getName(), event.getParameters()));
   }
 
+  public float width() {
+    return Jaylib.GetRenderWidth();
+  }
+  public float height() {
+    return Jaylib.GetRenderHeight();
+  }
+
+  public Vec2 center() {
+    return new Vec2(width() / 2, height() / 2);
+  }
+
   /** Add a game object to the game */
   public GameObject add(Object... components) {
     GameObject newGameObject = root.add(components);
@@ -138,6 +149,7 @@ public class Game {
     });
 
   }
+
 
 
 }

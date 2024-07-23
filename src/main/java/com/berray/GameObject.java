@@ -43,7 +43,7 @@ public class GameObject {
    */
   private List<GameObject> children = new LinkedList<>();
   private GameObject parent;
-  private Game game;
+  protected Game game;
 
   public GameObject() {
     this.components = new LinkedHashMap<>();
@@ -96,7 +96,8 @@ public class GameObject {
     return children;
   }
 
-  public void addComponents(Object... components) {
+  /** only for classes extending GameObject: add components to this game object and trigger "add" event. */
+  protected void addComponents(Object... components) {
     for (Object c : components) {
       if (c instanceof String) {
         addTag(c.toString());

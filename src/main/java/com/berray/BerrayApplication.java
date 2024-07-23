@@ -77,6 +77,13 @@ public abstract class BerrayApplication {
   public void runGame() {
     initWindow();
     InitWindow(width, height, title);
+    // Note: when the window is not ready, the GetRenderHeight() might return 0. This way the components which
+    // depends on the actual window size may be wrong initialized. So wait until the window has a height > 0
+    while (!IsWindowReady() || GetRenderHeight() == 0) {
+      // Wait until the window is ready
+      // TODO: this may be a good place to start loading assets
+      Thread.yield();
+    }
 
     this.game = new Game();
     game.on("add", this::addDebugInfos);

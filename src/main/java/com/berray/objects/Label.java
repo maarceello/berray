@@ -1,15 +1,15 @@
 package com.berray.objects;
 
 import com.berray.GameObject;
-import com.berray.components.AnchorComponent;
-import com.berray.components.AnchorType;
-import com.berray.components.PosComponent;
-import com.berray.components.TextComponent;
+import com.berray.components.core.AnchorComponent;
+import com.berray.components.core.AnchorType;
+import com.berray.components.core.PosComponent;
+import com.berray.components.core.TextComponent;
 import com.berray.math.Vec2;
 
 import java.util.function.Supplier;
 
-import static com.berray.components.AnchorType.CENTER;
+import static com.berray.components.core.AnchorType.CENTER;
 
 /**
  * Simple text based label. The labels content is updated each frame from the supplier.

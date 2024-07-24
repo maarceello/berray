@@ -24,26 +24,27 @@ WIP
 
 ## core
 
-[ ] local coordinate system (child objects position is relative to parent position)
-[ ] localArea should respect anchor
-[ ] collision detection: support more shapes (only rect at the moment)
-[ ] collision detection: skip object combination which are already checked
+- [ ] local coordinate system (child objects position is relative to parent position)
+  - [ ] TODO: fix collision detection
+- [ ] localArea should respect anchor
+- [ ] collision detection: support more shapes (only rect at the moment)
+- [ ] collision detection: skip object combination which are already checked
 
 ## 2d stack
 
-[ ] add 2d camera object
-[ ] add sprite sheet animation
-[ ] add bone animation
+- [ ] add 2d camera object
+- [ ] add sprite sheet animation
+- [ ] add bone animation
 
 ## 3d stack
 
-[ ] create 3d pipeline
-[ ] add 3d camera object
-[ ] add 3d asset loader (ie md3 Models)
-[ ] add 3d parts animation (ie md3 models, https://www.moddb.com/games/quake-iii-arena/addons)
-[ ] add 3d bones animation (natively supported by raylib)
+- [ ] create 3d pipeline
+- [ ] add 3d camera object
+- [ ] add 3d asset loader (ie md3 Models)
+- [ ] add 3d parts animation (ie md3 models, https://www.moddb.com/games/quake-iii-arena/addons)
+- [ ] add 3d bones animation (natively supported by raylib)
 
 ## documentation
 
-[ ] create documentation from javacoc
+- [ ] create documentation from javacoc
 

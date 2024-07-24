@@ -1,4 +1,4 @@
-package com.berray.components;
+package com.berray.components.core;
 
 public enum AnchorType {
   TOP_LEFT(-1, -1),

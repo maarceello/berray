@@ -1,8 +1,6 @@
-package com.berray.components;
+package com.berray.components.core;
 
 import com.berray.GameObject;
-
-import java.util.function.Consumer;
 
 public class RotateComponent extends Component {
   private float angle;
@@ -17,6 +15,9 @@ public class RotateComponent extends Component {
   }
 
   public void setAngle(float angle ) {
+    if (angle > 360) {
+      angle = angle % 360;
+    }
     this.angle = angle;
     gameObject.setTransformDirty();
   }

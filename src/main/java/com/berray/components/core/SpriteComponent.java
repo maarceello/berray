@@ -1,16 +1,15 @@
-package com.berray.components;
+package com.berray.components.core;
 
 import com.berray.GameObject;
-import com.berray.math.Matrix4;
+
 import com.berray.math.Rect;
 import com.berray.math.Vec2;
-import com.berray.math.Vec3;
 import com.raylib.Raylib;
 
 import static com.berray.AssetManager.getSprite;
 import static com.raylib.Jaylib.Texture;
 import static com.raylib.Jaylib.WHITE;
-import static com.raylib.Raylib.*;
+import static com.raylib.Raylib.DrawTexture;
 
 public class SpriteComponent extends Component {
   public Texture texture;
@@ -30,35 +29,12 @@ public class SpriteComponent extends Component {
 
   @Override
   public void draw() {
-    Float angle = gameObject.getOrDefault("angle", 0f);
-    AnchorType anchor = gameObject.getOrDefault("anchor", AnchorType.CENTER);
-
-    float w2 = texture.width() / 2.0f;
-    float h2 = texture.height() / 2.0f;
-
-    float anchorX = w2 + anchor.getX() * w2;
-    float anchorY = h2 + anchor.getY() * h2;
-
-    // transform anchor with world transform
-    Matrix4 worldTransform = gameObject.getWorldTransform();
-    Vec3 position = worldTransform.multiply(new Vec3(0, 0, 0));
-
     Raylib.rlPushMatrix();
-//    Raylib.rlTranslatef(position.getX(), position.getY(), 0);
-//    Raylib.rlRotatef(angle, 0f, 0f, 1.0f);
-//    Raylib.rlTranslatef(-anchorX, -anchorY, 0);
-    Raylib.rlMultMatrixf(worldTransform.toFloatTransposed());
-    DrawTexture(
-        this.texture,
-        0, 0,
-        WHITE);
-
-    DrawRectangleLines(
-        0, 0, texture.width(), texture.height(),
-        WHITE);
-
+    {
+      Raylib.rlMultMatrixf(gameObject.getWorldTransform().toFloatTransposed());
+      DrawTexture(this.texture, 0, 0, WHITE);
+    }
     Raylib.rlPopMatrix();
-
   }
 
   @Override

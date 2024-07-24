@@ -1,11 +1,11 @@
 package com.berray.tests;
 
 import com.berray.BerrayApplication;
-import com.berray.components.AnchorType;
+import com.berray.components.core.AnchorType;
 import com.raylib.Jaylib;
 
 import static com.berray.AssetManager.loadSprite;
-import static com.berray.components.SpriteComponent.sprite;
+import static com.berray.components.core.SpriteComponent.sprite;
 
 public class AnchorTest extends BerrayApplication {
   @Override

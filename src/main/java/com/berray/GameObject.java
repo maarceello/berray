@@ -1,7 +1,7 @@
 package com.berray;
 
-import com.berray.components.AnchorType;
-import com.berray.components.Component;
+import com.berray.components.core.AnchorType;
+import com.berray.components.core.Component;
 import com.berray.event.EventListener;
 import com.berray.event.EventManager;
 import com.berray.math.Matrix4;
@@ -280,9 +280,9 @@ public class GameObject {
       float anchorY = h2 + anchor.getY() * h2;
 
       localTransform = Matrix4.fromTranslate(pos.getX(), pos.getY(), 0)
-          .multiply(Matrix4.fromRotatez(angle))
+          .multiply(Matrix4.fromRotatez((float) Math.toRadians(angle)))
           .multiply(Matrix4.fromTranslate(-anchorX, -anchorY, 0));
-      worldTransform = parent == null ? localTransform : localTransform.multiply(parent.getWorldTransform());
+      worldTransform = parent == null ? localTransform : parent.getWorldTransform().multiply(localTransform);
       transformDirty = false;
     }
     return worldTransform;

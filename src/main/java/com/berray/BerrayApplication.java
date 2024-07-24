@@ -1,13 +1,13 @@
 package com.berray;
 
 
-import com.berray.components.*;
+import com.berray.components.core.*;
 import com.berray.event.Event;
 import com.berray.event.EventListener;
 import com.berray.math.Rect;
 import com.berray.math.Vec2;
 
-import static com.berray.components.DebugComponent.debug;
+import static com.berray.components.core.DebugComponent.debug;
 import static com.raylib.Jaylib.*;
 import static com.raylib.Raylib.Color;
 

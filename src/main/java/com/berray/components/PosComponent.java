@@ -1,7 +1,6 @@
 package com.berray.components;
 
 import com.berray.GameObject;
-import com.berray.math.Matrix4;
 import com.berray.math.Vec2;
 
 import java.util.function.Consumer;
@@ -36,7 +35,7 @@ public class PosComponent extends Component {
   @Override
   public void add(GameObject gameObject) {
     Consumer<Vec2> consumer = this::setPos;
-    gameObject.addMethod("pos", this::getPos, consumer);
+    gameObject.registerMethod("pos", this::getPos, consumer);
   }
 
 }

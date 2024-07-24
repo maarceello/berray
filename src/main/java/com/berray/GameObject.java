@@ -1,5 +1,6 @@
 package com.berray;
 
+import com.berray.components.AnchorType;
 import com.berray.components.Component;
 import com.berray.event.EventListener;
 import com.berray.event.EventManager;
@@ -167,7 +168,7 @@ public class GameObject {
     setterMethods.put(name, setter);
   }
 
-  public void addMethod(String name, Supplier<?> getter, Consumer<?> setter) {
+  public <E> void registerMethod(String name, Supplier<E> getter, Consumer<E> setter) {
     getterMethods.put(name, getter);
     setterMethods.put(name, setter);
   }
@@ -268,7 +269,19 @@ public class GameObject {
   public Matrix4 getWorldTransform() {
     if (transformDirty) {
       Vec2 pos = getOrDefault("pos", Vec2.origin());
-      localTransform = Matrix4.fromTranslate(pos.getX(), pos.getY(), 0);
+      float angle = getOrDefault("angle", 0f);
+      Vec2 size = getOrDefault("size", Vec2.origin());
+      AnchorType anchor = getOrDefault("anchor", AnchorType.CENTER);
+
+      float w2 = size.getX() / 2.0f;
+      float h2 = size.getY() / 2.0f;
+
+      float anchorX = w2 + anchor.getX() * w2;
+      float anchorY = h2 + anchor.getY() * h2;
+
+      localTransform = Matrix4.fromTranslate(pos.getX(), pos.getY(), 0)
+          .multiply(Matrix4.fromRotatez(angle))
+          .multiply(Matrix4.fromTranslate(-anchorX, -anchorY, 0));
       worldTransform = parent == null ? localTransform : localTransform.multiply(parent.getWorldTransform());
       transformDirty = false;
     }

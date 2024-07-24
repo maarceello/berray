@@ -1,13 +1,14 @@
 package com.berray.tests;
 
 import com.berray.BerrayApplication;
+import com.berray.GameObject;
 import com.berray.components.AnchorType;
 import com.raylib.Jaylib;
 
 import static com.berray.AssetManager.loadSprite;
 import static com.berray.components.SpriteComponent.sprite;
 
-public class AnchorTest extends BerrayApplication {
+public class RotateTest  extends BerrayApplication {
   @Override
   public void game() {
     loadSprite("berry", "resources/berry.png");
@@ -15,29 +16,24 @@ public class AnchorTest extends BerrayApplication {
     debug = true;
 
     for (int i = 0; i < AnchorType.values().length; i++) {
-      int xgaps = 100;
-      add(
-          rect(20, 40),
-          pos(50+i* xgaps, 50),
-          anchor(AnchorType.values()[i])
-      );
-      add(
-          circle(20),
-          pos(50+i* xgaps, 150),
-          anchor(AnchorType.values()[i])
-      );
-
+      int x = i % 3;
+      int y = i / 3;
       add(
           sprite("berry"),
-          pos(50+i* xgaps, 300),
-          anchor(AnchorType.values()[i])
-      );
-      add(
-          text("berry"),
-          pos(50+i* xgaps, 400),
-          anchor(AnchorType.values()[i])
+          pos(150+x* 200, 150 + y * 200),
+          anchor(AnchorType.values()[i]),
+          rotate((360f / 9f) * i),
+          "berry"
       );
     }
+
+    onUpdate("berry", (event) -> {
+      GameObject berry = event.getParameter(0);
+      float frameTime = event.getParameter(1);
+      Float angle = berry.get("angle");
+      angle += frameTime * 45f;
+      berry.set("angle", angle);
+    });
 
   }
 
@@ -45,12 +41,12 @@ public class AnchorTest extends BerrayApplication {
   public void initWindow() {
     width(1024);
     height(768);
-    background(Jaylib.GRAY);
+    background(Jaylib.BLACK);
     title("Anchor Test");
   }
 
   public static void main(String[] args) {
-    new AnchorTest().runGame();
+    new RotateTest().runGame();
   }
 
 }

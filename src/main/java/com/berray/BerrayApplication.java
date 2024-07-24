@@ -63,6 +63,10 @@ public abstract class BerrayApplication {
     game.on(event, listener);
   }
 
+  public void onUpdate(String tag, EventListener eventListener) {
+    game.onUpdate(tag, eventListener);
+  }
+
 
   public void trigger(String event, Object... params) {
     game.trigger(event, params);
@@ -151,6 +155,10 @@ public abstract class BerrayApplication {
 
   public static AnchorComponent anchor(AnchorType anchorType) {
     return AnchorComponent.anchor(anchorType);
+  }
+
+  public static RotateComponent rotate(float angle) {
+    return RotateComponent.rotate(angle);
   }
 
   public static AreaComponent area() {

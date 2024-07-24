@@ -1,14 +1,16 @@
 package com.berray.components;
 
 import com.berray.GameObject;
+import com.berray.math.Matrix4;
 import com.berray.math.Rect;
 import com.berray.math.Vec2;
+import com.berray.math.Vec3;
+import com.raylib.Raylib;
 
 import static com.berray.AssetManager.getSprite;
-import static com.raylib.Jaylib.Vector2;
 import static com.raylib.Jaylib.Texture;
-import static com.raylib.Jaylib.DrawTextureEx;
 import static com.raylib.Jaylib.WHITE;
+import static com.raylib.Raylib.*;
 
 public class SpriteComponent extends Component {
   public Texture texture;
@@ -28,7 +30,6 @@ public class SpriteComponent extends Component {
 
   @Override
   public void draw() {
-    Vec2 pos = gameObject.getOrDefault("pos", Vec2.origin());
     Float angle = gameObject.getOrDefault("angle", 0f);
     AnchorType anchor = gameObject.getOrDefault("anchor", AnchorType.CENTER);
 
@@ -38,28 +39,51 @@ public class SpriteComponent extends Component {
     float anchorX = w2 + anchor.getX() * w2;
     float anchorY = h2 + anchor.getY() * h2;
 
-    DrawTextureEx(
+    // transform anchor with world transform
+    Matrix4 worldTransform = gameObject.getWorldTransform();
+    Vec3 position = worldTransform.multiply(new Vec3(0, 0, 0));
+
+    Raylib.rlPushMatrix();
+//    Raylib.rlTranslatef(position.getX(), position.getY(), 0);
+//    Raylib.rlRotatef(angle, 0f, 0f, 1.0f);
+//    Raylib.rlTranslatef(-anchorX, -anchorY, 0);
+    Raylib.rlMultMatrixf(worldTransform.toFloatTransposed());
+    DrawTexture(
         this.texture,
-        new Vector2(pos.getX() - anchorX, pos.getY() - anchorY),
-        angle,
-        1.0f,
+        0, 0,
         WHITE);
+
+    DrawRectangleLines(
+        0, 0, texture.width(), texture.height(),
+        WHITE);
+
+    Raylib.rlPopMatrix();
 
   }
 
   @Override
   public void add(GameObject gameObject) {
     gameObject.registerGetter("localArea", this::localArea);
+    gameObject.registerGetter("size", this::getSize);
+  }
+
+  private Vec2 getSize() {
+    return new Vec2(texture.width(), texture.height());
   }
 
   private Rect localArea() {
-    Vec2 pos = gameObject.get("pos");
+    Vec2 pos = gameObject.getOrDefault("pos", Vec2.origin());
+    AnchorType anchor = gameObject.getOrDefault("anchor", AnchorType.CENTER);
     if (pos == null) {
       return null;
     }
-    int w = texture.width();
-    int h = texture.height();
-    return new Rect(pos.getX() - w / 2, pos.getY() - h / 2, w, h);
+    float w2 = texture.width() / 2.0f;
+    float h2 = texture.height() / 2.0f;
+
+    float anchorX = w2 + anchor.getX() * w2;
+    float anchorY = h2 + anchor.getY() * h2;
+
+    return new Rect(pos.getX() - anchorX, pos.getY() - anchorY, texture.width(), texture.height());
   }
 
   // Static method to just call "sprite()" get the sprite from the asset manager and put in into the texture for the sprite component

@@ -133,11 +133,11 @@ public class Matrix4 {
    */
   public Vec3 multiply(Vec3 other) {
     Matrix4 a = this;
-    Vec3 P = new Vec3(0, 0, 0);
-    P.x = a.a * other.x + a.b * other.y + a.c * other.z;
-    P.y = a.e * other.x + a.f * other.y + a.g * other.z;
-    P.z = a.i * other.x + a.j * other.y + a.k * other.z;
-    return P;
+    float x = a.a * other.x + a.b * other.y + a.c * other.z + a.d/* * other.w*/;
+    float y = a.e * other.x + a.f * other.y + a.g * other.z + a.h/* * other.w*/;
+    float z = a.i * other.x + a.j * other.y + a.k * other.z + a.l/* * other.w*/;
+//    result.w = a.m * other.x + a.n * other.y + a.o * other.z + a.p/* * other.w*/;
+    return new Vec3(x,y,z);
   }
 
   public Matrix4 scale(float x, float y, float z) {
@@ -317,5 +317,30 @@ public class Matrix4 {
     m.p = d * (self.a * (self.f * self.k - self.j * self.g) + self.e * (self.j * self.c - self.b * self.k) + self.i * (self.b * self.g - self.f * self.c));
 
     return m;
+  }
+
+  public float[] toFloat() {
+    return new float[] {
+        a,b,c,d,
+        e,f,g,h,
+        i,j,k,l,
+        m,n,o,p
+    };
+  }
+  public float[] toFloatTransposed() {
+    return new float[] {
+        a,e,i,m,
+        b,f,j,n,
+        c,g,k,o,
+        d,h,l,p
+    };
+  }
+
+  @Override
+  public String toString() {
+    return String.format("| %4.3f %4.3f %4.3f %4.3f |%n", a, b, c, d) +
+        String.format("| %4.3f %4.3f %4.3f %4.3f |%n", e, f, g, h) +
+        String.format("| %4.3f %4.3f %4.3f %4.3f |%n", i, j, k, l) +
+        String.format("| %4.3f %4.3f %4.3f %4.3f |%n", m, n, o, p);
   }
 }

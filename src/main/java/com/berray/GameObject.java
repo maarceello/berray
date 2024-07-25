@@ -116,6 +116,7 @@ public class GameObject {
     other.parent = this;
     other.game = this.game;
     trigger("add", this, other);
+    other.trigger("add", this, other);
   }
 
 

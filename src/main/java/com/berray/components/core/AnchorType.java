@@ -1,5 +1,7 @@
 package com.berray.components.core;
 
+import com.berray.math.Vec2;
+
 public enum AnchorType {
   TOP_LEFT(-1, -1),
   TOP(0, -1),
@@ -25,5 +27,14 @@ public enum AnchorType {
 
   public int getY() {
     return y;
+  }
+
+  public Vec2 getAnchorPoint(Vec2 size) {
+    float w2 = size.getX() / 2.0f;
+    float h2 = size.getY() / 2.0f;
+
+    float anchorX = w2 + getX() * w2;
+    float anchorY = h2 + getY() * h2;
+    return new Vec2(-anchorX, -anchorY);
   }
 }

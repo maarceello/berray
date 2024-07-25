@@ -141,6 +141,7 @@ public abstract class BerrayApplication {
   public PosComponent pos(float x, float y) {
     return PosComponent.pos(x, y);
   }
+
   public PosComponent pos(Vec2 pos) {
     return PosComponent.pos(pos);
   }
@@ -171,6 +172,10 @@ public abstract class BerrayApplication {
 
   public TextComponent text(String text) {
     return TextComponent.text(text);
+  }
+
+  public ColorComponent color(int r, int g, int b) {
+    return ColorComponent.color(r, g, b);
   }
 
 

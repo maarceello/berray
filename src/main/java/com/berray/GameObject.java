@@ -52,6 +52,10 @@ public class GameObject {
    */
   protected Matrix4 localTransform = Matrix4.identity();
   /**
+   * local transformation relative to the parent, without the applied anchor.
+   */
+  protected Matrix4 localTransformWithoutAnchor = Matrix4.identity();
+  /**
    * transformation relative to the world.
    */
   protected Matrix4 worldTransform;
@@ -80,9 +84,28 @@ public class GameObject {
     return id;
   }
 
+  /**
+   * Add a GameObject as a child to this gameObject.
+   * `components` is an array of:
+   *
+   * - a {@link Component}. Components are added the the child gameobject as is.
+   * - a {@link String}. I this case the string will be added as a tag to the child gameObject.
+   * - the first component may be an instance of {@link GameObject}. In this case this object is
+   *   uses as the new object and all components and tags are added to this existing game object.
+   *
+   * */
   public GameObject add(Object... components) {
-    GameObject gameObject = new GameObject(game, this);
-    gameObject.addComponents(components);
+    if (components == null || components.length == 0) {
+      throw new NullPointerException("components is null or empty");
+    }
+    GameObject gameObject;
+    if (components[0] instanceof GameObject) {
+      gameObject = (GameObject) components[0];
+      gameObject.addComponents(Arrays.asList(components).subList(1, components.length));
+    } else {
+      gameObject = new GameObject(game, this);
+      gameObject.addComponents(Arrays.asList(components));
+    }
     // trigger add event for all other interested parties
     addChild(gameObject);
     return gameObject;
@@ -112,10 +135,14 @@ public class GameObject {
     return children;
   }
 
-  /**
-   * only for classes extending GameObject: add components to this game object and trigger "add" event.
-   */
   protected void addComponents(Object... components) {
+    addComponents(Arrays.asList(components));
+  }
+
+    /**
+     * only for classes extending GameObject: add components to this game object and trigger "add" event.
+     */
+  protected void addComponents(List<Object> components) {
     for (Object c : components) {
       if (c instanceof String) {
         addTag(c.toString());
@@ -266,6 +293,14 @@ public class GameObject {
     return transformDirty;
   }
 
+  public Matrix4 getLocalTransform() {
+    return localTransform;
+  }
+
+  public Matrix4 getLocalTransformWithoutAnchor() {
+    return localTransformWithoutAnchor;
+  }
+
   public Matrix4 getWorldTransform() {
     if (transformDirty) {
       Vec2 pos = getOrDefault("pos", Vec2.origin());
@@ -279,9 +314,9 @@ public class GameObject {
       float anchorX = w2 + anchor.getX() * w2;
       float anchorY = h2 + anchor.getY() * h2;
 
-      localTransform = Matrix4.fromTranslate(pos.getX(), pos.getY(), 0)
-          .multiply(Matrix4.fromRotatez((float) Math.toRadians(angle)))
-          .multiply(Matrix4.fromTranslate(-anchorX, -anchorY, 0));
+      localTransformWithoutAnchor = Matrix4.fromTranslate(pos.getX(), pos.getY(), 0)
+          .multiply(Matrix4.fromRotatez((float) Math.toRadians(angle)));
+      localTransform = localTransformWithoutAnchor.multiply(Matrix4.fromTranslate(-anchorX, -anchorY, 0));
       worldTransform = parent == null ? localTransform : parent.getWorldTransform().multiply(localTransform);
       transformDirty = false;
     }

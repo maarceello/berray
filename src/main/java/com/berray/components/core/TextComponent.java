@@ -3,6 +3,7 @@ package com.berray.components.core;
 import com.berray.GameObject;
 import com.berray.math.Rect;
 import com.berray.math.Vec2;
+import com.raylib.Jaylib;
 import com.raylib.Raylib;
 
 import java.util.function.Consumer;
@@ -33,8 +34,9 @@ public class TextComponent extends Component {
   public void draw() {
     Raylib.rlPushMatrix();
     {
+      Raylib.Color color = gameObject.getOrDefault("color", Jaylib.BLACK);
       Raylib.rlMultMatrixf(gameObject.getWorldTransform().toFloatTransposed());
-      DrawText(text, 0,0, fontHeight, BLACK);
+      DrawText(text, 0,0, fontHeight, color);
     }
     Raylib.rlPopMatrix();
   }

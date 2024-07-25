@@ -58,4 +58,8 @@ public class Vec3 {
 
   }
 
+
+  public static Vec3 center() {
+    return new Vec3(0,0,0);
+  }
 }

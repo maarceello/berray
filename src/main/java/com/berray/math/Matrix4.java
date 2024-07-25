@@ -132,12 +132,19 @@ public class Matrix4 {
    * Multiply the current matrix with a vector and returns the result.
    */
   public Vec3 multiply(Vec3 other) {
+    return multiply(other.x, other.y, other.z);
+  }
+
+  /**
+   * Multiply the current matrix with a vector and returns the result.
+   */
+  public Vec3 multiply(float x, float y, float z) {
     Matrix4 a = this;
-    float x = a.a * other.x + a.b * other.y + a.c * other.z + a.d/* * other.w*/;
-    float y = a.e * other.x + a.f * other.y + a.g * other.z + a.h/* * other.w*/;
-    float z = a.i * other.x + a.j * other.y + a.k * other.z + a.l/* * other.w*/;
-//    result.w = a.m * other.x + a.n * other.y + a.o * other.z + a.p/* * other.w*/;
-    return new Vec3(x,y,z);
+    float x1 = a.a * x + a.b * y + a.c * z + a.d/* * w*/;
+    float y1 = a.e * x + a.f * y + a.g * z + a.h/* * w*/;
+    float z1 = a.i * x + a.j * y + a.k * z + a.l/* * w*/;
+//    result.w = a.m * x + a.n * y + a.o * z + a.p/* * w*/;
+    return new Vec3(x1,y1,z1);
   }
 
   public Matrix4 scale(float x, float y, float z) {

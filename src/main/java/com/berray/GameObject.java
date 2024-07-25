@@ -97,7 +97,7 @@ public class GameObject {
   }
 
   /** only for classes extending GameObject: add components to this game object and trigger "add" event. */
-  protected void addComponents(Object... components) {
+public void addComponents(Object... components) {
     for (Object c : components) {
       if (c instanceof String) {
         addTag(c.toString());

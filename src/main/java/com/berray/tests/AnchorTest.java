@@ -2,14 +2,13 @@ package com.berray.tests;
 
 import com.berray.BerrayApplication;
 import com.berray.components.core.AnchorType;
-import com.berray.components.core.ColorComponent;
 import com.berray.math.Vec2;
 import com.raylib.Jaylib;
 import com.raylib.Raylib;
 
 import static com.berray.AssetManager.loadSprite;
 import static com.berray.components.core.SpriteComponent.sprite;
-import static com.berray.objects.Label.label;
+import static com.berray.objects.core.Label.label;
 
 public class AnchorTest extends BerrayApplication {
   @Override
@@ -22,7 +21,7 @@ public class AnchorTest extends BerrayApplication {
         label(() -> "FPS: "+ Raylib.GetFPS()),
         pos(Vec2.origin()),
         anchor(AnchorType.TOP_LEFT),
-        ColorComponent.color(255, 0, 0)
+        color(255, 0, 0)
     );
 
     for (int i = 0; i < AnchorType.values().length; i++) {

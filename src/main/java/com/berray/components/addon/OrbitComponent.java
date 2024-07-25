@@ -1,4 +1,4 @@
-package com.berray.components.movement;
+package com.berray.components.addon;
 
 import com.berray.GameObject;
 import com.berray.components.core.Component;

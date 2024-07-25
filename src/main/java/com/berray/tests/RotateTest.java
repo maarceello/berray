@@ -3,14 +3,14 @@ package com.berray.tests;
 import com.berray.BerrayApplication;
 import com.berray.GameObject;
 import com.berray.components.core.AnchorType;
-import com.berray.components.movement.OrbitComponent;
+import com.berray.components.addon.OrbitComponent;
 import com.berray.math.Vec2;
 import com.raylib.Jaylib;
 import com.raylib.Raylib;
 
 import static com.berray.AssetManager.loadSprite;
 import static com.berray.components.core.SpriteComponent.sprite;
-import static com.berray.objects.Label.label;
+import static com.berray.objects.core.Label.label;
 
 public class RotateTest extends BerrayApplication {
   @Override
@@ -19,18 +19,17 @@ public class RotateTest extends BerrayApplication {
 
     debug = true;
 
-    GameObject mainNode = add(
-        pos(game.center()),
-        rotate(0)
-    );
-
-    mainNode.add(
-        label(() -> ""+Raylib.GetFPS()),
+    add(
+        label(() -> "FPS: "+Raylib.GetFPS()),
         pos(Vec2.origin()),
         anchor(AnchorType.TOP_LEFT),
         color(255, 255, 255)
     );
 
+    GameObject mainNode = add(
+        pos(game.center()),
+        rotate(0)
+    );
 
     for (int i = 0; i < AnchorType.values().length; i++) {
       int x = i % 3 - 1;

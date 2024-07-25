@@ -24,9 +24,9 @@ WIP
 
 ## core
 
-- [ ] local coordinate system (child objects position is relative to parent position)
+- [x] local coordinate system (child objects position is relative to parent position)
   - [ ] TODO: fix collision detection
-- [ ] localArea should respect anchor
+- [x] localArea should respect anchor
 - [ ] collision detection: support more shapes (only rect at the moment)
 - [ ] collision detection: skip object combination which are already checked
 

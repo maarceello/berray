@@ -1,12 +1,14 @@
 package com.berray.tests;
 
 import com.berray.BerrayApplication;
-import com.berray.components.AnchorType;
+import com.berray.components.core.AnchorType;
+import com.berray.math.Vec2;
 import com.raylib.Jaylib;
+import com.raylib.Raylib;
 
 import static com.berray.AssetManager.loadSprite;
-import static com.berray.components.CircleComponent.circle;
-import static com.berray.components.SpriteComponent.sprite;
+import static com.berray.components.core.SpriteComponent.sprite;
+import static com.berray.objects.core.Label.label;
 
 public class AnchorTest extends BerrayApplication {
   @Override
@@ -14,6 +16,13 @@ public class AnchorTest extends BerrayApplication {
     loadSprite("berry", "resources/berry.png");
 
     debug = true;
+
+    add(
+        label(() -> "FPS: "+ Raylib.GetFPS()),
+        pos(Vec2.origin()),
+        anchor(AnchorType.TOP_LEFT),
+        color(255, 0, 0)
+    );
 
     for (int i = 0; i < AnchorType.values().length; i++) {
       int xgaps = 100;
@@ -46,7 +55,7 @@ public class AnchorTest extends BerrayApplication {
   public void initWindow() {
     width(1024);
     height(768);
-    background(Jaylib.GRAY);
+    background(Jaylib.BLACK);
     title("Anchor Test");
   }
 

@@ -1,4 +1,4 @@
-package com.berray.components;
+package com.berray.components.core;
 
 import com.berray.GameObject;
 
@@ -32,7 +32,6 @@ public class Component {
   // Static methods have no this in their scope
 
   public void draw() {}
-  public void update(float deltaTime) {}
 
   public void add(GameObject gameObject) {
     this.gameObject = gameObject;

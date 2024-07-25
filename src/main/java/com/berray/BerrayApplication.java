@@ -1,13 +1,13 @@
 package com.berray;
 
 
-import com.berray.components.*;
+import com.berray.components.core.*;
 import com.berray.event.Event;
 import com.berray.event.EventListener;
 import com.berray.math.Rect;
 import com.berray.math.Vec2;
 
-import static com.berray.components.DebugComponent.debug;
+import static com.berray.components.core.DebugComponent.debug;
 import static com.raylib.Jaylib.*;
 import static com.raylib.Raylib.Color;
 
@@ -61,6 +61,10 @@ public abstract class BerrayApplication {
 
   public void on(String event, EventListener listener) {
     game.on(event, listener);
+  }
+
+  public void onUpdate(String tag, EventListener eventListener) {
+    game.onUpdate(tag, eventListener);
   }
 
 
@@ -137,6 +141,7 @@ public abstract class BerrayApplication {
   public PosComponent pos(float x, float y) {
     return PosComponent.pos(x, y);
   }
+
   public PosComponent pos(Vec2 pos) {
     return PosComponent.pos(pos);
   }
@@ -153,6 +158,10 @@ public abstract class BerrayApplication {
     return AnchorComponent.anchor(anchorType);
   }
 
+  public static RotateComponent rotate(float angle) {
+    return RotateComponent.rotate(angle);
+  }
+
   public static AreaComponent area() {
     return AreaComponent.area();
   }
@@ -163,6 +172,10 @@ public abstract class BerrayApplication {
 
   public TextComponent text(String text) {
     return TextComponent.text(text);
+  }
+
+  public ColorComponent color(int r, int g, int b) {
+    return ColorComponent.color(r, g, b);
   }
 
 

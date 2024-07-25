@@ -1,8 +1,11 @@
 package com.berray;
 
-import com.berray.components.Component;
+import com.berray.components.core.AnchorType;
+import com.berray.components.core.Component;
 import com.berray.event.EventListener;
 import com.berray.event.EventManager;
+import com.berray.math.Matrix4;
+import com.berray.math.Vec2;
 
 
 import java.util.*;
@@ -44,6 +47,23 @@ public class GameObject {
   private List<GameObject> children = new LinkedList<>();
   private GameObject parent;
   protected Game game;
+  /**
+   * local transformation relative to the parent.
+   */
+  protected Matrix4 localTransform = Matrix4.identity();
+  /**
+   * local transformation relative to the parent, without the applied anchor.
+   */
+  protected Matrix4 localTransformWithoutAnchor = Matrix4.identity();
+  /**
+   * transformation relative to the world.
+   */
+  protected Matrix4 worldTransform;
+  /**
+   * true when the local transformation is changed and therefore the world transformation
+   * must be recalculated.
+   */
+  protected boolean transformDirty = true;
 
   public GameObject() {
     this.components = new LinkedHashMap<>();
@@ -64,9 +84,28 @@ public class GameObject {
     return id;
   }
 
+  /**
+   * Add a GameObject as a child to this gameObject.
+   * `components` is an array of:
+   *
+   * - a {@link Component}. Components are added the the child gameobject as is.
+   * - a {@link String}. I this case the string will be added as a tag to the child gameObject.
+   * - the first component may be an instance of {@link GameObject}. In this case this object is
+   *   uses as the new object and all components and tags are added to this existing game object.
+   *
+   * */
   public GameObject add(Object... components) {
-    GameObject gameObject = new GameObject(game, this);
-    gameObject.addComponents(components);
+    if (components == null || components.length == 0) {
+      throw new NullPointerException("components is null or empty");
+    }
+    GameObject gameObject;
+    if (components[0] instanceof GameObject) {
+      gameObject = (GameObject) components[0];
+      gameObject.addComponents(Arrays.asList(components).subList(1, components.length));
+    } else {
+      gameObject = new GameObject(game, this);
+      gameObject.addComponents(Arrays.asList(components));
+    }
     // trigger add event for all other interested parties
     addChild(gameObject);
     return gameObject;
@@ -77,6 +116,7 @@ public class GameObject {
     other.parent = this;
     other.game = this.game;
     trigger("add", this, other);
+    other.trigger("add", this, other);
   }
 
 
@@ -96,8 +136,14 @@ public class GameObject {
     return children;
   }
 
-  /** only for classes extending GameObject: add components to this game object and trigger "add" event. */
   protected void addComponents(Object... components) {
+    addComponents(Arrays.asList(components));
+  }
+
+    /**
+     * only for classes extending GameObject: add components to this game object and trigger "add" event.
+     */
+  protected void addComponents(List<Object> components) {
     for (Object c : components) {
       if (c instanceof String) {
         addTag(c.toString());
@@ -150,7 +196,7 @@ public class GameObject {
     setterMethods.put(name, setter);
   }
 
-  public void addMethod(String name, Supplier<?> getter, Consumer<?> setter) {
+  public <E> void registerMethod(String name, Supplier<E> getter, Consumer<E> setter) {
     getterMethods.put(name, getter);
     setterMethods.put(name, setter);
   }
@@ -170,6 +216,7 @@ public class GameObject {
     E value = get(property);
     return value == null ? defaultValue : value;
   }
+
   /**
    * sets registered component property
    */
@@ -211,7 +258,9 @@ public class GameObject {
     eventManager.trigger(eventName, Arrays.asList(params));
   }
 
-  /** Update all game objects */
+  /**
+   * Update all game objects
+   */
   public void onCollide(String tag, EventListener eventListener) {
     on("collide", event -> {
       GameObject gameObject = event.getParameter(0);
@@ -220,7 +269,59 @@ public class GameObject {
         eventListener.onEvent(event);
       }
     });
+  }
 
+  /**
+   * marks the objects that the world transformation should be recalculated .
+   */
+  public void setTransformDirty() {
+    transformDirty = true;
+  }
+
+  /**
+   * Returns true when this object or a parent is dirty.
+   */
+  public boolean isTransformDirty() {
+    // do we have a parent and are *not* dirty?
+    if (parent != null && !transformDirty) {
+      // yes. if the parent is dirty, set us dirty too.
+      boolean parentDirty = parent.isTransformDirty();
+      if (parentDirty) {
+        this.transformDirty = true;
+      }
+    }
+    // return dirty flag which may be copied from parent
+    return transformDirty;
+  }
+
+  public Matrix4 getLocalTransform() {
+    return localTransform;
+  }
+
+  public Matrix4 getLocalTransformWithoutAnchor() {
+    return localTransformWithoutAnchor;
+  }
+
+  public Matrix4 getWorldTransform() {
+    if (transformDirty) {
+      Vec2 pos = getOrDefault("pos", Vec2.origin());
+      float angle = getOrDefault("angle", 0f);
+      Vec2 size = getOrDefault("size", Vec2.origin());
+      AnchorType anchor = getOrDefault("anchor", AnchorType.CENTER);
+
+      float w2 = size.getX() / 2.0f;
+      float h2 = size.getY() / 2.0f;
+
+      float anchorX = w2 + anchor.getX() * w2;
+      float anchorY = h2 + anchor.getY() * h2;
+
+      localTransformWithoutAnchor = Matrix4.fromTranslate(pos.getX(), pos.getY(), 0)
+          .multiply(Matrix4.fromRotatez((float) Math.toRadians(angle)));
+      localTransform = localTransformWithoutAnchor.multiply(Matrix4.fromTranslate(-anchorX, -anchorY, 0));
+      worldTransform = parent == null ? localTransform : parent.getWorldTransform().multiply(localTransform);
+      transformDirty = false;
+    }
+    return worldTransform;
   }
 
 }

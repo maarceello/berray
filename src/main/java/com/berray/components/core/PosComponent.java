@@ -34,8 +34,7 @@ public class PosComponent extends Component {
 
   @Override
   public void add(GameObject gameObject) {
-    Consumer<Vec2> consumer = this::setPos;
-    gameObject.registerMethod("pos", this::getPos, consumer);
+    gameObject.registerMethod("pos", this::getPos, this::setPos);
   }
 
 }

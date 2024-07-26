@@ -6,8 +6,22 @@ import com.berray.math.Vec2;
 import com.raylib.Raylib;
 
 import static com.raylib.Jaylib.WHITE;
-import static com.raylib.Raylib.DrawCircle;
+import static com.raylib.Raylib.*;
 
+/**
+ * # CircleComponent
+ *
+ * {@link CircleComponent#circle(float)} provides a circle shape for rendering.
+ *
+ * # Properties
+ *
+ * - localArea (read only) - todo
+ * - size (read only) - size of the circle (2 * radius)
+ *
+ * # Events
+ *
+ * none
+ */
 public class CircleComponent extends Component {
   private final float radius;
 
@@ -22,12 +36,12 @@ public class CircleComponent extends Component {
 
   @Override
   public void draw() {
-    Raylib.rlPushMatrix();
+    rlPushMatrix();
     {
-      Raylib.rlMultMatrixf(gameObject.getWorldTransform().toFloatTransposed());
+      rlMultMatrixf(gameObject.getWorldTransform().toFloatTransposed());
       DrawCircle((int) (radius), (int) (radius), radius, WHITE);
     }
-    Raylib.rlPopMatrix();
+    rlPopMatrix();
   }
 
 

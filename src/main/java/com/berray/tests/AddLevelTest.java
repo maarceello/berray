@@ -7,7 +7,6 @@ import com.berray.math.Vec2;
 import com.raylib.Jaylib;
 
 import static com.berray.AssetManager.loadSprite;
-import static com.berray.components.core.PosComponent.pos;
 import static com.berray.components.core.SpriteComponent.sprite;
 
 import java.util.HashMap;

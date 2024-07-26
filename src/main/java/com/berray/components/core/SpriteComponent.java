@@ -9,7 +9,7 @@ import com.raylib.Raylib;
 import static com.berray.AssetManager.getSprite;
 import static com.raylib.Jaylib.Texture;
 import static com.raylib.Jaylib.WHITE;
-import static com.raylib.Raylib.DrawTexture;
+import static com.raylib.Raylib.*;
 
 public class SpriteComponent extends Component {
   public Texture texture;
@@ -29,12 +29,12 @@ public class SpriteComponent extends Component {
 
   @Override
   public void draw() {
-    Raylib.rlPushMatrix();
+    rlPushMatrix();
     {
-      Raylib.rlMultMatrixf(gameObject.getWorldTransform().toFloatTransposed());
+      rlMultMatrixf(gameObject.getWorldTransform().toFloatTransposed());
       DrawTexture(this.texture, 0, 0, WHITE);
     }
-    Raylib.rlPopMatrix();
+    rlPopMatrix();
   }
 
   @Override

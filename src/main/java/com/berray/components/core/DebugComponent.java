@@ -8,6 +8,7 @@ import com.raylib.Jaylib;
 import com.raylib.Raylib;
 
 import static com.raylib.Jaylib.*;
+import static com.raylib.Raylib.DrawLine;
 
 public class DebugComponent extends Component {
   public DebugComponent() {
@@ -45,15 +46,17 @@ public class DebugComponent extends Component {
           int y1 = (int) Math.min(p1.getY(), Math.min(p2.getY(), Math.min(p3.getY(), p4.getY())));
           int y2 = (int) Math.max(p1.getY(), Math.max(p2.getY(), Math.max(p3.getY(), p4.getY())));
 
+          // draw transformed rectangle around the shape
           drawLine(p1, p2, LIME);
           drawLine(p1, p3, LIME);
           drawLine(p4, p2, LIME);
           drawLine(p4, p3, LIME);
 
-          Jaylib.DrawLine(x1, y1, x2, y1, GOLD);
-          Jaylib.DrawLine(x1, y1, x1, y2, GOLD);
-          Jaylib.DrawLine(x1, y2, x2, y2, GOLD);
-          Jaylib.DrawLine(x2, y1, x2, y2, GOLD);
+          // draw bounding box
+          DrawLine(x1, y1, x2, y1, GOLD);
+          DrawLine(x1, y1, x1, y2, GOLD);
+          DrawLine(x1, y2, x2, y2, GOLD);
+          DrawLine(x2, y1, x2, y2, GOLD);
         }
       }
     }
@@ -61,12 +64,12 @@ public class DebugComponent extends Component {
 
   private static void drawPoint(Vec3 pos, Raylib.Color color) {
     DrawCircleLines((int) pos.getX(), (int) pos.getY(), 10, color);
-    Jaylib.DrawLine((int) pos.getX() - 10, (int) pos.getY() + 10, (int) pos.getX() + 10, (int) pos.getY() - 10, color);
-    Jaylib.DrawLine((int) pos.getX() + 10, (int) pos.getY() + 10, (int) pos.getX() - 10, (int) pos.getY() - 10, color);
+    DrawLine((int) pos.getX() - 10, (int) pos.getY() + 10, (int) pos.getX() + 10, (int) pos.getY() - 10, color);
+    DrawLine((int) pos.getX() + 10, (int) pos.getY() + 10, (int) pos.getX() - 10, (int) pos.getY() - 10, color);
   }
 
   private void drawLine(Vec3 p1, Vec3 p2, Raylib.Color color) {
-    Jaylib.DrawLine((int) p1.getX(), (int) p1.getY(), (int) p2.getX(), (int) p2.getY(), color);
+    DrawLine((int) p1.getX(), (int) p1.getY(), (int) p2.getX(), (int) p2.getY(), color);
   }
 
   public static DebugComponent debug() {

@@ -9,7 +9,6 @@ import com.raylib.Raylib;
 import java.util.function.Consumer;
 
 import static com.raylib.Jaylib.*;
-import static com.raylib.Raylib.MeasureText;
 
 public class TextComponent extends Component {
   private String text;
@@ -32,13 +31,13 @@ public class TextComponent extends Component {
 
   @Override
   public void draw() {
-    Raylib.rlPushMatrix();
+    rlPushMatrix();
     {
       Raylib.Color color = gameObject.getOrDefault("color", Jaylib.BLACK);
-      Raylib.rlMultMatrixf(gameObject.getWorldTransform().toFloatTransposed());
+      rlMultMatrixf(gameObject.getWorldTransform().toFloatTransposed());
       DrawText(text, 0,0, fontHeight, color);
     }
-    Raylib.rlPopMatrix();
+    rlPopMatrix();
   }
 
   @Override

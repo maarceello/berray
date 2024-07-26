@@ -7,6 +7,7 @@ import com.berray.math.Vec2;
 import com.raylib.Raylib;
 
 import static com.raylib.Jaylib.*;
+import static com.raylib.Raylib.*;
 
 public class RectComponent extends Component {
   private final float width;
@@ -20,12 +21,12 @@ public class RectComponent extends Component {
 
   @Override
   public void draw() {
-    Raylib.rlPushMatrix();
+    rlPushMatrix();
     {
-      Raylib.rlMultMatrixf(gameObject.getWorldTransform().toFloatTransposed());
+      rlMultMatrixf(gameObject.getWorldTransform().toFloatTransposed());
       DrawRectangle(0,0, (int) width, (int) height, WHITE);
     }
-    Raylib.rlPopMatrix();
+    rlPopMatrix();
   }
 
 

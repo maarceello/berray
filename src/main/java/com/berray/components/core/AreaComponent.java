@@ -7,12 +7,32 @@ import com.berray.math.Rect;
 
 import java.util.*;
 
+
+/**
+ * # AreaComponent
+ *
+ * {@link AreaComponent#area()} provides collision detection for the game object.
+ *
+ * # Properties
+ *
+ * - worldArea (read only) - returns the current absolute positioning of the collision area
+ *
+ * # Events
+ *
+ * | Event         | Direction | Description |
+ * |---------------|-----------|---|
+ * | collideUpdate | consumed  | triggered by collision detection when this object collides with another. |
+ * | update        | consumed  | triggered by main update loop. used to keep track of objects which collides this frame and which doesn't collide anymore |
+ * | collide       | triggered | triggered when a collision starts |
+ * | collideEnd    | triggered | triggered when a collision ends |
+ */
 public class AreaComponent extends Component {
 
   /**
    * List of objects this object is already colliding with.
    */
   private Map<Integer, Collision> colliding = new HashMap<>();
+  /** List of objects this object is colliding with in the current frame. */
   private Set<Integer> collidingThisFrame = new HashSet<>();
 
   public AreaComponent(Rect shape) {
@@ -23,16 +43,12 @@ public class AreaComponent extends Component {
   @Override
   public void add(GameObject gameObject) {
     super.add(gameObject);
-    gameObject.on("hover", this::onHover);
     gameObject.on("collideUpdate", this::onCollideUpdate);
     gameObject.on("update", this::onUpdate);
 
     gameObject.registerGetter("worldArea", this::worldArea);
   }
 
-  public void onHover(Event event) {
-
-  }
 
   public void onCollideUpdate(Event event) {
     GameObject other = event.getParameter(0);

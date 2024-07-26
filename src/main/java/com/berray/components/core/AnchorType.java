@@ -2,6 +2,7 @@ package com.berray.components.core;
 
 import com.berray.math.Vec2;
 
+/** Anchor point for the {@link AnchorComponent}. */
 public enum AnchorType {
   TOP_LEFT(-1, -1),
   TOP(0, -1),

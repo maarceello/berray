@@ -111,10 +111,16 @@ public class GameObject {
     return gameObject;
   }
 
+  public void setGame(Game game) {
+    this.game = game;
+    // tell each childs the game instance
+    children.forEach(child -> child.setGame(game));
+  }
+
   public void addChild(GameObject other) {
     children.add(other);
     other.parent = this;
-    other.game = this.game;
+    other.setGame(this.game);
     trigger("add", this, other);
     other.trigger("add", this, other);
   }

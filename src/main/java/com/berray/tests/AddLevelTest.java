@@ -2,43 +2,20 @@ package com.berray.tests;
 
 import com.berray.BerrayApplication;
 import com.berray.GameObject;
-import com.berray.components.core.AnchorType;
-import com.berray.math.Vec2;
 import com.raylib.Jaylib;
 
 import static com.berray.AssetManager.loadSprite;
-import static com.berray.components.core.SpriteComponent.sprite;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.Supplier;
 
 
 public class AddLevelTest extends BerrayApplication {
-
-
-  // this needs to be a separate level class, with scenes and stuff
-  // but there i had problems to call "add()" since im not in the berray context anymore
-  // have fun mato
-
-  class Level {
-    public void addLevel(float tileWidth, float tileHeight, String[] levelString, Vec2 pos, Map<Character, Supplier<GameObject>> tileMappings) {
-      for (int y = 0; y < levelString.length; y++) {
-        for (int x = 0; x < levelString[y].length(); x++) {
-          char tile = levelString[y].charAt(x);
-          if (tileMappings.containsKey(tile)) {
-            GameObject gameObject = tileMappings.get(tile).get();
-            gameObject.addComponents(pos(pos.getX() + (x * tileWidth), pos.getY() + (y * tileHeight)));
-          }
-
-        }
-      }
-    }
-  }
-
+  private LevelBuilder levelBuilder;
 
   @Override
   public void game() {
+
+    // Note: levelBuilder is a field, so we can create the helper method for
+    // variant 3
+    this.levelBuilder = new LevelBuilder();
 
     // Load Resources
     loadSprite("grass", "resources/grass.png");
@@ -46,8 +23,6 @@ public class AddLevelTest extends BerrayApplication {
     loadSprite("berry", "resources/berry.png");
     loadSprite("door", "resources/door.png");
 
-    int tileWidth = 64;
-    int tileHeight = 64;
     String[] level = {
         "===|====",
         "=      =",
@@ -57,39 +32,54 @@ public class AddLevelTest extends BerrayApplication {
         "=      =",
         "========",
     };
-    Vec2 startingPos = new Vec2(100.0f, 100.0f);
-    Map<Character, Supplier<GameObject>> tiles = new HashMap<>();
-    tiles.put('=', () -> add(
-        sprite("grass"),
-        anchor(AnchorType.CENTER)
-    ));
-    tiles.put('$', () -> add(
-        sprite("key"),
-        anchor(AnchorType.CENTER)
-    ));
-    tiles.put('@', () -> add(
-        sprite("berry"),
-        anchor(AnchorType.CENTER)
-    ));
-    tiles.put('|', () -> add(
-        sprite("door"),
-        anchor(AnchorType.CENTER)
-    ));
 
-    // stupid
-    addLevelTemp(tileWidth, tileHeight, level, startingPos, tiles);
+    // Variante 1: der Hauptknoten wird von der game() kontrolliert bzw. erstellt und
+    // übergibt diesen an den LevelBuilder
+    GameObject variant1 = add(
+        pos(0, 100)
+    );
+    levelBuilder.addLevel1(variant1, level);
+    variant1.add(
+        text("Variant 1"),
+        pos(150, -30),
+        color(255, 203, 0)
+    );
 
+
+    // Variante 2: der LevelBuilder erstellt das GameObject. Da "add()" als ersten Parameter
+    // auch ein GameObject akzeptiert, sieht das schon eher "kanonisch"
+    GameObject variant2 = add(
+        levelBuilder.level(level),
+        pos(512, 100)
+    );
+    variant2.add(
+        text("Variant 2"),
+        pos(150, -30),
+        color(255, 203, 0)
+    );
+
+    // Variante 3: wie 2, nur dass 'levelBuilder.level(level)' in eine eigene Methode in dieser
+    // Klasse ausgelagert wurde. Da 'levelBuilder' ein Field ist, kann die Methode "level(String[] level)"
+    // darauf zugreifen. Jetzt sieht zumindest der Aufruf schön kanonisch aus.
+    GameObject variant3 = add(
+        level(level),
+        pos(1024, 100)
+    );
+    variant3.add(
+        text("Variant 3"),
+        pos(150, -30),
+        color(255, 203, 0)
+    );
   }
-  // more stupid
-  private void addLevelTemp(int tileWidth, int tileHeight, String[] levelString, Vec2 pos, Map<Character, Supplier<GameObject>> tileMappings) {
-    Level level = new Level();
-    level.addLevel(tileWidth, tileHeight, levelString, pos, tileMappings);
+
+  private GameObject level(String[] level) {
+    return levelBuilder.level(level);
   }
 
 
   @Override
   public void initWindow() {
-    width(1024);
+    width(512*3);
     height(768);
     background(Jaylib.GRAY);
     title("Add Level Test");

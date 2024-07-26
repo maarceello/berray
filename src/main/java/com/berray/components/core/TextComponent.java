@@ -1,13 +1,14 @@
-package com.berray.components;
+package com.berray.components.core;
 
 import com.berray.GameObject;
 import com.berray.math.Rect;
 import com.berray.math.Vec2;
+import com.raylib.Jaylib;
+import com.raylib.Raylib;
 
 import java.util.function.Consumer;
 
-import static com.raylib.Jaylib.DrawText;
-import static com.raylib.Jaylib.BLACK;
+import static com.raylib.Jaylib.*;
 import static com.raylib.Raylib.MeasureText;
 
 public class TextComponent extends Component {
@@ -25,22 +26,25 @@ public class TextComponent extends Component {
     this.text = text;
   }
 
+  private Vec2 getSize() {
+    return new Vec2(width, fontHeight);
+  }
+
   @Override
   public void draw() {
-    Vec2 pos = gameObject.getOrDefault("pos", Vec2.origin());
-    AnchorType anchor = gameObject.getOrDefault("anchor", AnchorType.CENTER);
-
-    int w2 = width / 2;
-    int h2 = fontHeight / 2;
-    float anchorX = w2 + anchor.getX() * w2;
-    float anchorY = h2 + anchor.getY() * h2;
-
-    DrawText(text, (int) (pos.getX() - anchorX), (int) (pos.getY() - anchorY), fontHeight, BLACK);
+    Raylib.rlPushMatrix();
+    {
+      Raylib.Color color = gameObject.getOrDefault("color", Jaylib.BLACK);
+      Raylib.rlMultMatrixf(gameObject.getWorldTransform().toFloatTransposed());
+      DrawText(text, 0,0, fontHeight, color);
+    }
+    Raylib.rlPopMatrix();
   }
 
   @Override
   public void add(GameObject gameObject) {
     gameObject.registerGetter("localArea", this::localArea);
+    gameObject.registerGetter("size", this::getSize);
     gameObject.registerSetter("text", (Consumer<String>) this::setText);
   }
 

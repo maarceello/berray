@@ -2,14 +2,13 @@ package com.berray.tests;
 
 import com.berray.BerrayApplication;
 import com.berray.GameObject;
+import com.berray.components.core.AnchorType;
 import com.berray.math.Vec2;
 import com.raylib.Jaylib;
 
 import static com.berray.AssetManager.loadMusic;
 import static com.berray.AssetManager.loadSprite;
-import static com.berray.components.CircleComponent.circle;
-import static com.berray.components.RotateComponent.rotate;
-import static com.berray.components.SpriteComponent.sprite;
+import static com.berray.components.core.SpriteComponent.sprite;
 import static com.raylib.Jaylib.RED;
 
 public class ShapeTest  extends BerrayApplication {
@@ -31,7 +30,8 @@ public class ShapeTest  extends BerrayApplication {
     debug = true;
 
     GameObject infoTxt = add(
-        text("Hello im a berry")
+        text("Hello im a berry"),
+        anchor(AnchorType.TOP_LEFT)
     );
 
     GameObject startTxt = add(
@@ -68,6 +68,7 @@ public class ShapeTest  extends BerrayApplication {
     GameObject berry = add(
         sprite("berry"),
         pos(110, 100),
+        anchor(AnchorType.TOP_LEFT),
         rotate(45),
         area()
     );
@@ -80,7 +81,7 @@ public class ShapeTest  extends BerrayApplication {
 
     on("mousePress", (event) -> {
       Vec2 pos = event.getParameter(0);
-      berry2.set("pos", pos);
+      berry.set("pos", pos);
     });
 
     game.onUpdate("sprite", event -> {
@@ -90,6 +91,7 @@ public class ShapeTest  extends BerrayApplication {
       if (pos != null) {
         // Note: this updates the pos inside the component
         pos.setY(mouseY);
+        gameObject.set("pos", pos);
       }
     });
   }

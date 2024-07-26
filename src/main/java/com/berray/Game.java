@@ -1,6 +1,6 @@
 package com.berray;
 
-import com.berray.components.AreaComponent;
+import com.berray.components.core.AreaComponent;
 import com.berray.event.EventListener;
 import com.berray.event.EventManager;
 import com.berray.math.Collision;

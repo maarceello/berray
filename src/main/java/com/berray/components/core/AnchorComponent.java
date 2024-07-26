@@ -1,4 +1,4 @@
-package com.berray.components;
+package com.berray.components.core;
 
 import com.berray.GameObject;
 

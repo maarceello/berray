@@ -27,9 +27,13 @@ public class AnchorComponent extends Component {
     return anchorType;
   }
 
+  public void setAnchor(AnchorType anchorType) {
+    this.anchorType = anchorType;
+  }
+
   @Override
   public void add(GameObject gameObject) {
-    gameObject.registerGetter("anchor", this::getAnchor);
+    gameObject.registerMethod("anchor", this::getAnchor, this::setAnchor);
   }
 
   public static AnchorComponent anchor(AnchorType anchorType) {

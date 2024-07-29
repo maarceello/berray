@@ -1,11 +1,11 @@
 package com.berray;
 
 
-import com.berray.components.core.*;
 import com.berray.event.Event;
 import com.berray.event.EventListener;
 import com.berray.math.Rect;
 import com.berray.math.Vec2;
+import com.raylib.Raylib.Vector2;
 
 import static com.berray.components.core.DebugComponent.debug;
 import static com.raylib.Jaylib.*;
@@ -20,6 +20,7 @@ public abstract class BerrayApplication {
   private String title = "Berry Application";
 
   protected boolean debug = false;
+  protected int frameNo = 0;
 
 
   public BerrayApplication width(int width) {
@@ -67,6 +68,24 @@ public abstract class BerrayApplication {
     game.onUpdate(tag, eventListener);
   }
 
+  public void onKeyPress(int key, EventListener eventListener) {
+    game.on("keyPress", (event) -> {
+      int pressedKey = event.getParameter(0);
+      if (pressedKey == key) {
+        eventListener.onEvent(event);
+      }
+    });
+  }
+
+  public void onKeyDown(int key, EventListener eventListener) {
+    game.on("keyDown", (event) -> {
+      int pressedKey = event.getParameter(0);
+      if (pressedKey == key) {
+        eventListener.onEvent(event);
+      }
+    });
+  }
+
 
   public void trigger(String event, Object... params) {
     game.trigger(event, params);
@@ -96,6 +115,7 @@ public abstract class BerrayApplication {
 
     SetTargetFPS(60);
     while (!WindowShouldClose()) {
+      frameNo++;
       game.checkFrame();
       game.update();
       BeginDrawing();
@@ -130,53 +150,47 @@ public abstract class BerrayApplication {
     }
   }
 
+  // KEY_KB_MENU is the last key code with id 348
+  private int[] keysDown = new int[KEY_KB_MENU];
+
   private void processInputs() {
     if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-      com.raylib.Raylib.Vector2 pos = GetMousePosition();
+      Vector2 pos = GetMousePosition();
       game.trigger("mousePress", new Vec2(pos.x(), pos.y()));
+    }
+
+    while (true) {
+      int keyCode = GetKeyPressed();
+      // no more keys
+      if (keyCode == 0) {
+        break;
+      }
+      // save frame in which the key was last down.
+      keysDown[keyCode] = frameNo;
+    }
+
+    for (int i = 0; i < keysDown.length; i++) {
+      int frame = keysDown[i];
+      if (frame > 0) {
+        // key was pressed this or the last frame
+        if (frame < frameNo) {
+          // frame was pressed the last frame, but not this. So the key must be released
+          keysDown[i] = 0;
+          trigger("keyPress", i);
+        } else {
+          // key is still pressed (or pressed the first time)
+          trigger("keyDown", i);
+        }
+      }
     }
   }
 
-  // Shortcuts to some common base components
-  public PosComponent pos(float x, float y) {
-    return PosComponent.pos(x, y);
+  public void play(String name) {
+    // TODO: play sound
   }
 
-  public PosComponent pos(Vec2 pos) {
-    return PosComponent.pos(pos);
+  public void destroy(GameObject gameObject) {
+    game.destroy(gameObject);
   }
-
-  public static RectComponent rect(float width, float height) {
-    return RectComponent.rect(width, height);
-  }
-
-  public static CircleComponent circle(float radius) {
-    return CircleComponent.circle(radius);
-  }
-
-  public static AnchorComponent anchor(AnchorType anchorType) {
-    return AnchorComponent.anchor(anchorType);
-  }
-
-  public static RotateComponent rotate(float angle) {
-    return RotateComponent.rotate(angle);
-  }
-
-  public static AreaComponent area() {
-    return AreaComponent.area();
-  }
-
-  public static AreaComponent area(Rect shape) {
-    return AreaComponent.area(shape);
-  }
-
-  public TextComponent text(String text) {
-    return TextComponent.text(text);
-  }
-
-  public ColorComponent color(int r, int g, int b) {
-    return ColorComponent.color(r, g, b);
-  }
-
 
 }

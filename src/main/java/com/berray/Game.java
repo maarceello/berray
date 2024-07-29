@@ -12,7 +12,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class Game {
-  private int gravity;
+  /** Gravity vector. */
+  private Vec2 gravity;
+  /** normalized gravity vector. */
+  private Vec2 gravityDirection;
   private final GameObject root;
 
   private EventManager eventManager = new EventManager();
@@ -28,11 +31,15 @@ public class Game {
     root.on("add", event -> eventManager.trigger(event.getName(), event.getParameters()));
     // forward update events down the object tree
     on("update", event -> root.trigger(event.getName(), event.getParameters()));
+
+    root.registerGetter("gravityDirection", this::getGravityDirection);
+    root.registerGetter("gravity", this::getGravity);
   }
 
   public float width() {
     return Jaylib.GetRenderWidth();
   }
+
   public float height() {
     return Jaylib.GetRenderHeight();
   }
@@ -41,7 +48,22 @@ public class Game {
     return new Vec2(width() / 2, height() / 2);
   }
 
-  /** Add a game object to the game */
+  public void setGravity(int gravity) {
+    this.gravity = new Vec2(0, gravity);
+    this.gravityDirection = this.gravity.normalize();
+  }
+
+  public Vec2 getGravityDirection() {
+    return gravityDirection;
+  }
+
+  public Vec2 getGravity() {
+    return gravity;
+  }
+
+  /**
+   * Add a game object to the game
+   */
   public GameObject add(Object... components) {
     GameObject newGameObject = root.add(components);
     // forward add events from the new game object to game event manager
@@ -49,13 +71,17 @@ public class Game {
     return newGameObject;
   }
 
-  /** Add a game object to the game */
+  /**
+   * Add a game object to the game
+   */
   public void addChild(GameObject child) {
     root.addChild(child);
   }
 
 
-  /** Update all game objects */
+  /**
+   * Update all game objects
+   */
   public void update() {
     root.update(Jaylib.GetFrameTime());
   }
@@ -81,6 +107,7 @@ public class Game {
 
   public void checkFrame() {
     // linearize the object tree
+    // https://en.wikipedia.org/wiki/Sweep_and_prune
     List<GameObject> gameObjects = new ArrayList<>();
     for (GameObject gameObject : root.getChildren()) {
       addGameObjects(gameObject, gameObjects);
@@ -88,8 +115,8 @@ public class Game {
     // only keep game objects with area component
     List<GameObject> areaObjects = gameObjects.stream().filter(gameObject -> gameObject.is("area")).collect(Collectors.toList());
 
-    for (int i = 0; i < areaObjects.size()-1; i++) {
-      checkObj(areaObjects.get(i), areaObjects.subList(i+1, areaObjects.size()));
+    for (int i = 0; i < areaObjects.size() - 1; i++) {
+      checkObj(areaObjects.get(i), areaObjects.subList(i + 1, areaObjects.size()));
     }
 
   }
@@ -134,11 +161,13 @@ public class Game {
   }
 
 
-  public void trigger(String event, Object...params) {
+  public void trigger(String event, Object... params) {
     eventManager.trigger(event, Arrays.asList(params));
   }
 
-  /** Update all game objects */
+  /**
+   * Update all game objects
+   */
   public void onUpdate(String tag, EventListener eventListener) {
     on("update", event -> {
       GameObject gameObject = event.getParameter(0);
@@ -147,9 +176,10 @@ public class Game {
         eventListener.onEvent(event);
       }
     });
-
   }
 
+  /** removes the game object and all of its children from the game. */
+  public void destroy(GameObject gameObject) {
 
-
+  }
 }

@@ -2,16 +2,16 @@ package com.berray.tests;
 
 import com.berray.BerrayApplication;
 import com.berray.GameObject;
+import com.berray.components.CoreComponentShortcuts;
 import com.berray.components.core.AnchorType;
 import com.berray.math.Vec2;
 import com.raylib.Jaylib;
 
 import static com.berray.AssetManager.loadMusic;
 import static com.berray.AssetManager.loadSprite;
-import static com.berray.components.core.SpriteComponent.sprite;
 import static com.raylib.Jaylib.RED;
 
-public class ShapeTest  extends BerrayApplication {
+public class ShapeTest  extends BerrayApplication implements CoreComponentShortcuts {
 
   @Override
   public void initWindow() {

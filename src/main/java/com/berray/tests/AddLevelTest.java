@@ -2,84 +2,110 @@ package com.berray.tests;
 
 import com.berray.BerrayApplication;
 import com.berray.GameObject;
+import com.berray.components.CoreComponentShortcuts;
+import com.berray.components.core.AnchorType;
+import com.berray.math.Vec2;
+import com.berray.tests.level.LevelBuilder;
+import com.berray.tests.level.LevelGameObject;
 import com.raylib.Jaylib;
 
 import static com.berray.AssetManager.loadSprite;
+import static java.lang.Boolean.FALSE;
 
 
-public class AddLevelTest extends BerrayApplication {
+public class AddLevelTest extends BerrayApplication implements CoreComponentShortcuts {
+  private static final int SPEED = 480;
   private LevelBuilder levelBuilder;
 
   @Override
   public void game() {
 
-    // Note: levelBuilder is a field, so we can create the helper method for
-    // variant 3
-    this.levelBuilder = new LevelBuilder();
+    game.setGravity(2400);
 
-    // Load Resources
+
+    loadSprite("bean", "resources/berry.png");
+    loadSprite("coin", "resources/coin.png");
+    loadSprite("spike", "resources/spike.png");
     loadSprite("grass", "resources/grass.png");
-    loadSprite("key", "resources/key.png");
-    loadSprite("berry", "resources/berry.png");
-    loadSprite("door", "resources/door.png");
 
-    String[] level = {
-        "===|====",
-        "=      =",
-        "= $    =",
-        "=    a =",
-        "=    @ =",
-        "=      =",
-        "========",
-    };
+    this.levelBuilder = new LevelBuilder();
+    levelBuilder
+        .tileWidth(64)
+        .tileHeight(64)
+        .tile('@', tile -> tile.components(
+            sprite("bean"),
+            area(),
+            body(),
+            anchor(AnchorType.BOTTOM),
+            "player"
+        ))
+        .tile('=', tile -> tile.components(
+            sprite("grass"),
+            area(),
+            body(true),
+            anchor(AnchorType.BOTTOM)
+        ))
+        .tile('$', tile -> tile.components(
+            sprite("coin"),
+            area(),
+            anchor(AnchorType.BOTTOM),
+            "coin"
+        ))
+        .tile('^', tile -> tile.components(
+            sprite("spike"),
+            area(),
+            anchor(AnchorType.BOTTOM),
+            "danger"
+        ));
 
-    // Variante 1: der Hauptknoten wird von der game() kontrolliert bzw. erstellt und
-    // übergibt diesen an den LevelBuilder
-    GameObject variant1 = add(
-        pos(0, 100)
-    );
-    levelBuilder.addLevel1(variant1, level);
-    variant1.add(
-        text("Variant 1"),
-        pos(150, -30),
-        color(255, 203, 0)
+    LevelGameObject level = levelBuilder.level(
+        "@  ^ $$",
+        "=======");
+    level.set("pos", new Vec2(100, 200));
+    level.set("anchor", AnchorType.TOP_LEFT);
+
+    add(level);
+
+    level.getGameObjectStream().forEach((gameObject) -> {
+          System.out.println(gameObject.getId()+": "+gameObject.getTags()+" "+gameObject.getChildren());
+        }
     );
 
+    // Get the player object from tag
+    GameObject player = level.getTagStream("player").findFirst().orElse(null);
 
-    // Variante 2: der LevelBuilder erstellt das GameObject. Da "add()" als ersten Parameter
-    // auch ein GameObject akzeptiert, sieht das schon eher "kanonisch"
-    GameObject variant2 = add(
-        levelBuilder.level(level),
-        pos(512, 100)
-    );
-    variant2.add(
-        text("Variant 2"),
-        pos(150, -30),
-        color(255, 203, 0)
-    );
+    // Movements
+    onKeyPress(Jaylib.KEY_SPACE, (event) -> {
+      if (player.<Boolean>getOrDefault("grounded", FALSE)) {
+        player.doAction("jump");
+      }
+    });
 
-    // Variante 3: wie 2, nur dass 'levelBuilder.level(level)' in eine eigene Methode in dieser
-    // Klasse ausgelagert wurde. Da 'levelBuilder' ein Field ist, kann die Methode "level(String[] level)"
-    // darauf zugreifen. Jetzt sieht zumindest der Aufruf schön kanonisch aus.
-    GameObject variant3 = add(
-        level(level),
-        pos(1024, 100)
-    );
-    variant3.add(
-        text("Variant 3"),
-        pos(150, -30),
-        color(255, 203, 0)
-    );
-  }
+    onKeyDown(Jaylib.KEY_LEFT, (event) -> {
+      player.doAction("move", -SPEED, 0);
+    });
 
-  private GameObject level(String[] level) {
-    return levelBuilder.level(level);
+    onKeyDown(Jaylib.KEY_RIGHT, (event) -> {
+      player.doAction("move", SPEED, 0);
+    });
+
+    // Back to the original position if hit a "danger" item
+    player.onCollide("danger", (event) -> {
+      player.set("pos", level.tile2Pos(0, 0));
+    });
+
+    // Eat the coin!
+    player.onCollide("coin", (event) -> {
+      GameObject coin = event.getParameter(0);
+      destroy(coin);
+      play("score");
+    });
   }
 
 
   @Override
   public void initWindow() {
-    width(512*3);
+    width(1024);
     height(768);
     background(Jaylib.GRAY);
     title("Add Level Test");

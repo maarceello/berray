@@ -47,8 +47,14 @@ public class AreaComponent extends Component {
     gameObject.on("update", this::onUpdate);
 
     gameObject.registerGetter("worldArea", this::worldArea);
+    gameObject.registerAction("isColliding", this::isColliding);
   }
 
+  // TODO kaboom: perform check instead of use cache
+  public boolean isColliding(List<Object> params) {
+    GameObject other = (GameObject) params.get(0);
+    return colliding.containsKey(other.getId());
+  }
 
   public void onCollideUpdate(Event event) {
     GameObject other = event.getParameter(0);

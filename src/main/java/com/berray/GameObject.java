@@ -11,7 +11,10 @@ import com.berray.math.Vec2;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 public class GameObject {
   private static final AtomicInteger nextComponentId = new AtomicInteger(0);
@@ -34,6 +37,12 @@ public class GameObject {
    * registered setter methods from components.
    */
   private final Map<String, Consumer<?>> setterMethods = new HashMap<>();
+  /**
+   * registered action methods.
+   */
+  private final Map<String, Function<List<Object>, ?>> actionMethods = new HashMap<>();
+
+
   private final Map<String, Object> properties = new HashMap<>();
   /**
    * event manager for game object local event.
@@ -88,18 +97,17 @@ public class GameObject {
    * Add a GameObject as a child to this gameObject.
    * `components` is an array of:
    *
-   * - a {@link Component}. Components are added the the child gameobject as is.
+   * - a {@link Component}. Components are added to the child gameobject as is.
    * - a {@link String}. I this case the string will be added as a tag to the child gameObject.
    * - the first component may be an instance of {@link GameObject}. In this case this object is
-   *   uses as the new object and all components and tags are added to this existing game object.
-   *
-   * */
+   * uses as the new object and all components and tags are added to this existing game object.
+   */
   public GameObject add(Object... components) {
-    if (components == null || components.length == 0) {
-      throw new NullPointerException("components is null or empty");
+    if (components == null) {
+      throw new NullPointerException("components is null");
     }
     GameObject gameObject;
-    if (components[0] instanceof GameObject) {
+    if (components.length > 0 && components[0] instanceof GameObject) {
       gameObject = (GameObject) components[0];
       gameObject.addComponents(Arrays.asList(components).subList(1, components.length));
     } else {
@@ -115,6 +123,10 @@ public class GameObject {
     this.game = game;
     // tell each childs the game instance
     children.forEach(child -> child.setGame(game));
+  }
+
+  public Set<String> getTags() {
+    return tags;
   }
 
   public void addChild(GameObject other) {
@@ -146,10 +158,10 @@ public class GameObject {
     addComponents(Arrays.asList(components));
   }
 
-    /**
-     * only for classes extending GameObject: add components to this game object and trigger "add" event.
-     */
-  protected void addComponents(List<Object> components) {
+  /**
+   * add components to this game object and trigger "add" event.
+   */
+  public void addComponents(List<Object> components) {
     for (Object c : components) {
       if (c instanceof String) {
         addTag(c.toString());
@@ -207,6 +219,17 @@ public class GameObject {
     setterMethods.put(name, setter);
   }
 
+  public void registerAction(String name, Consumer<List<Object>> actionMethod) {
+    actionMethods.put(name, (params) -> {
+      actionMethod.accept(params);
+      return null;
+    });
+  }
+
+  public void registerAction(String name, Function<List<Object>, ?> actionMethod) {
+    actionMethods.put(name, actionMethod);
+  }
+
   /**
    * returns registered component property
    */
@@ -228,9 +251,47 @@ public class GameObject {
    */
   public <E> void set(String property, E value) {
     Consumer<E> setterMethod = (Consumer<E>) setterMethods.get(property);
-    if (setterMethod != null) {
-      setterMethod.accept(value);
+    if (setterMethod == null) {
+      throw new IllegalStateException("cannot find setter for property "+property+" in gameobject with tags "+tags);
     }
+    setterMethod.accept(value);
+  }
+
+  /**
+   * calls a registered action, returning the result
+   */
+  public <E> E doAction(String methodName, Object... value) {
+    Function<List<Object>, E> actionMethod = (Function<List<Object>, E>) actionMethods.get(methodName);
+    if (actionMethod == null) {
+      throw new IllegalStateException("can't find action method " + methodName+" on game object with tags "+tags);
+    }
+    return actionMethod.apply(value == null ? Collections.emptyList() : Arrays.asList(value));
+  }
+
+  /**
+   * Returns an iterator over all children game objects.
+   *
+   * @param recursive when true the children are returned recursivly (breadth-first)
+   */
+  public Iterator<GameObject> childrenIterator(boolean recursive) {
+    return new ChildIterator(children, recursive);
+  }
+
+  /**
+   * Returns all game objects recursively as a stream. The iteration order is breath-first.
+   */
+  public Stream<GameObject> getGameObjectStream() {
+    return StreamSupport.stream(
+        Spliterators.spliteratorUnknownSize
+            (childrenIterator(true), Spliterator.ORDERED), false);
+  }
+
+  /**
+   * Returns all game objects with the specified tag.
+   */
+  public Stream<GameObject> getTagStream(String tag) {
+    return getGameObjectStream()
+        .filter(object -> object.is(tag));
   }
 
   public void setProperty(String property, Object value) {
@@ -262,6 +323,10 @@ public class GameObject {
 
   public void trigger(String eventName, Object... params) {
     eventManager.trigger(eventName, Arrays.asList(params));
+  }
+
+  public GameObject getRoot() {
+    return (parent == null) ? this : parent.getRoot();
   }
 
   /**
@@ -330,4 +395,72 @@ public class GameObject {
     return worldTransform;
   }
 
+  public boolean exists() {
+    return parent != null;
+  }
+
+  private static class ChildIterator implements Iterator<GameObject> {
+    private final List<GameObject> children;
+    private final List<ChildIterator> childIterators;
+
+    private int position = 0;
+    private int depthPosition = 0;
+
+    public ChildIterator(List<GameObject> children, boolean recursive) {
+      this.children = new ArrayList<>(children);
+      this.childIterators = new ArrayList<>();
+      if (recursive) {
+        for (GameObject child : children) {
+          List<GameObject> children1 = child.getChildren();
+          if (!children1.isEmpty()) {
+            childIterators.add(new ChildIterator(children1, true));
+          }
+        }
+      }
+    }
+
+    @Override
+    public boolean hasNext() {
+      // still one element in our own children?
+      if (position < children.size()) {
+        return true;
+      }
+
+      // no more child iterators?
+      if (depthPosition >= childIterators.size()) {
+        // => no more elements
+        return false;
+      }
+
+      // either the current child iterator has one more element or
+      // we have another child iterator (which we checked just before)
+      return true;
+    }
+
+    @Override
+    public GameObject next() {
+      // still an element in our own list? return it (and increase position).
+      if (position < children.size()) {
+        return children.get(position++);
+      }
+
+      if (!childIterators.isEmpty()) {
+
+        // the current iterator still has elements? return it.
+        if (childIterators.get(depthPosition).hasNext()) {
+          return childIterators.get(depthPosition).next();
+        }
+
+        // current iterator is drained, but we have another child iterator ?
+        if (depthPosition < children.size()) {
+          // increase depthPosition and return the element from this iterator.
+          return childIterators.get(depthPosition++).next();
+        }
+      }
+
+      // no element in out own list, current iterator is drained and
+      // we don't have more iterators. so we don't have an element to return
+      throw new NoSuchElementException();
+    }
+  }
 }

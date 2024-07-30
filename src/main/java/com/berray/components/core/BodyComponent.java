@@ -23,6 +23,7 @@ public class BodyComponent extends Component {
    * current jump force
    */
   private float jumpForce = DEFAULT_JUMP_FORCE;
+  private float mass = 1.0f;
   /**
    * other object this object sits on
    */
@@ -49,26 +50,93 @@ public class BodyComponent extends Component {
   public void add(GameObject gameObject) {
     super.add(gameObject);
     gameObject.registerGetter("grounded", this::isGrounded);
+    gameObject.registerGetter("static", this::isStatic);
     gameObject.registerAction("jump", this::jump);
 
     if (gameObject.is("area")) {
       gameObject.on("collideUpdate", this::collideUpdate);
+      gameObject.on("physicsResolve", this::onPhysicsResolve);
     }
     gameObject.on("update", this::update);
   }
 
+  public boolean isStatic() {
+    return isStatic;
+  }
+
+
   public void collideUpdate(Event event) {
     GameObject other = event.getParameter(0);
-    Collision col = event.getParameter(1);
+    Collision collision = event.getParameter(1);
 
-    if (col == null || col.isResolved() || !other.is("body")) {
+    if (collision == null || collision.isResolved() || !other.is("body")) {
       return;
     }
 
-    gameObject.trigger("beforePhysicsResolve", col);
-    Collision rcol = col.reverse();
-    other.trigger("beforePhysicsResolve", rcol);
+    gameObject.trigger("beforePhysicsResolve", collision);
+    Collision reverseCollision = collision.reverse();
+    other.trigger("beforePhysicsResolve", reverseCollision);
+    // user can mark 'resolved' in beforePhysicsResolve to stop a resolution
+    if (collision.isResolved() || reverseCollision.isResolved()) {
+      return;
+    }
+
+    BodyComponent otherBody = other.getComponent(BodyComponent.class);
+    if (otherBody != null) {
+      if (this.isStatic && otherBody.isStatic) {
+        // both objects are static: do nothing to resolve the collision
+        return;
+      } else if (!this.isStatic && !otherBody.isStatic) {
+        // both objects are dynamic. bounce the object back, based on their mass ratio
+        float totalMass = this.mass + otherBody.mass;
+        gameObject.doAction("moveBy", collision.getDisplacement().scale(otherBody.mass / totalMass));
+        other.doAction("moveBy", collision.getDisplacement().scale(-this.mass / totalMass));
+      } else {
+        // if one is static and one is not, resolve the non-static one
+        if (!this.isStatic) {
+          gameObject.doAction("moveBy", collision.getDisplacement());
+        } else {
+          other.doAction("moveBy", reverseCollision.getDisplacement());
+        }
+      }
+    }
+
+    collision.setResolved(true);
+    reverseCollision.setResolved(true);
+    gameObject.trigger("physicsResolve", collision);
+    other.trigger("physicsResolve", reverseCollision);
   }
+
+  public boolean isFalling() {
+    Vec2 gravityDirection = gameObject.getRoot().get("gravityDirection");
+    return gravityDirection != null && this.vel.dot(gravityDirection) > 0;
+  }
+
+  public boolean isJumping() {
+    Vec2 gravityDirection = gameObject.getRoot().get("gravityDirection");
+    return gravityDirection != null && this.vel.dot(gravityDirection) < 0;
+  }
+
+  private void onPhysicsResolve(Event event) {
+    Collision col = event.getParameter(0);
+    Vec2 gravity = gameObject.getRoot().get("gravity");
+    if (gravity != null) {
+      if (col.isBottom(gravity) && this.isFalling()) {
+        this.vel = this.vel.reject(gravity.normalize());
+        curPlatform = col.getOther();
+        lastPlatformPos = curPlatform.get("pos");
+        if (willFall) {
+          willFall = false;
+        } else {
+          gameObject.trigger("ground", curPlatform);
+        }
+      } else if (col.isTop(gravity) && this.isJumping()) {
+        this.vel = this.vel.reject(gravity.normalize());
+        gameObject.trigger("headbutt", col.getOther());
+      }
+    }
+  };
+
 
   public void update(Event event) {
     float deltaTime = event.getParameter(0);

@@ -20,7 +20,9 @@ public class AddLevelTest extends BerrayApplication implements CoreComponentShor
   @Override
   public void game() {
 
-    game.setGravity(2400);
+    debug = true;
+
+    game.setGravity(200);
 
 
     loadSprite("bean", "resources/berry.png");
@@ -59,7 +61,8 @@ public class AddLevelTest extends BerrayApplication implements CoreComponentShor
         ));
 
     LevelGameObject level = levelBuilder.level(
-        "@  ^ $$",
+        "@      ",
+        "   ^ $$",
         "=======");
     level.set("pos", new Vec2(100, 200));
     level.set("anchor", AnchorType.TOP_LEFT);

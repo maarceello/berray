@@ -5,7 +5,9 @@ import com.berray.components.core.Component;
 import com.berray.event.EventListener;
 import com.berray.event.EventManager;
 import com.berray.math.Matrix4;
+import com.berray.math.Rect;
 import com.berray.math.Vec2;
+import com.berray.math.Vec3;
 
 
 import java.util.*;
@@ -74,6 +76,11 @@ public class GameObject {
    */
   protected boolean transformDirty = true;
 
+  /**
+   * Bounding box in world coordinates.
+   */
+  protected Rect boundingBox;
+
   public GameObject() {
     this.components = new LinkedHashMap<>();
     this.id = nextGameObjectId.incrementAndGet();
@@ -93,10 +100,15 @@ public class GameObject {
     return id;
   }
 
+  public Rect getBoundingBox() {
+    ensureTransformCalculated();
+    return boundingBox;
+  }
+
   /**
    * Add a GameObject as a child to this gameObject.
    * `components` is an array of:
-   *
+   * <p>
    * - a {@link Component}. Components are added to the child gameobject as is.
    * - a {@link String}. I this case the string will be added as a tag to the child gameObject.
    * - the first component may be an instance of {@link GameObject}. In this case this object is
@@ -252,7 +264,7 @@ public class GameObject {
   public <E> void set(String property, E value) {
     Consumer<E> setterMethod = (Consumer<E>) setterMethods.get(property);
     if (setterMethod == null) {
-      throw new IllegalStateException("cannot find setter for property "+property+" in gameobject with tags "+tags);
+      throw new IllegalStateException("cannot find setter for property " + property + " in gameobject with tags " + tags);
     }
     setterMethod.accept(value);
   }
@@ -263,7 +275,7 @@ public class GameObject {
   public <E> E doAction(String methodName, Object... value) {
     Function<List<Object>, E> actionMethod = (Function<List<Object>, E>) actionMethods.get(methodName);
     if (actionMethod == null) {
-      throw new IllegalStateException("can't find action method " + methodName+" on game object with tags "+tags);
+      throw new IllegalStateException("can't find action method " + methodName + " on game object with tags " + tags);
     }
     return actionMethod.apply(value == null ? Collections.emptyList() : Arrays.asList(value));
   }
@@ -374,7 +386,12 @@ public class GameObject {
   }
 
   public Matrix4 getWorldTransform() {
-    if (transformDirty) {
+    ensureTransformCalculated();
+    return worldTransform;
+  }
+
+  private void ensureTransformCalculated() {
+    if (transformDirty || (parent != null && parent.isTransformDirty())) {
       Vec2 pos = getOrDefault("pos", Vec2.origin());
       float angle = getOrDefault("angle", 0f);
       Vec2 size = getOrDefault("size", Vec2.origin());
@@ -389,10 +406,44 @@ public class GameObject {
       localTransformWithoutAnchor = Matrix4.fromTranslate(pos.getX(), pos.getY(), 0)
           .multiply(Matrix4.fromRotatez((float) Math.toRadians(angle)));
       localTransform = localTransformWithoutAnchor.multiply(Matrix4.fromTranslate(-anchorX, -anchorY, 0));
+
+      if (is("area")) {
+        this.boundingBox = calculateBoundingBox(localTransformWithoutAnchor, size, anchor);
+      } else {
+        this.boundingBox = null;
+      }
+
       worldTransform = parent == null ? localTransform : parent.getWorldTransform().multiply(localTransform);
       transformDirty = false;
     }
-    return worldTransform;
+  }
+
+
+  protected Rect calculateBoundingBox(Matrix4 localTransformWithoutAnchor, Vec2 size, AnchorType anchor) {
+    if (size.getX() <= 0 || size.getY() <= 0) {
+      // a game object without dimensions cannot collide with anything
+      return null;
+    }
+    Matrix4 localTransform = localTransformWithoutAnchor;
+    Matrix4 parentsWorldTransform = getParent().getWorldTransform();
+    Matrix4 worldTransformWithoutAnchor = parentsWorldTransform.multiply(localTransform);
+
+    Vec2 anchorPoint = anchor.getAnchorPoint(size);
+    float width = size.getX();
+    float height = size.getY();
+
+    Vec3 p1 = worldTransformWithoutAnchor.multiply(anchorPoint.getX(), anchorPoint.getY(), 0);
+    Vec3 p2 = worldTransformWithoutAnchor.multiply(anchorPoint.getX() + width, anchorPoint.getY(), 0);
+    Vec3 p3 = worldTransformWithoutAnchor.multiply(anchorPoint.getX(), anchorPoint.getY() + height, 0);
+    Vec3 p4 = worldTransformWithoutAnchor.multiply(anchorPoint.getX() + width, anchorPoint.getY() + height, 0);
+
+    int x1 = (int) Math.min(p1.getX(), Math.min(p2.getX(), Math.min(p3.getX(), p4.getX())));
+    int x2 = (int) Math.max(p1.getX(), Math.max(p2.getX(), Math.max(p3.getX(), p4.getX())));
+
+    int y1 = (int) Math.min(p1.getY(), Math.min(p2.getY(), Math.min(p3.getY(), p4.getY())));
+    int y2 = (int) Math.max(p1.getY(), Math.max(p2.getY(), Math.max(p3.getY(), p4.getY())));
+
+    return new Rect(x1, y1, x2 - x1, y2 - y1);
   }
 
   public boolean exists() {
@@ -426,15 +477,18 @@ public class GameObject {
         return true;
       }
 
-      // no more child iterators?
-      if (depthPosition >= childIterators.size()) {
-        // => no more elements
-        return false;
+      // current child iterator has more elements?
+      if (!childIterators.isEmpty() && childIterators.get(depthPosition).hasNext()) {
+        return true;
       }
 
-      // either the current child iterator has one more element or
-      // we have another child iterator (which we checked just before)
-      return true;
+      // still more child iterators?
+      if ((depthPosition+1) < childIterators.size()) {
+        return true;
+      }
+
+      // our own childs are processed and all child iterators. so no more elements available.
+      return false;
     }
 
     @Override
@@ -451,10 +505,12 @@ public class GameObject {
           return childIterators.get(depthPosition).next();
         }
 
+        depthPosition += 1;
+
         // current iterator is drained, but we have another child iterator ?
         if (depthPosition < children.size()) {
           // increase depthPosition and return the element from this iterator.
-          return childIterators.get(depthPosition++).next();
+          return childIterators.get(depthPosition).next();
         }
       }
 

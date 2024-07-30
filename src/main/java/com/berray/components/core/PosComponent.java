@@ -30,7 +30,7 @@ public class PosComponent extends Component {
     if (params.get(0) instanceof Vec2) {
       Vec2 velocity = (Vec2) params.get(0);
       float deltaTime = (float) params.get(1);
-      pos = pos.move(velocity.scale(deltaTime));
+      setPos(pos.move(velocity.scale(deltaTime)));
     }
   }
 
@@ -40,8 +40,8 @@ public class PosComponent extends Component {
    * */
   public void moveBy(List<Object> params) {
     if (params.get(0) instanceof Vec2) {
-      Vec2 velocity = (Vec2) params.get(0);
-      pos = pos.move(velocity);
+      Vec2 amount = (Vec2) params.get(0);
+      pos = pos.move(amount);
     }
   }
 

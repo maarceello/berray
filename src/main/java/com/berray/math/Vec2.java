@@ -20,6 +20,10 @@ public class Vec2 {
     return new Vec2(0.0f, 0.0f);
   }
 
+  public static Vec2 down() {
+    return new Vec2(0.0f, 1.0f);
+  }
+
   public static Vec2 fromAngle(float angleDegree) {
     double rad = Math.toRadians(angleDegree);
     return new Vec2((float) Math.cos(rad), (float) Math.sin(rad));
@@ -51,25 +55,27 @@ public class Vec2 {
 
   public Vec2 normalize() {
     float len = length();
-    return new Vec2(this.x /len, this.y / len);
+    return len == 0 ? origin() : new Vec2(this.x / len, this.y / len);
   }
 
   public float length() {
     return (float) Math.sqrt(this.x * this.x + this.y * this.y);
   }
+
   public float lengthSquared() {
     return this.x * this.x + this.y * this.y;
   }
 
   public Vec2 sub(Vec2 other) {
-    return new Vec2(this.x -other.getX(), this.y - other.getY());
+    return new Vec2(this.x - other.getX(), this.y - other.getY());
   }
 
   public Vec2 move(Vec2 speed) {
     return add(speed);
   }
+
   public Vec2 add(Vec2 other) {
-    return new Vec2(this.x +other.getX(), this.y +other.getY());
+    return new Vec2(this.x + other.getX(), this.y + other.getY());
   }
 
   public float angle(Vec2 other) {
@@ -88,4 +94,23 @@ public class Vec2 {
   public float dot(Vec2 other) {
     return this.x * other.x + this.y * other.y;
   }
+
+  public float cross(Vec2 other) {
+    return this.x * other.y - this.y * other.x;
+  }
+
+  /**
+   * Get the projection of a vector onto another vector.
+   */
+  public Vec2 project(Vec2 on) {
+    return on.scale(on.dot(this) / on.length());
+  }
+
+  /**
+   * Get the rejection of a vector onto another vector.
+   */
+  public Vec2 reject(Vec2 on) {
+    return this.sub(this.project(on));
+  }
+
 }

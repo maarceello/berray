@@ -2,6 +2,7 @@ package com.berray.components.core;
 
 import com.berray.GameObject;
 import com.berray.math.Matrix4;
+import com.berray.math.Rect;
 import com.berray.math.Vec2;
 import com.berray.math.Vec3;
 import com.raylib.Jaylib;
@@ -30,6 +31,8 @@ public class DebugComponent extends Component {
         int id = gameObject.getParent().getId();
         Jaylib.DrawText("#" + id, (int) pos.getX(), (int) pos.getY() - 25, 15, GOLD);
 
+
+
         Vec2 size = parent.get("size");
         if (size != null) {
           Vec2 anchorPoint = anchor.getAnchorPoint(size);
@@ -40,23 +43,25 @@ public class DebugComponent extends Component {
           Vec3 p3 = worldTransform.multiply(anchorPoint.getX(), anchorPoint.getY() + height, 0);
           Vec3 p4 = worldTransform.multiply(anchorPoint.getX() + width, anchorPoint.getY() + height, 0);
 
-          int x1 = (int) Math.min(p1.getX(), Math.min(p2.getX(), Math.min(p3.getX(), p4.getX())));
-          int x2 = (int) Math.max(p1.getX(), Math.max(p2.getX(), Math.max(p3.getX(), p4.getX())));
-
-          int y1 = (int) Math.min(p1.getY(), Math.min(p2.getY(), Math.min(p3.getY(), p4.getY())));
-          int y2 = (int) Math.max(p1.getY(), Math.max(p2.getY(), Math.max(p3.getY(), p4.getY())));
-
           // draw transformed rectangle around the shape
           drawLine(p1, p2, LIME);
           drawLine(p1, p3, LIME);
           drawLine(p4, p2, LIME);
           drawLine(p4, p3, LIME);
 
-          // draw bounding box
-          DrawLine(x1, y1, x2, y1, GOLD);
-          DrawLine(x1, y1, x1, y2, GOLD);
-          DrawLine(x1, y2, x2, y2, GOLD);
-          DrawLine(x2, y1, x2, y2, GOLD);
+          Rect bb = gameObject.getParent().getBoundingBox();
+          if (bb != null) {
+            Raylib.Color color = GOLD;
+            AreaComponent area = gameObject.getParent().getComponent(AreaComponent.class);
+            if (area != null && area.isColliding()) {
+              color = PINK;
+            }
+
+            DrawLine((int) bb.getX(), (int) bb.getY(), (int) (bb.getX() + bb.getWidth()), (int) bb.getY(), color);
+            DrawLine((int) bb.getX(), (int) (bb.getY() + bb.getHeight()), (int) (bb.getX() + bb.getWidth()), (int) (bb.getY() + bb.getHeight()), color);
+            DrawLine((int) bb.getX(), (int) bb.getY(), (int) bb.getX(), (int) (bb.getY() + bb.getHeight()), color);
+            DrawLine((int) (bb.getX() + bb.getWidth()), (int) bb.getY(), (int) (bb.getX() + bb.getWidth()), (int) (bb.getY() + bb.getHeight()), color);
+          }
         }
       }
     }

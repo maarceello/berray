@@ -52,4 +52,19 @@ public class Collision {
   public Collision reverse() {
     return new Collision(other, obj, new Vec2(-displacement.getX(), -displacement.getY()));
   }
+
+
+  public boolean isLeft(Vec2 gravity) {
+    return this.displacement.cross(gravity != null ? gravity : Vec2.down()) > 0;
+  }
+  public boolean isRight(Vec2 gravity) {
+    return this.displacement.cross(gravity != null ? gravity : Vec2.down()) < 0;
+  }
+  public boolean isTop(Vec2 gravity) {
+    return this.displacement.dot(gravity != null ? gravity : Vec2.down()) > 0;
+  }
+  public boolean isBottom(Vec2 gravity) {
+    return this.displacement.dot(gravity != null ? gravity : Vec2.down()) < 0;
+  }
+
 }

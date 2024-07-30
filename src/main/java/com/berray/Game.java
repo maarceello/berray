@@ -1,6 +1,5 @@
 package com.berray;
 
-import com.berray.components.core.AreaComponent;
 import com.berray.event.EventListener;
 import com.berray.event.EventManager;
 import com.berray.math.Collision;
@@ -105,15 +104,20 @@ public class Game {
     return new Vec2(a.getX() - b.getX(), a.getY() - b.getY());
   }
 
-  public void checkFrame() {
+  public void updateCollisions() {
     // linearize the object tree
     // https://en.wikipedia.org/wiki/Sweep_and_prune
     List<GameObject> gameObjects = new ArrayList<>();
     for (GameObject gameObject : root.getChildren()) {
       addGameObjects(gameObject, gameObjects);
     }
-    // only keep game objects with area component
-    List<GameObject> areaObjects = gameObjects.stream().filter(gameObject -> gameObject.is("area")).collect(Collectors.toList());
+    // only keep game objects with area componentLIME
+    List<GameObject> areaObjects = gameObjects.stream()
+        // only game objects with area component may participate in collision detection
+        .filter(gameObject -> gameObject.is("area"))
+        // paused game objects don't participate in collision detection
+        .filter(gameObject -> !gameObject.isPaused())
+        .collect(Collectors.toList());
 
     for (int i = 0; i < areaObjects.size() - 1; i++) {
       checkObj(areaObjects.get(i), areaObjects.subList(i + 1, areaObjects.size()));
@@ -128,30 +132,25 @@ public class Game {
     }
   }
 
-
   public void checkObj(GameObject obj, List<GameObject> others) {
-    AreaComponent aobj = obj.getComponent(AreaComponent.class);
-    if (aobj != null && !obj.isPaused()) {
-      // TODO: only update worldArea if transform changed
-      Rect area = aobj.worldArea();
+    Rect area = obj.getBoundingBox();
 
-      for (GameObject other : others) {
-        if (other.isPaused()) continue;
-        // if (!other.exists()) continue;
+    for (GameObject other : others) {
+      // TODO: if (checked.has(other.id)) continue;
+      // TODO: check collisionIgnore: should other ignore collisions with objects with specific tags
+      if (other.getBoundingBox() == null) {
+        continue;
+      }
 
-        // TODO: if (checked.has(other.id)) continue;
-        // TODO: check collisionIgnore: should other ignore collisions with objects with specific tags
-
-        Vec2 res = collides(area, other.get("worldArea"));
-        if (res != null) {
-          // TODO: rehash if the object position is changed after resolution?
-          Collision col1 = new Collision(obj, other, res);
-          obj.trigger("collideUpdate", other, col1);
-          Collision col2 = col1.reverse();
-          // resolution only has to happen once
-          col2.setResolved(col1.isResolved());
-          other.trigger("collideUpdate", obj, col2);
-        }
+      Vec2 res = collides(area, other.getBoundingBox());
+      if (res != null) {
+        // TODO: rehash if the object position is changed after resolution?
+        Collision col1 = new Collision(obj, other, res);
+        obj.trigger("collideUpdate", other, col1);
+        Collision col2 = col1.reverse();
+        // resolution only has to happen once
+        col2.setResolved(col1.isResolved());
+        other.trigger("collideUpdate", obj, col2);
       }
     }
   }
@@ -159,7 +158,6 @@ public class Game {
   public void on(String event, EventListener listener) {
     eventManager.addEventListener(event, listener);
   }
-
 
   public void trigger(String event, Object... params) {
     eventManager.trigger(event, Arrays.asList(params));

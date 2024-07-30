@@ -47,14 +47,25 @@ public class AreaComponent extends Component {
     gameObject.on("update", this::onUpdate);
 
     gameObject.registerGetter("worldArea", this::worldArea);
-    gameObject.registerAction("isColliding", this::isColliding);
+    gameObject.registerAction("isColliding", this::isCollidingWith);
   }
 
-  // TODO kaboom: perform check instead of use cache
-  public boolean isColliding(List<Object> params) {
+  /**
+   * Checks if this GameObeject is colliding with `other` in this frame.
+   * Params:
+   * - GameObject other */
+  public boolean isCollidingWith(List<Object> params) {
     GameObject other = (GameObject) params.get(0);
     return colliding.containsKey(other.getId());
   }
+
+  /**
+   * Returns true when this game object is colliding with anything this frame.
+   */
+  public boolean isColliding() {
+    return !colliding.isEmpty();
+  }
+
 
   public void onCollideUpdate(Event event) {
     GameObject other = event.getParameter(0);

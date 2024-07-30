@@ -3,7 +3,6 @@ package com.berray;
 
 import com.berray.event.Event;
 import com.berray.event.EventListener;
-import com.berray.math.Rect;
 import com.berray.math.Vec2;
 import com.raylib.Raylib.Vector2;
 
@@ -116,7 +115,7 @@ public abstract class BerrayApplication {
     SetTargetFPS(60);
     while (!WindowShouldClose()) {
       frameNo++;
-      game.checkFrame();
+      game.updateCollisions();
       game.update();
       BeginDrawing();
       {
@@ -137,13 +136,21 @@ public abstract class BerrayApplication {
       return;
     }
     GameObject gameObject = event.getParameter(1);
+    addDebugInfos(gameObject);
+  }
+
+  private static void addDebugInfos(GameObject gameObject) {
     // if the game object is already a debug object, ignore it
     if (gameObject.is("debug")) {
       return;
     }
-    // add frame around the object
-    Rect area = gameObject.get("localArea");
-    if (area != null) {
+    // recursively add debug infos
+    for (GameObject child : gameObject.getChildren()) {
+      addDebugInfos(child);
+    }
+
+    // only add debug infos when the object has a size
+    if (gameObject.get("size") != null) {
       gameObject.add(
           debug()
       );

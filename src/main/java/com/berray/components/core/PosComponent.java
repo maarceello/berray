@@ -16,9 +16,9 @@ public class PosComponent extends Component {
 
   @Override
   public void add(GameObject gameObject) {
-    gameObject.registerMethod("pos", this::getPos, this::setPos);
-    gameObject.registerAction("move", this::move);
-    gameObject.registerAction("moveBy", this::moveBy);
+    registerMethod("pos", this::getPos, this::setPos);
+    registerAction("move", this::move);
+    registerAction("moveBy", this::moveBy);
   }
 
   /**

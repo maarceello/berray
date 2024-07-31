@@ -24,7 +24,7 @@ public class RotateComponent extends Component {
 
   @Override
   public void add(GameObject gameObject) {
-    gameObject.registerMethod("angle", this::getAngle, this::setAngle);
+    registerMethod("angle", this::getAngle, this::setAngle);
   }
 
   public static RotateComponent rotate(float angle) {

@@ -66,11 +66,14 @@ public class AddLevelTest extends BerrayApplication implements CoreComponentShor
         ));
 
     LevelGameObject level = levelBuilder.level(
-        "@      ",
-        "   ^ $$",
-        "=======");
-    level.set("pos", new Vec2(100, 200));
-    level.set("anchor", AnchorType.TOP_LEFT);
+        new String[]{
+            "@      ",
+            "   ^ $$",
+            "======="
+        },
+        pos(100, 200),
+        anchor(AnchorType.TOP_LEFT)
+    );
 
     add(level);
 
@@ -79,11 +82,11 @@ public class AddLevelTest extends BerrayApplication implements CoreComponentShor
 
     // Add Debug Infos for Player object
     add(objectDebug(player),
-        pos(0,0),
+        pos(0, 0),
         anchor(AnchorType.TOP_LEFT));
     // add fps display
-    add(label(() -> "FPS: "+fps()),
-        pos(width()-40,0),
+    add(label(() -> "FPS: " + fps()),
+        pos(width() - 40, 0),
         anchor(AnchorType.TOP_RIGHT));
 
     // Movements

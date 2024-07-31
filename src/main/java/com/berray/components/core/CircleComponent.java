@@ -2,6 +2,7 @@ package com.berray.components.core;
 
 import com.berray.GameObject;
 import com.berray.math.Vec2;
+import com.raylib.Raylib;
 
 import static com.raylib.Jaylib.WHITE;
 import static com.raylib.Raylib.*;
@@ -36,8 +37,9 @@ public class CircleComponent extends Component {
   public void draw() {
     rlPushMatrix();
     {
+      Color color = gameObject.getOrDefault("color", WHITE);
       rlMultMatrixf(gameObject.getWorldTransform().toFloatTransposed());
-      DrawCircle((int) (radius), (int) (radius), radius, WHITE);
+      DrawCircle((int) (radius), (int) (radius), radius, color);
     }
     rlPopMatrix();
   }
@@ -45,7 +47,7 @@ public class CircleComponent extends Component {
 
   @Override
   public void add(GameObject gameObject) {
-    gameObject.registerGetter("size", this::getSize);
+    registerGetter("size", this::getSize);
   }
 
   private Vec2 getSize() {

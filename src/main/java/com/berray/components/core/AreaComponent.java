@@ -41,15 +41,14 @@ public class AreaComponent extends Component {
     super("area");
   }
 
-
   @Override
   public void add(GameObject gameObject) {
     super.add(gameObject);
-    gameObject.on("collideUpdate", this::onCollideUpdate);
-    gameObject.on("update", this::onUpdate);
+    on("collideUpdate", this::onCollideUpdate);
+    on("update", this::onUpdate);
 
-    gameObject.registerAction("isColliding", this::isCollidingWith);
-    gameObject.registerGetter("collisionIgnore", this::getCollisionIgnore);
+    registerAction("isColliding", this::isCollidingWith);
+    registerGetter("collisionIgnore", this::getCollisionIgnore);
   }
 
   public Set<String> getCollisionIgnore() {

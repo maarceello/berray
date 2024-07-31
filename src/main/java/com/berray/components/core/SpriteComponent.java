@@ -37,7 +37,7 @@ public class SpriteComponent extends Component {
 
   @Override
   public void add(GameObject gameObject) {
-    gameObject.registerGetter("size", this::getSize);
+    registerGetter("size", this::getSize);
   }
 
   private Vec2 getSize() {

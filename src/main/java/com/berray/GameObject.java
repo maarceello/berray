@@ -231,6 +231,11 @@ public class GameObject {
     setterMethods.put(name, setter);
   }
 
+  public void removeProperty(String name) {
+    getterMethods.remove(name);
+    setterMethods.remove(name);
+  }
+
   public void registerAction(String name, Consumer<List<Object>> actionMethod) {
     actionMethods.put(name, (params) -> {
       actionMethod.accept(params);
@@ -240,6 +245,10 @@ public class GameObject {
 
   public void registerAction(String name, Function<List<Object>, ?> actionMethod) {
     actionMethods.put(name, actionMethod);
+  }
+
+  public void removeAction(String name) {
+    actionMethods.remove(name);
   }
 
   /**
@@ -336,7 +345,19 @@ public class GameObject {
    * add event listener.
    */
   public void on(String event, EventListener listener) {
-    eventManager.addEventListener(event, listener);
+    on(event, listener, null);
+  }
+
+  /**
+   * add event listener.
+   */
+  public void on(String event, EventListener listener, Object owner) {
+    eventManager.addEventListener(event, listener, owner);
+  }
+
+  /** Removes all listeners belonging to the owner. */
+  public void removeListener(Object owner) {
+    eventManager.removeListener(owner);
   }
 
   public boolean isPaused() {
@@ -493,7 +514,7 @@ public class GameObject {
       }
 
       // still more child iterators?
-      if ((depthPosition+1) < childIterators.size()) {
+      if ((depthPosition + 1) < childIterators.size()) {
         return true;
       }
 

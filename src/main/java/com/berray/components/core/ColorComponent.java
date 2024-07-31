@@ -17,7 +17,7 @@ public class ColorComponent extends Component {
 
   @Override
   public void add(GameObject gameObject) {
-    gameObject.registerGetter("color", this::getColor);
+    registerGetter("color", this::getColor);
   }
 
   public static ColorComponent color(int r, int g, int b) {

@@ -49,21 +49,20 @@ public class BodyComponent extends Component {
   @Override
   public void add(GameObject gameObject) {
     super.add(gameObject);
-    gameObject.registerGetter("grounded", this::isGrounded);
-    gameObject.registerGetter("static", this::isStatic);
-    gameObject.registerAction("jump", this::jump);
+    registerGetter("grounded", this::isGrounded);
+    registerGetter("static", this::isStatic);
+    registerAction("jump", this::jump);
 
     if (gameObject.is("area")) {
-      gameObject.on("collideUpdate", this::collideUpdate);
-      gameObject.on("physicsResolve", this::onPhysicsResolve);
+      on("collideUpdate", this::collideUpdate);
+      on("physicsResolve", this::onPhysicsResolve);
     }
-    gameObject.on("update", this::update);
+    on("update", this::update);
   }
 
   public boolean isStatic() {
     return isStatic;
   }
-
 
   public void collideUpdate(Event event) {
     GameObject other = event.getParameter(0);
@@ -152,7 +151,7 @@ public class BodyComponent extends Component {
 
       if (curPlatform != null) {
         if (
-          // TODO: this prevents from falling when on edge
+            // TODO: this prevents from falling when on edge
             !gameObject.<Boolean>doAction("isColliding", curPlatform)
                 || !curPlatform.exists()
                 || !curPlatform.is("body")

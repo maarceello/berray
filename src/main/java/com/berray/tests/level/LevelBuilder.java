@@ -1,12 +1,10 @@
 package com.berray.tests.level;
 
-import com.berray.components.core.AnchorType;
 import com.berray.math.Vec2;
 
 import java.util.*;
 import java.util.function.Consumer;
 
-import static com.berray.components.core.AnchorComponent.anchor;
 import static com.berray.components.core.PosComponent.pos;
 
 /**
@@ -41,11 +39,10 @@ public class LevelBuilder {
     return this;
   }
 
-  public LevelGameObject level(String... levelStrings) {
+  public LevelGameObject level(String[] levelStrings, Object ... levelComponents) {
     LevelGameObject level = new LevelGameObject(tileWidth, tileHeight);
     level.addComponents(
-        pos(Vec2.origin()),
-        anchor(AnchorType.TOP_LEFT)
+        levelComponents
     );
     for (int y = 0; y < levelStrings.length; y++) {
       for (int x = 0; x < levelStrings[y].length(); x++) {

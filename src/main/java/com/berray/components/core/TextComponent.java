@@ -42,20 +42,9 @@ public class TextComponent extends Component {
 
   @Override
   public void add(GameObject gameObject) {
-    gameObject.registerGetter("localArea", this::localArea);
-    gameObject.registerGetter("size", this::getSize);
-    gameObject.registerSetter("text", (Consumer<String>) this::setText);
+    registerGetter("size", this::getSize);
+    registerSetter("text", (Consumer<String>) this::setText);
   }
-
-  private Rect localArea() {
-    Vec2 pos = gameObject.get("pos");
-    if (pos == null) {
-      return null;
-    }
-    int width = MeasureText(text, fontHeight);
-    return new Rect(pos.getX(), pos.getY(), width, fontHeight);
-  }
-
 
   public static TextComponent text(String text) {
     return new TextComponent(text);

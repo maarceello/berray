@@ -1,10 +1,7 @@
 package com.berray.components.core;
 
 import com.berray.GameObject;
-import com.berray.math.Matrix4;
-import com.berray.math.Rect;
-import com.berray.math.Vec2;
-import com.berray.math.Vec3;
+import com.berray.math.*;
 import com.raylib.Jaylib;
 import com.raylib.Raylib;
 
@@ -61,6 +58,11 @@ public class DebugComponent extends Component {
             DrawLine((int) bb.getX(), (int) (bb.getY() + bb.getHeight()), (int) (bb.getX() + bb.getWidth()), (int) (bb.getY() + bb.getHeight()), color);
             DrawLine((int) bb.getX(), (int) bb.getY(), (int) bb.getX(), (int) (bb.getY() + bb.getHeight()), color);
             DrawLine((int) (bb.getX() + bb.getWidth()), (int) bb.getY(), (int) (bb.getX() + bb.getWidth()), (int) (bb.getY() + bb.getHeight()), color);
+
+            for (Collision collision : area.getCollisions()) {
+              Vec2 displacement = collision.getDisplacement();
+              DrawLine((int) p1.getX(), (int) p1.getY(), (int) (p1.getX()+displacement.getX()), (int) (p1.getY()+displacement.getY()), GOLD);
+            }
           }
         }
       }

@@ -23,8 +23,9 @@ public class RectComponent extends Component {
   public void draw() {
     rlPushMatrix();
     {
+      Raylib.Color color = gameObject.getOrDefault("color", WHITE);
       rlMultMatrixf(gameObject.getWorldTransform().toFloatTransposed());
-      DrawRectangle(0,0, (int) width, (int) height, WHITE);
+      DrawRectangle(0,0, (int) width, (int) height, color);
     }
     rlPopMatrix();
   }

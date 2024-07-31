@@ -11,9 +11,13 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class Game {
-  /** Gravity vector. */
+  /**
+   * Gravity vector.
+   */
   private Vec2 gravity;
-  /** normalized gravity vector. */
+  /**
+   * normalized gravity vector.
+   */
   private Vec2 gravityDirection;
   private final GameObject root;
 
@@ -83,30 +87,88 @@ public class Game {
    */
   public void update() {
     root.update(Jaylib.GetFrameTime());
+    // simulate 60 fps
+    //root.update(1.0f / 60);
   }
 
-  // Draw all game objects
+  /**
+   * Draw all game objects
+   */
   public void draw() {
     root.draw();
   }
 
   private Vec2 collides(Rect a, Rect b) {
+    float rax1 = a.getX();
+    float ray1 = a.getY();
+    float rax2 = a.getX() + a.getWidth();
+    float ray2 = a.getY() + a.getHeight();
+
+    float rbx1 = b.getX();
+    float rby1 = b.getY();
+    float rbx2 = b.getX() + b.getWidth();
+    float rby2 = b.getY() + b.getHeight();
+
+    // note: the lower coordinate is inclusive, the bigger coordinate is exclusive
     if (
-        a.getX() > b.getX() + b.getWidth() || // a is to the right of b
-            a.getY() > b.getY() + b.getHeight() || // a is below b
-            b.getX() > a.getX() + a.getWidth() || // a is to the left of b
-            b.getY() > a.getY() + a.getHeight() // a is above b
+        rax1 > rbx2 || // a is to the right of b
+            ray1 >= rby2 || // a is below b
+            rbx1 > rax2 || // a is to the left of b
+            rby1 >= ray2 // a is above b
     ) {
       // not colliding
       return null;
     }
-    // todo: how to calculate displacement?
-    return new Vec2(a.getX() - b.getX(), a.getY() - b.getY());
+
+    // find the shortest vector in which to move the object a so the collision is resolved
+    Vec2 displacement = Vec2.origin();
+    float minDistance = Float.MAX_VALUE;
+    // upper edge in collision? Move upper edge down
+    if (ray1 > rby1 && ray1 < rby2) {
+      float distance = rby2 - ray1;
+      if (distance < minDistance) {
+        minDistance = distance;
+        displacement = new Vec2(0, distance);
+      }
+    }
+    // lower edge in collision? Move lower edge up
+    if (ray2 > rby1 && ray2 < rby2) {
+      float distance = ray2 - rby1;
+      if (distance < minDistance) {
+        minDistance = distance;
+        displacement = new Vec2(0, -distance);
+      }
+    }
+    // left edge in collision? Move left edge to the right
+    if (rax1 > rbx1 && rax1 < rbx2) {
+      float distance = rbx2 - rax1;
+      if (distance < minDistance) {
+        minDistance = distance;
+        displacement = new Vec2(distance, 0);
+      }
+    }
+    // right edge in collision? Move right edge to the left
+    if (rax2 > rbx1 && rax2 < rbx2) {
+      float distance = rax2 - rbx1;
+      if (distance < minDistance) {
+        minDistance = distance;
+        displacement = new Vec2(-distance,0 );
+      }
+    }
+
+    return displacement;
   }
 
   public void updateCollisions() {
+    // optimization and collision detection between arbitrarily oriented polygons
+    // Reduce number of object to object collision detections
+    // * some kind of bsp or quad tree
+    // * https://en.wikipedia.org/wiki/Sweep_and_prune
+    // Separating Axis Theorem:
+    // * https://www.sevenson.com.au/programming/sat/
+    // * https://code.tutsplus.com/collision-detection-using-the-separating-axis-theorem--gamedev-169t
+
     // linearize the object tree
-    // https://en.wikipedia.org/wiki/Sweep_and_prune
     List<GameObject> gameObjects = new ArrayList<>();
     for (GameObject gameObject : root.getChildren()) {
       addGameObjects(gameObject, gameObjects);
@@ -144,11 +206,10 @@ public class Game {
 
       Vec2 res = collides(area, other.getBoundingBox());
       if (res != null) {
-        // TODO: rehash if the object position is changed after resolution?
         Collision col1 = new Collision(obj, other, res);
         obj.trigger("collideUpdate", other, col1);
         Collision col2 = col1.reverse();
-        // resolution only has to happen once
+        // resolution only has to happen only once
         col2.setResolved(col1.isResolved());
         other.trigger("collideUpdate", obj, col2);
       }
@@ -176,7 +237,9 @@ public class Game {
     });
   }
 
-  /** removes the game object and all of its children from the game. */
+  /**
+   * removes the game object and all of its children from the game.
+   */
   public void destroy(GameObject gameObject) {
 
   }

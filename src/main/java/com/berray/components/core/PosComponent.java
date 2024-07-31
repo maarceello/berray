@@ -41,7 +41,7 @@ public class PosComponent extends Component {
   public void moveBy(List<Object> params) {
     if (params.get(0) instanceof Vec2) {
       Vec2 amount = (Vec2) params.get(0);
-      pos = pos.move(amount);
+      setPos(pos.move(amount));
     }
   }
 

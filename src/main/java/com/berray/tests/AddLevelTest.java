@@ -69,11 +69,6 @@ public class AddLevelTest extends BerrayApplication implements CoreComponentShor
 
     add(level);
 
-    level.getGameObjectStream().forEach((gameObject) -> {
-          System.out.println(gameObject.getId()+": "+gameObject.getTags()+" "+gameObject.getChildren());
-        }
-    );
-
     // Get the player object from tag
     GameObject player = level.getTagStream("player").findFirst().orElse(null);
 
@@ -96,6 +91,7 @@ public class AddLevelTest extends BerrayApplication implements CoreComponentShor
     player.onCollide("danger", (event) -> {
       player.set("pos", level.tile2Pos(0, 0));
     });
+
 
     // Eat the coin!
     player.onCollide("coin", (event) -> {

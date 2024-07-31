@@ -66,6 +66,9 @@ public class AreaComponent extends Component {
     return !colliding.isEmpty();
   }
 
+  public List<Collision> getCollisions() {
+    return new ArrayList<>(colliding.values());
+  }
 
   public void onCollideUpdate(Event event) {
     GameObject other = event.getParameter(0);

@@ -9,11 +9,13 @@ import java.util.function.Consumer;
 import static com.berray.components.core.AnchorComponent.anchor;
 import static com.berray.components.core.PosComponent.pos;
 
-/** Class responsible for creating level Game Objects. */
+/**
+ * Class responsible for creating level Game Objects.
+ */
 public class LevelBuilder {
   private int tileWidth;
   private int tileHeight;
-  private Map<Character, Consumer<TileBuilder>> charToTile =  new HashMap<>();
+  private Map<Character, Consumer<TileBuilder>> charToTile = new HashMap<>();
 
   public LevelBuilder(int tileWidth, int tileHeight) {
     this.tileWidth = tileWidth;
@@ -53,7 +55,7 @@ public class LevelBuilder {
           int finalY = y;
           charToTile.get(tile).accept(components -> {
             List<Object> componentsList = new ArrayList<>(Arrays.asList(components));
-            componentsList.add(pos(new Vec2(finalX *tileWidth, finalY *tileHeight)));
+            componentsList.add(pos(new Vec2(finalX * tileWidth, finalY * tileHeight)));
             level.add().addComponents(componentsList);
           });
         }

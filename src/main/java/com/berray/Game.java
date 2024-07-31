@@ -246,6 +246,6 @@ public class Game {
    * removes the game object and all of its children from the game.
    */
   public void destroy(GameObject gameObject) {
-
+    gameObject.getParent().remove(gameObject);
   }
 }

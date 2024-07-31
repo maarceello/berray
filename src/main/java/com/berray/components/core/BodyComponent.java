@@ -136,7 +136,11 @@ public class BodyComponent extends Component {
     }
   };
 
-
+  /**
+   * Params:
+   *
+   * - float deltaTime
+   */
   public void update(Event event) {
     float deltaTime = event.getParameter(0);
     if (gameObject.getRoot().get("gravityDirection") != null && !this.isStatic) {

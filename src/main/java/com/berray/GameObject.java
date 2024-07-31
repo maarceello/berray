@@ -131,6 +131,21 @@ public class GameObject {
     return gameObject;
   }
 
+  public void remove(GameObject gameObject) {
+    children.remove(gameObject);
+    gameObject.destroy();
+    gameObject.parent = null;
+    gameObject.game = null;
+  }
+
+  private void destroy() {
+    for (Component component : components.values()) {
+      component.destroy();
+    }
+    components.clear();
+  }
+
+
   public void setGame(Game game) {
     this.game = game;
     // tell each childs the game instance

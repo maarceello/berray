@@ -20,6 +20,8 @@ public class AddLevelTest extends BerrayApplication implements CoreComponentShor
   private static final int SPEED = 480;
   private LevelBuilder levelBuilder;
 
+  private int score = 0;
+
   @Override
   public void game() {
 
@@ -88,6 +90,10 @@ public class AddLevelTest extends BerrayApplication implements CoreComponentShor
     add(label(() -> "FPS: " + fps()),
         pos(width() - 40, 0),
         anchor(AnchorType.TOP_RIGHT));
+    // add score label
+    add(label(() -> "Score: " + score),
+        pos(width() / 2.0f, 0),
+        anchor(AnchorType.TOP));
 
     // Movements
     onKeyPress(KEY_SPACE, (event) -> {
@@ -122,6 +128,7 @@ public class AddLevelTest extends BerrayApplication implements CoreComponentShor
       GameObject coin = event.getParameter(0);
       destroy(coin);
       play("score");
+      score++;
     });
   }
 

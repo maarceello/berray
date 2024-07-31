@@ -85,10 +85,8 @@ public class Game {
   /**
    * Update all game objects
    */
-  public void update() {
-    root.update(Jaylib.GetFrameTime());
-    // simulate 60 fps
-    //root.update(1.0f / 60);
+  public void update(float frameTime) {
+    root.update(frameTime);
   }
 
   /**
@@ -109,12 +107,11 @@ public class Game {
     float rbx2 = b.getX() + b.getWidth();
     float rby2 = b.getY() + b.getHeight();
 
-    // note: the lower coordinate is inclusive, the bigger coordinate is exclusive
     if (
-        rax1 > rbx2 || // a is to the right of b
+        rax1 >= rbx2 || // a is to the right of b
             ray1 >= rby2 || // a is below b
-            rbx1 > rax2 || // a is to the left of b
-            rby1 >= ray2 // a is above b
+            rax2 < rbx1 || // a is to the left of b
+            ray2 < rby1 // a is above b
     ) {
       // not colliding
       return null;
@@ -132,7 +129,7 @@ public class Game {
       }
     }
     // lower edge in collision? Move lower edge up
-    if (ray2 > rby1 && ray2 < rby2) {
+    if (ray2 >= rby1 && ray2 < rby2) {
       float distance = ray2 - rby1;
       if (distance < minDistance) {
         minDistance = distance;
@@ -148,7 +145,7 @@ public class Game {
       }
     }
     // right edge in collision? Move right edge to the left
-    if (rax2 > rbx1 && rax2 < rbx2) {
+    if (rax2 >= rbx1 && rax2 < rbx2) {
       float distance = rax2 - rbx1;
       if (distance < minDistance) {
         minDistance = distance;
@@ -181,6 +178,7 @@ public class Game {
         .filter(gameObject -> !gameObject.isPaused())
         .collect(Collectors.toList());
 
+    System.out.println("checking "+areaObjects.size()+" objects");
     for (int i = 0; i < areaObjects.size() - 1; i++) {
       checkObj(areaObjects.get(i), areaObjects.subList(i + 1, areaObjects.size()));
     }
@@ -197,15 +195,24 @@ public class Game {
   public void checkObj(GameObject obj, List<GameObject> others) {
     Rect area = obj.getBoundingBox();
 
+    Set<String> thisCollisionIgnores = obj.getOrDefault("collisionIgnore", Collections.emptySet());
+
     for (GameObject other : others) {
       // TODO: if (checked.has(other.id)) continue;
-      // TODO: check collisionIgnore: should other ignore collisions with objects with specific tags
       if (other.getBoundingBox() == null) {
+        continue;
+      }
+      // should we ignore the other object based on tags?
+      Optional<String> ignoreTag = thisCollisionIgnores.stream()
+          .filter(other::is)
+          .findFirst();
+      if (ignoreTag.isPresent()) {
         continue;
       }
 
       Vec2 res = collides(area, other.getBoundingBox());
       if (res != null) {
+        System.out.println("collision "+obj.getId()+" with "+other.getId()+" with displacement "+res);
         Collision col1 = new Collision(obj, other, res);
         obj.trigger("collideUpdate", other, col1);
         Collision col2 = col1.reverse();

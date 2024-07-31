@@ -132,4 +132,9 @@ public class Vec2 {
   public int hashCode() {
     return Objects.hash(x, y);
   }
+
+  @Override
+  public String toString() {
+    return String.format("(%.3f, %.3f)", x,y);
+  }
 }

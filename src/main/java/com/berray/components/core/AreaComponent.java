@@ -34,6 +34,8 @@ public class AreaComponent extends Component {
   private Map<Integer, Collision> colliding = new HashMap<>();
   /** List of objects this object is colliding with in the current frame. */
   private Set<Integer> collidingThisFrame = new HashSet<>();
+  /** List of tags this object should ignore collisions with. */
+  private Set<String> collisionIgnore = new HashSet<>();
 
   public AreaComponent(Rect shape) {
     super("area");
@@ -46,8 +48,17 @@ public class AreaComponent extends Component {
     gameObject.on("collideUpdate", this::onCollideUpdate);
     gameObject.on("update", this::onUpdate);
 
-    gameObject.registerGetter("worldArea", this::worldArea);
     gameObject.registerAction("isColliding", this::isCollidingWith);
+    gameObject.registerGetter("collisionIgnore", this::getCollisionIgnore);
+  }
+
+  public Set<String> getCollisionIgnore() {
+    return collisionIgnore;
+  }
+
+  public AreaComponent ignoreCollisionWith(String...tags) {
+    collisionIgnore.addAll(Arrays.asList(tags));
+    return this;
   }
 
   /**
@@ -100,17 +111,6 @@ public class AreaComponent extends Component {
     }
     // clear list of collisions for next frame
     collidingThisFrame.clear();
-  }
-
-  public Rect worldArea() {
-    // TODO: Respect fixed game objects
-    // TODO: add using Polygon as area
-
-    Rect rect = gameObject.get("localArea");
-    if (rect == null) {
-      return null;
-    }
-    return rect;
   }
 
   public static AreaComponent area() {

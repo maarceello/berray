@@ -1,13 +1,11 @@
 package com.berray.components.core;
 
 import com.berray.GameObject;
-import com.berray.math.Rect;
 import com.berray.math.Vec2;
 
 import com.raylib.Raylib;
 
 import static com.raylib.Jaylib.*;
-import static com.raylib.Raylib.*;
 
 public class RectComponent extends Component {
   private final float width;
@@ -33,16 +31,7 @@ public class RectComponent extends Component {
 
   @Override
   public void add(GameObject gameObject) {
-    gameObject.registerGetter("localArea", this::localArea);
     gameObject.registerGetter("size", this::getSize);
-  }
-
-  private Rect localArea() {
-    Vec2 pos = gameObject.get("pos");
-    if (pos == null) {
-      return null;
-    }
-    return new Rect(pos.getX() - width / 2, pos.getY() - height / 2, width, height);
   }
 
   private Vec2 getSize() {

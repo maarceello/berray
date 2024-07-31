@@ -4,6 +4,7 @@ package com.berray;
 import com.berray.event.Event;
 import com.berray.event.EventListener;
 import com.berray.math.Vec2;
+import com.raylib.Jaylib;
 import com.raylib.Raylib.Vector2;
 
 import static com.berray.components.core.DebugComponent.debug;
@@ -20,6 +21,7 @@ public abstract class BerrayApplication {
 
   protected boolean debug = false;
   protected int frameNo = 0;
+  protected int targetFps = 60;
 
 
   public BerrayApplication width(int width) {
@@ -112,11 +114,11 @@ public abstract class BerrayApplication {
 
     game();
 
-    SetTargetFPS(60);
+    SetTargetFPS(targetFps);
     while (!WindowShouldClose()) {
       frameNo++;
       game.updateCollisions();
-      game.update();
+      game.update(frameTime());
       BeginDrawing();
       {
         ClearBackground(background);
@@ -126,6 +128,16 @@ public abstract class BerrayApplication {
       EndDrawing();
     }
     CloseWindow();
+  }
+
+  /**
+   * Returns the time passed since the last frame.
+   * Note: by overriding this method and returning a fixed value you can simulate a constant
+   * framerate even when the application is halted during debugging or similar.
+   */
+  public float frameTime() {
+    // TODO: return fixed framerate 1.0f/60 when debug == true?
+    return Jaylib.GetFrameTime();
   }
 
   /**
@@ -166,27 +178,22 @@ public abstract class BerrayApplication {
       game.trigger("mousePress", new Vec2(pos.x(), pos.y()));
     }
 
-    while (true) {
-      int keyCode = GetKeyPressed();
-      // no more keys
-      if (keyCode == 0) {
-        break;
-      }
-      // save frame in which the key was last down.
-      keysDown[keyCode] = frameNo;
-    }
-
     for (int i = 0; i < keysDown.length; i++) {
       int frame = keysDown[i];
-      if (frame > 0) {
-        // key was pressed this or the last frame
-        if (frame < frameNo) {
-          // frame was pressed the last frame, but not this. So the key must be released
-          keysDown[i] = 0;
+      // check if the key is down?
+      if (IsKeyDown(i)) {
+        if (frame == 0) {
+          // key is pressed this frame
           trigger("keyPress", i);
-        } else {
-          // key is still pressed (or pressed the first time)
-          trigger("keyDown", i);
+        }
+        // key is still pressed (or pressed the first time)
+        trigger("keyDown", i);
+        keysDown[i] = frameNo;
+      } else {
+        // Key not down, but was down the previous frame? Then it was released this frame.
+        if (frame != 0) {
+          keysDown[i] = 0;
+          trigger("keyUp", i);
         }
       }
     }

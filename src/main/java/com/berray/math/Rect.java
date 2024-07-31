@@ -66,4 +66,9 @@ public class Rect {
   public Raylib.Rectangle toRectangle() {
     return new Jaylib.Rectangle(x, y, width, height);
   }
+
+  @Override
+  public String toString() {
+    return String.format("(%.3f, %.3f - %.3f, %.3f)", x,y, width, height);
+  }
 }

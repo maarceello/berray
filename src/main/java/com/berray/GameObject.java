@@ -269,6 +269,13 @@ public class GameObject {
     setterMethod.accept(value);
   }
 
+  public Set<String> getProperties() {
+    Set<String> properties = new HashSet<>();
+    properties.addAll(getterMethods.keySet());
+    properties.addAll(setterMethods.keySet());
+    return properties;
+  }
+
   /**
    * calls a registered action, returning the result
    */

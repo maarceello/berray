@@ -196,13 +196,13 @@ public class BodyComponent extends Component {
   }
 
   public boolean isGrounded() {
-    return grounded;
+    return curPlatform != null;
   }
 
   public void jump(List<Object> params) {
-    Float force = (Float) params.get(0);
-    if (force == null) {
-      force = jumpForce;
+    Float force = jumpForce;
+    if (params.size() > 0) {
+      force = (Float) params.get(0);
     }
     curPlatform = null;
     lastPlatformPos = null;

@@ -5,11 +5,13 @@ import com.berray.GameObject;
 import com.berray.components.CoreComponentShortcuts;
 import com.berray.components.core.AnchorType;
 import com.berray.math.Vec2;
+import com.berray.objects.addon.ObjectDebug;
 import com.berray.tests.level.LevelBuilder;
 import com.berray.tests.level.LevelGameObject;
 import com.raylib.Jaylib;
 
 import static com.berray.AssetManager.loadSprite;
+import static com.raylib.Raylib.*;
 import static java.lang.Boolean.FALSE;
 
 
@@ -22,8 +24,8 @@ public class AddLevelTest extends BerrayApplication implements CoreComponentShor
 
     debug = true;
 
-    game.setGravity(200);
-
+    game.setGravity(2400);
+    targetFps = 60;
 
     loadSprite("bean", "resources/berry.png");
     loadSprite("coin", "resources/coin.png");
@@ -43,21 +45,23 @@ public class AddLevelTest extends BerrayApplication implements CoreComponentShor
         ))
         .tile('=', tile -> tile.components(
             sprite("grass"),
-            area(),
+            area().ignoreCollisionWith("terrain"),
             body(true),
-            anchor(AnchorType.BOTTOM)
+            anchor(AnchorType.BOTTOM),
+            "terrain"
         ))
         .tile('$', tile -> tile.components(
             sprite("coin"),
-            area(),
+            area().ignoreCollisionWith("terrain"),
             anchor(AnchorType.BOTTOM),
             "coin"
         ))
         .tile('^', tile -> tile.components(
             sprite("spike"),
-            area(),
+            area().ignoreCollisionWith("terrain"),
             anchor(AnchorType.BOTTOM),
-            "danger"
+            "danger",
+            "terrain"
         ));
 
     LevelGameObject level = levelBuilder.level(
@@ -72,19 +76,23 @@ public class AddLevelTest extends BerrayApplication implements CoreComponentShor
     // Get the player object from tag
     GameObject player = level.getTagStream("player").findFirst().orElse(null);
 
+    add(new ObjectDebug(player),
+        pos(0,0),
+        anchor(AnchorType.TOP_LEFT));
+
     // Movements
-    onKeyPress(Jaylib.KEY_SPACE, (event) -> {
+    onKeyPress(KEY_SPACE, (event) -> {
       if (player.<Boolean>getOrDefault("grounded", FALSE)) {
         player.doAction("jump");
       }
     });
 
-    onKeyDown(Jaylib.KEY_LEFT, (event) -> {
-      player.doAction("move", -SPEED, 0);
+    onKeyDown(KEY_LEFT, (event) -> {
+      player.doAction("move", new Vec2(-SPEED, 0), frameTime());
     });
 
-    onKeyDown(Jaylib.KEY_RIGHT, (event) -> {
-      player.doAction("move", SPEED, 0);
+    onKeyDown(KEY_RIGHT, (event) -> {
+      player.doAction("move", new Vec2(SPEED, 0), frameTime());
     });
 
     // Back to the original position if hit a "danger" item
@@ -92,6 +100,13 @@ public class AddLevelTest extends BerrayApplication implements CoreComponentShor
       player.set("pos", level.tile2Pos(0, 0));
     });
 
+    // back to start when the player falls off screen
+    player.on("update", (event) -> {
+      Vec2 pos = player.get("pos");
+      if (pos.getY() > width()) {
+        player.set("pos", level.tile2Pos(0, 0));
+      }
+    });
 
     // Eat the coin!
     player.onCollide("coin", (event) -> {
@@ -101,6 +116,10 @@ public class AddLevelTest extends BerrayApplication implements CoreComponentShor
     });
   }
 
+  @Override
+  public float frameTime() {
+    return 1.0f/60;
+  }
 
   @Override
   public void initWindow() {

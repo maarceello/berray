@@ -114,7 +114,9 @@ public abstract class BerrayApplication {
 
     game();
 
-    SetTargetFPS(targetFps);
+    if (targetFps > 0) {
+      SetTargetFPS(targetFps);
+    }
     while (!WindowShouldClose()) {
       frameNo++;
       game.updateCollisions();
@@ -138,6 +140,14 @@ public abstract class BerrayApplication {
   public float frameTime() {
     // TODO: return fixed framerate 1.0f/60 when debug == true?
     return Jaylib.GetFrameTime();
+  }
+
+  /**
+   * Returns the Frames per second.
+   */
+  public int fps() {
+    // TODO: return fixed framerate 1.0f/60 when debug == true?
+    return Jaylib.GetFPS();
   }
 
   /**

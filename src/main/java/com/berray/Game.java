@@ -178,7 +178,6 @@ public class Game {
         .filter(gameObject -> !gameObject.isPaused())
         .collect(Collectors.toList());
 
-    System.out.println("checking "+areaObjects.size()+" objects");
     for (int i = 0; i < areaObjects.size() - 1; i++) {
       checkObj(areaObjects.get(i), areaObjects.subList(i + 1, areaObjects.size()));
     }
@@ -193,11 +192,11 @@ public class Game {
   }
 
   public void checkObj(GameObject obj, List<GameObject> others) {
-    Rect area = obj.getBoundingBox();
 
     Set<String> thisCollisionIgnores = obj.getOrDefault("collisionIgnore", Collections.emptySet());
 
     for (GameObject other : others) {
+      Rect area = obj.getBoundingBox();
       // TODO: if (checked.has(other.id)) continue;
       if (other.getBoundingBox() == null) {
         continue;
@@ -212,7 +211,6 @@ public class Game {
 
       Vec2 res = collides(area, other.getBoundingBox());
       if (res != null) {
-        System.out.println("collision "+obj.getId()+" with "+other.getId()+" with displacement "+res);
         Collision col1 = new Collision(obj, other, res);
         obj.trigger("collideUpdate", other, col1);
         Collision col2 = col1.reverse();

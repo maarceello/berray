@@ -5,12 +5,13 @@ import com.berray.GameObject;
 import com.berray.components.CoreComponentShortcuts;
 import com.berray.components.core.AnchorType;
 import com.berray.math.Vec2;
-import com.berray.objects.addon.ObjectDebug;
 import com.berray.tests.level.LevelBuilder;
 import com.berray.tests.level.LevelGameObject;
 import com.raylib.Jaylib;
 
 import static com.berray.AssetManager.loadSprite;
+import static com.berray.objects.addon.ObjectDebug.objectDebug;
+import static com.berray.objects.core.Label.label;
 import static com.raylib.Raylib.*;
 import static java.lang.Boolean.FALSE;
 
@@ -25,7 +26,7 @@ public class AddLevelTest extends BerrayApplication implements CoreComponentShor
     debug = true;
 
     game.setGravity(2400);
-    targetFps = 60;
+    targetFps = -1;
 
     loadSprite("bean", "resources/berry.png");
     loadSprite("coin", "resources/coin.png");
@@ -76,9 +77,14 @@ public class AddLevelTest extends BerrayApplication implements CoreComponentShor
     // Get the player object from tag
     GameObject player = level.getTagStream("player").findFirst().orElse(null);
 
-    add(new ObjectDebug(player),
+    // Add Debug Infos for Player object
+    add(objectDebug(player),
         pos(0,0),
         anchor(AnchorType.TOP_LEFT));
+    // add fps display
+    add(label(() -> "FPS: "+fps()),
+        pos(width()-40,0),
+        anchor(AnchorType.TOP_RIGHT));
 
     // Movements
     onKeyPress(KEY_SPACE, (event) -> {
@@ -116,10 +122,10 @@ public class AddLevelTest extends BerrayApplication implements CoreComponentShor
     });
   }
 
-  @Override
-  public float frameTime() {
-    return 1.0f/60;
-  }
+//  @Override
+//  public float frameTime() {
+//    return 1.0f/60;
+//  }
 
   @Override
   public void initWindow() {

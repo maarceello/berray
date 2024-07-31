@@ -61,4 +61,8 @@ public class ObjectDebug extends GameObject {
     return result.toString();
   }
 
+  public static ObjectDebug objectDebug(GameObject object) {
+    return new ObjectDebug(object);
+  }
+
 }

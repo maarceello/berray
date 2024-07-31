@@ -307,6 +307,9 @@ public class GameObject {
 
   /**
    * Returns all game objects with the specified tag.
+   * TODO: this method is not well named. Rethink naming
+   * Note: in kaboom this method is named `get(Tag)`, but we already have a method named `get`. Maybe rename the
+   * existing {@link #get(String)} method?
    */
   public Stream<GameObject> getTagStream(String tag) {
     return getGameObjectStream()

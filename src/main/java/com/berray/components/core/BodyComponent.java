@@ -107,18 +107,18 @@ public class BodyComponent extends Component {
   }
 
   public boolean isFalling() {
-    Vec2 gravityDirection = gameObject.getRoot().get("gravityDirection");
+    Vec2 gravityDirection = gameObject.getGame().getGravityDirection();
     return gravityDirection != null && this.vel.dot(gravityDirection) > 0;
   }
 
   public boolean isJumping() {
-    Vec2 gravityDirection = gameObject.getRoot().get("gravityDirection");
+    Vec2 gravityDirection = gameObject.getGame().getGravityDirection();
     return gravityDirection != null && this.vel.dot(gravityDirection) < 0;
   }
 
   private void onPhysicsResolve(Event event) {
     Collision col = event.getParameter(0);
-    Vec2 gravity = gameObject.getRoot().get("gravity");
+    Vec2 gravity = gameObject.getGame().getGravity();
     if (gravity != null) {
       if (col.isBottom(gravity) && this.isFalling()) {
         this.vel = this.vel.reject(gravity.normalize());
@@ -143,7 +143,7 @@ public class BodyComponent extends Component {
    */
   public void update(Event event) {
     float deltaTime = event.getParameter(0);
-    if (gameObject.getRoot().get("gravityDirection") != null && !this.isStatic) {
+    if (gameObject.getGame().getGravityDirection() != null && !this.isStatic) {
       if (willFall) {
         curPlatform = null;
         lastPlatformPos = null;
@@ -177,7 +177,7 @@ public class BodyComponent extends Component {
         Vec2 prevVel = this.vel;
 
         // Apply gravity
-        Vec2 gravity = gameObject.getRoot().<Vec2>get("gravity");
+        Vec2 gravity = gameObject.getGame().getGravity();
         this.vel = this.vel.add(gravity.scale(this.gravityScale * deltaTime));
 
         // Clamp velocity
@@ -210,7 +210,7 @@ public class BodyComponent extends Component {
     curPlatform = null;
     lastPlatformPos = null;
     // jump in the opposite direction as the gravity
-    this.vel = gameObject.getRoot().<Vec2>get("gravityDirection").normalize().scale(-force);
+    this.vel = gameObject.getGame().getGravityDirection().scale(-force);
   }
 
   public static BodyComponent body(boolean isStatic) {

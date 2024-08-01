@@ -9,7 +9,7 @@ import com.berray.tests.level.LevelBuilder;
 import com.berray.tests.level.LevelGameObject;
 import com.raylib.Jaylib;
 
-import static com.berray.AssetManager.loadSprite;
+import static com.berray.assets.AssetManager.loadSprite;
 import static com.berray.objects.addon.ObjectDebug.objectDebug;
 import static com.berray.objects.core.Label.label;
 import static com.raylib.Raylib.*;

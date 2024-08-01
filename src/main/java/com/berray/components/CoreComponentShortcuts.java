@@ -57,4 +57,8 @@ public interface CoreComponentShortcuts {
     return BodyComponent.body(isStatic);
   }
 
+  default LayerComponent layer(String layer) {
+    return LayerComponent.layer(layer);
+  }
+
 }

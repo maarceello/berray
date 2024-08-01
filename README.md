@@ -25,10 +25,26 @@ WIP
 ## core
 
 - [x] local coordinate system (child objects position is relative to parent position)
-  - [ ] TODO: fix collision detection
+  - [x] TODO: fix collision detection
 - [x] localArea should respect anchor
-- [ ] collision detection: support more shapes (only rect at the moment)
-- [ ] collision detection: skip object combination which are already checked
+- [ ] layers
+- [ ] sprite animation
+- [ ] sprite sheet loading
+- [ ] scenes, scene switching
+- [ ] use and unuse
+- [ ] events: timing, move out of screen 
+- [ ] collision detection: 
+  - [ ] support more shapes (only rect at the moment)
+  - [ ] skip object combination which are already checked
+  - [ ] detect collision with rotated shapes
+
+
+## gui
+- [ ] label
+- [ ] button
+- [ ] checkbox
+- [ ] slider
+- [ ] textarea (static), scrollable or autoremove rows after some time
 
 ## 2d stack
 

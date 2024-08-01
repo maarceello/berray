@@ -100,6 +100,10 @@ public class GameObject {
     return id;
   }
 
+  public Game getGame() {
+    return game;
+  }
+
   public Rect getBoundingBox() {
     ensureTransformCalculated();
     return boundingBox;

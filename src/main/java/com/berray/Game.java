@@ -11,6 +11,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class Game {
+  public static final String DEFAULT_LAYER = "default";
   /**
    * Gravity vector.
    */
@@ -20,6 +21,7 @@ public class Game {
    */
   private Vec2 gravityDirection;
   private final GameObject root;
+  private List<String> layers = new ArrayList<>();
 
   private EventManager eventManager = new EventManager();
 
@@ -34,9 +36,11 @@ public class Game {
     root.on("add", event -> eventManager.trigger(event.getName(), event.getParameters()));
     // forward update events down the object tree
     on("update", event -> root.trigger(event.getName(), event.getParameters()));
+    layers.add(DEFAULT_LAYER);
+  }
 
-    root.registerGetter("gravityDirection", this::getGravityDirection);
-    root.registerGetter("gravity", this::getGravity);
+  public void setLayers(List<String> layers) {
+    this.layers = layers;
   }
 
   public float width() {
@@ -93,7 +97,26 @@ public class Game {
    * Draw all game objects
    */
   public void draw() {
-    root.draw();
+    Map<String, List<GameObject>> sortedLayers = new HashMap<>();
+    // insert empty list for each layer
+    layers.forEach(layerName -> sortedLayers.put(layerName, new ArrayList<>()));
+
+    // sort game objects which needs to be rendered in the hashmap
+    root.getGameObjectStream()
+            .filter(gameObject -> gameObject.get("render") != null)
+            .forEach(gameObject -> {
+              String layer = gameObject.getOrDefault("layer", DEFAULT_LAYER);
+              List<GameObject> layerList = sortedLayers.get(layer);
+              if (layerList == null) {
+                throw new IllegalStateException("layer " + layer + " not allowed in game object with tags "+gameObject.getTags());
+              }
+              layerList.add(gameObject);
+            });
+
+    // TODO: give application the possibility to resort render objects before actually rendering?
+    layers.stream().map(sortedLayers::get)
+            .flatMap(Collection::stream)
+                .forEach(GameObject::draw);
   }
 
   private Vec2 collides(Rect a, Rect b) {

@@ -31,7 +31,13 @@ public class RectComponent extends Component {
 
   @Override
   public void add(GameObject gameObject) {
+    super.add(gameObject);
     registerGetter("size", this::getSize);
+    registerGetter("render", this::isRender);
+  }
+
+  public boolean isRender() {
+    return true;
   }
 
   private Vec2 getSize() {

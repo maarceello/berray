@@ -1,4 +1,4 @@
-package com.berray;
+package com.berray.assets;
 
 import java.util.HashMap;
 import java.util.Map;

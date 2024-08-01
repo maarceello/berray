@@ -8,7 +8,7 @@ import com.berray.math.Vec2;
 import com.raylib.Jaylib;
 import com.raylib.Raylib;
 
-import static com.berray.AssetManager.loadSprite;
+import static com.berray.assets.AssetManager.loadSprite;
 import static com.berray.components.addon.OrbitComponent.orbit;
 import static com.berray.objects.core.Label.label;
 

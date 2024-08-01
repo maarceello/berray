@@ -4,7 +4,7 @@ import com.berray.GameObject;
 
 import com.berray.math.Vec2;
 
-import static com.berray.AssetManager.getSprite;
+import static com.berray.assets.AssetManager.getSprite;
 import static com.raylib.Jaylib.Texture;
 import static com.raylib.Jaylib.WHITE;
 import static com.raylib.Raylib.*;
@@ -38,10 +38,15 @@ public class SpriteComponent extends Component {
   @Override
   public void add(GameObject gameObject) {
     registerGetter("size", this::getSize);
+    registerGetter("render", this::isRender);
   }
 
   private Vec2 getSize() {
     return new Vec2(texture.width(), texture.height());
+  }
+
+  public boolean isRender() {
+    return true;
   }
 
   // Static method to just call "sprite()" get the sprite from the asset manager and put in into the texture for the sprite component

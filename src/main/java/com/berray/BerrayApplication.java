@@ -7,6 +7,9 @@ import com.berray.math.Vec2;
 import com.raylib.Jaylib;
 import com.raylib.Raylib.Vector2;
 
+import java.util.Arrays;
+import java.util.List;
+
 import static com.berray.components.core.DebugComponent.debug;
 import static com.raylib.Jaylib.*;
 import static com.raylib.Raylib.Color;
@@ -55,6 +58,15 @@ public abstract class BerrayApplication {
   // TODO: Accept a Ray Color or an Array [r, g, b, a]
   public BerrayApplication background(Color background) {
     this.background = background;
+    return this;
+  }
+
+  public BerrayApplication layers(String... layers) {
+    List<String> layerList = Arrays.asList(layers);
+    if (!layerList.contains(Game.DEFAULT_LAYER)) {
+      throw new IllegalStateException("layer list must contain '"+Game.DEFAULT_LAYER+"' layer");
+    }
+    game.setLayers(layerList);
     return this;
   }
 

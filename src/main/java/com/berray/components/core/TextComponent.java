@@ -50,6 +50,7 @@ public class TextComponent extends Component {
   public void add(GameObject gameObject) {
     registerGetter("size", this::getSize);
     registerSetter("text", (Consumer<String>) this::setText);
+    registerGetter("render", () -> true);
   }
 
   public static TextComponent text(String text) {

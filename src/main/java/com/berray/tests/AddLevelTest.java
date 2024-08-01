@@ -86,14 +86,6 @@ public class AddLevelTest extends BerrayApplication implements CoreComponentShor
     add(objectDebug(player),
         pos(0, 0),
         anchor(AnchorType.TOP_LEFT));
-    // add fps display
-    add(label(() -> "FPS: " + fps()),
-        pos(width(), 0),
-        anchor(AnchorType.TOP_RIGHT));
-    // add timings display
-    add(label(() -> "Timings:\n" + timings()),
-        pos(width(), 20),
-        anchor(AnchorType.TOP_RIGHT));
     // add score label
     add(label(() -> "Score: " + score),
         pos(width() / 2.0f, 0),
@@ -136,15 +128,6 @@ public class AddLevelTest extends BerrayApplication implements CoreComponentShor
     });
   }
 
-  private String timings() {
-    return String.format("CD: %.1f%% \nUP: %.1f%%\nDR: %.1f%%\nIN: %.1f%%\nRL: %.1f%%",
-        timings.getPercentCollisionDetection(),
-        timings.getPercentUpdate(),
-        timings.getPercentDraw(),
-        timings.getPercentInput(),
-        timings.getPercentRaylib()
-    );
-  }
 
 //  @Override
 //  public float frameTime() {

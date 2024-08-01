@@ -1,6 +1,7 @@
 package com.berray;
 
 
+import com.berray.components.core.AnchorType;
 import com.berray.event.Event;
 import com.berray.event.EventListener;
 import com.berray.math.Vec2;
@@ -10,7 +11,10 @@ import com.raylib.Raylib.Vector2;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.berray.components.core.AnchorComponent.anchor;
 import static com.berray.components.core.DebugComponent.debug;
+import static com.berray.components.core.PosComponent.pos;
+import static com.berray.objects.core.Label.label;
 import static com.raylib.Jaylib.*;
 import static com.raylib.Raylib.Color;
 
@@ -126,6 +130,18 @@ public abstract class BerrayApplication {
     game.on("add", this::addDebugInfos);
 
     game();
+    if (debug) {
+      // add fps display
+      add(label(() -> "FPS: " + fps()),
+          pos(width(), 0),
+          anchor(AnchorType.TOP_RIGHT),
+          "debug");
+      // add timings display
+      add(label(() -> "Timings:\n" + timings()),
+          pos(width(), 20),
+          anchor(AnchorType.TOP_RIGHT),
+          "debug");
+    }
 
     if (targetFps > 0) {
       SetTargetFPS(targetFps);
@@ -145,6 +161,17 @@ public abstract class BerrayApplication {
     }
     CloseWindow();
   }
+
+  protected String timings() {
+    return String.format("CD: %.1f%% \nUP: %.1f%%\nDR: %.1f%%\nIN: %.1f%%\nRL: %.1f%%",
+        timings.getPercentCollisionDetection(),
+        timings.getPercentUpdate(),
+        timings.getPercentDraw(),
+        timings.getPercentInput(),
+        timings.getPercentRaylib()
+    );
+  }
+
 
   /**
    * Returns the time passed since the last frame.

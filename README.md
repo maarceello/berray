@@ -27,7 +27,7 @@ WIP
 - [x] local coordinate system (child objects position is relative to parent position)
   - [x] TODO: fix collision detection
 - [x] localArea should respect anchor
-- [ ] layers
+- [x] layers
 - [ ] sprite animation
 - [ ] sprite sheet loading
 - [ ] scenes, scene switching
@@ -40,11 +40,12 @@ WIP
 
 
 ## gui
-- [ ] label
+- [x] label
 - [ ] button
 - [ ] checkbox
 - [ ] slider
 - [ ] textarea (static), scrollable or autoremove rows after some time
+- [ ] textarea/inputfield (enter text in input field)
 
 ## 2d stack
 

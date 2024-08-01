@@ -9,6 +9,8 @@ public class LayerTest extends BerrayApplication implements CoreComponentShortcu
   @Override
   public void game() {
 
+    debug = true;
+
     layers(
       "background",
       "default",

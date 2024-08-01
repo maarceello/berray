@@ -2,13 +2,16 @@ package com.berray.components.core;
 
 import com.berray.GameObject;
 
-/** Component to place the object in a specific render layer. */
-public class LayerComponent extends Component{
+/**
+ * Component to place the object in a specific render layer.
+ */
+public class LayerComponent extends Component {
 
   private String layer;
 
   public LayerComponent(String layer) {
-    super("layer", layer);
+    super("layer");
+    this.layer = layer;
   }
 
   @Override

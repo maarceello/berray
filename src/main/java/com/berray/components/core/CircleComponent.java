@@ -48,6 +48,7 @@ public class CircleComponent extends Component {
   @Override
   public void add(GameObject gameObject) {
     registerGetter("size", this::getSize);
+    registerGetter("render", () -> true);
   }
 
   private Vec2 getSize() {

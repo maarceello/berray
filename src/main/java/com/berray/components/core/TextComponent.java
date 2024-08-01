@@ -21,8 +21,14 @@ public class TextComponent extends Component {
   }
 
   public void setText(String text) {
-    this.width = MeasureText(text, fontHeight);
     this.text = text;
+    int newWidth = MeasureText(text, fontHeight);
+    if (newWidth != width && gameObject != null) {
+      // when the width of the text changes, recalculate transform (as the component might
+      // be moved when center or right aligned)
+      gameObject.setTransformDirty();
+    }
+    this.width = newWidth;
   }
 
   private Vec2 getSize() {

@@ -23,6 +23,7 @@ public abstract class BerrayApplication {
   protected int frameNo = 0;
   protected int targetFps = 60;
 
+  protected Timings timings = new Timings();
 
   public BerrayApplication width(int width) {
     this.width = width;
@@ -119,15 +120,16 @@ public abstract class BerrayApplication {
     }
     while (!WindowShouldClose()) {
       frameNo++;
-      game.updateCollisions();
-      game.update(frameTime());
-      BeginDrawing();
-      {
+      timings.timeCollisionDetection(() -> game.updateCollisions());
+      timings.timeUpdate(() -> game.update(frameTime()));
+      timings.timeRaylib(() -> BeginDrawing());
+      timings.timeDraw(() -> {
         ClearBackground(background);
         game.draw();
-        processInputs();
-      }
-      EndDrawing();
+      });
+      timings.timeRaylib(() -> EndDrawing());
+      timings.timeInput(() -> processInputs());
+      timings.apply();
     }
     CloseWindow();
   }

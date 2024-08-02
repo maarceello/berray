@@ -70,6 +70,7 @@ public class GameObject {
    * transformation relative to the world.
    */
   protected Matrix4 worldTransform;
+  protected Matrix4 worldTransformWithoutAnchor;
   /**
    * true when the local transformation is changed and therefore the world transformation
    * must be recalculated.
@@ -202,12 +203,16 @@ public class GameObject {
         this.components.put(component.getClass(), component);
         this.tags.add(component.getTag());
         component.setGameObject(this);
+      } else if (c instanceof Property) {
+        Property<?> property = (Property<?>) c;
+        setProperty(property.getName(), property.getValue());
       } else {
         throw new IllegalArgumentException("Component of type " + c.getClass() + " not supported. Either add a tag (String) or a component (Component)");
       }
     }
     // notify component that it was added
-    for (Object c : components) {
+    for (
+        Object c : components) {
       if (c instanceof Component) {
         Component component = (Component) c;
         // trigger add event for the current component
@@ -374,7 +379,9 @@ public class GameObject {
     eventManager.addEventListener(event, listener, owner);
   }
 
-  /** Removes all listeners belonging to the owner. */
+  /**
+   * Removes all listeners belonging to the owner.
+   */
   public void removeListener(Object owner) {
     eventManager.removeListener(owner);
   }
@@ -440,6 +447,11 @@ public class GameObject {
     return worldTransform;
   }
 
+  public Matrix4 getWorldTransformWithoutAnchor() {
+    ensureTransformCalculated();
+    return worldTransformWithoutAnchor;
+  }
+
   private void ensureTransformCalculated() {
     if (transformDirty || (parent != null && parent.isTransformDirty())) {
       Vec2 pos = getOrDefault("pos", Vec2.origin());
@@ -457,11 +469,12 @@ public class GameObject {
       localTransformWithoutAnchor = Matrix4.identity()
           .multiply(Matrix4.fromTranslate(pos.getX(), pos.getY(), 0))
           .multiply(Matrix4.fromRotatez((float) Math.toRadians(angle)))
-          .multiply(Matrix4.fromScale(scale, scale, 1.0f))
-      ;
+          .multiply(Matrix4.fromScale(scale, scale, 1.0f));
       localTransform = localTransformWithoutAnchor
-          .multiply(Matrix4.fromTranslate(-anchorX, -anchorY, 0))
-      ;
+          .multiply(Matrix4.fromTranslate(-anchorX, -anchorY, 0));
+
+      Matrix4 parentsWorldTransform = parent == null ? Matrix4.identity() : parent.getWorldTransformWithoutAnchor();
+      this.worldTransformWithoutAnchor = parentsWorldTransform.multiply(localTransformWithoutAnchor);
 
       if (is("area")) {
         this.boundingBox = calculateBoundingBox(localTransformWithoutAnchor, size, anchor);
@@ -469,7 +482,7 @@ public class GameObject {
         this.boundingBox = null;
       }
 
-      worldTransform = parent == null ? localTransform : parent.getWorldTransform().multiply(localTransform);
+      worldTransform = parentsWorldTransform.multiply(localTransform);
       transformDirty = false;
     }
   }
@@ -480,9 +493,6 @@ public class GameObject {
       // a game object without dimensions cannot collide with anything
       return null;
     }
-    Matrix4 localTransform = localTransformWithoutAnchor;
-    Matrix4 parentsWorldTransform = getParent().getWorldTransform();
-    Matrix4 worldTransformWithoutAnchor = parentsWorldTransform.multiply(localTransform);
 
     Vec2 anchorPoint = anchor.getAnchorPoint(size);
     float width = size.getX();

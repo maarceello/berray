@@ -1,5 +1,6 @@
 package com.berray.components;
 
+import com.berray.Property;
 import com.berray.components.core.*;
 import com.berray.math.Rect;
 import com.berray.math.Vec2;
@@ -53,6 +54,7 @@ public interface CoreComponentShortcuts {
   default BodyComponent body() {
     return BodyComponent.body(false);
   }
+
   default BodyComponent body(boolean isStatic) {
     return BodyComponent.body(isStatic);
   }
@@ -65,4 +67,11 @@ public interface CoreComponentShortcuts {
     return ScaleComponent.scale(scale);
   }
 
+  default TileComponent tile() {
+    return TileComponent.tile();
+  }
+
+  default <E> Property<E> property(String name, E value) {
+    return Property.property(name, value);
+  }
 }

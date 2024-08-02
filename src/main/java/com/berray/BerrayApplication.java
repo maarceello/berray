@@ -202,7 +202,7 @@ public abstract class BerrayApplication {
     addDebugInfos(gameObject);
   }
 
-  private static void addDebugInfos(GameObject gameObject) {
+  public void addDebugInfos(GameObject gameObject) {
     // if the game object is already a debug object, ignore it
     if (gameObject.is("debug")) {
       return;
@@ -256,6 +256,10 @@ public abstract class BerrayApplication {
 
   public void destroy(GameObject gameObject) {
     game.destroy(gameObject);
+  }
+
+  public int rand(int min, int maxExclusive) {
+    return (int) (Math.random() * (maxExclusive - min)) + min;
   }
 
 }

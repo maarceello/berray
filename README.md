@@ -28,10 +28,11 @@ WIP
   - [x] TODO: fix collision detection
 - [x] localArea should respect anchor
 - [x] layers
-- [ ] sprite animation
-- [ ] sprite sheet loading
+- [x] sprite animation
+- [x] sprite atlas loading
 - [ ] scenes, scene switching
 - [ ] use and unuse
+  - [ ] on unuse: recheck dependencies of remaining components
 - [ ] events: timing, move out of screen 
 - [ ] collision detection: 
   - [ ] support more shapes (only rect at the moment)

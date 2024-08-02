@@ -49,7 +49,7 @@ public class Animation {
   }
 
   public int getNumFrames() {
-    return (to - from) + 1;
+    return Math.abs(to - from) + 1;
   }
 
   public Rect getFrame(int frameNo) {

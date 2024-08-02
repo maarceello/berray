@@ -27,6 +27,17 @@ public class AssetManager {
     assets.put(name, new Asset(name, AssetType.MUSIC, music));
   }
 
+  public static void loadSpriteAtlas(String name, String path, SpriteAtlas atlas) {
+    Texture sprite = LoadTexture(path);
+    atlas.slice(sprite);
+    // add atlas to asset manager
+    assets.put(name, new Asset(name, AssetType.SPRITE_ATLAS, atlas));
+    // also add all individual sprite sheets
+    atlas.getSheets().forEach((spriteSheetName, spriteSheet) -> {
+      assets.put(spriteSheetName, new Asset(spriteSheetName, AssetType.SPRITE_SHEET, spriteSheet));
+    });
+  }
+
   public static Asset getAsset(String name) {
     Asset asset = assets.get(name);
     return asset;

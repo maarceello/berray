@@ -27,7 +27,7 @@ public class SpriteComponent extends Component {
   /**
    * Name of animation when the asset is a sprite sheet.
    */
-  private String anim = "idle";
+  private String anim = null;
   /**
    * current frame number
    */
@@ -58,8 +58,16 @@ public class SpriteComponent extends Component {
         DrawTexture(asset.getAsset(), 0, 0, WHITE);
       } else if (asset.getType() == AssetType.SPRITE_SHEET) {
         SpriteSheet spriteSheet = asset.getAsset();
-        Animation animation = spriteSheet.getAnimation(anim);
-        Rect frameRect = animation.getFrame(frameNo);
+
+        Rect frameRect;
+        if (anim != null && spriteSheet.hasAnimations()) {
+          // we have an animation, then get the frame no relative to the animation
+          Animation animation = spriteSheet.getAnimation(anim);
+          frameRect = animation.getFrame(frameNo);
+        } else {
+          // sprite sheet doesn't have animations. Then get the frame relative to the sheet.
+          frameRect = spriteSheet.getFrame(frameNo);
+        }
         Rectangle rectangle = frameRect.toRectangle();
         if (flipX) {
           rectangle.width(-frameRect.getWidth());
@@ -89,8 +97,29 @@ public class SpriteComponent extends Component {
     return frameNo;
   }
 
+  public SpriteComponent frame(int frame) {
+    this.frameNo = frame;
+    return this;
+  }
+
   public String getAnim() {
     return anim;
+  }
+
+  public SpriteComponent anim(String animationName) {
+    Asset asset = getAsset(texture);
+    if (asset.getType() == AssetType.SPRITE_SHEET) {
+      SpriteSheet spriteSheet = asset.getAsset();
+      Animation animation = spriteSheet.getAnimation(animationName);
+      if (animation == null) {
+        throw new IllegalStateException("animation " + animationName + " not found in asset " + texture);
+      }
+      this.anim = animationName;
+      this.currentAnimation = animation;
+      this.frameNo = 0;
+      this.frameDuration = 0;
+    }
+    return this;
   }
 
   public void setFlipX(boolean flipX) {
@@ -115,8 +144,7 @@ public class SpriteComponent extends Component {
           // when loop, rollback to first frame, else stay on last frame
           if (currentAnimation.isLoop()) {
             frameNo = 0;
-          }
-          else {
+          } else {
             frameNo = currentAnimation.getNumFrames() - 1;
           }
         }
@@ -126,18 +154,7 @@ public class SpriteComponent extends Component {
 
   public void play(List<Object> params) {
     String animationName = (String) params.get(0);
-    Asset asset = getAsset(texture);
-    if (asset.getType() == AssetType.SPRITE_SHEET) {
-      SpriteSheet spriteSheet = asset.getAsset();
-      Animation animation = spriteSheet.getAnimation(animationName);
-      if (animation == null) {
-        throw new IllegalStateException("animation "+animationName+" not found in asset "+texture);
-      }
-      this.anim = animationName;
-      this.currentAnimation = animation;
-      this.frameNo = 0;
-      this.frameDuration = 0;
-    }
+    anim(animationName);
   }
 
   private Vec2 getSize() {

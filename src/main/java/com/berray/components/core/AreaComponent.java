@@ -49,6 +49,7 @@ public class AreaComponent extends Component {
 
     registerAction("isColliding", this::isCollidingWith);
     registerGetter("collisionIgnore", this::getCollisionIgnore);
+    registerGetter("collisions", () -> colliding.values());
   }
 
   public Set<String> getCollisionIgnore() {

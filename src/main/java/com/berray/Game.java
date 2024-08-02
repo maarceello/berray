@@ -68,6 +68,10 @@ public class Game {
     return gravity;
   }
 
+  public GameObject getRoot() {
+    return root;
+  }
+
   /**
    * Add a game object to the game
    */

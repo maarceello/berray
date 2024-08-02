@@ -446,6 +446,7 @@ public class GameObject {
       float angle = getOrDefault("angle", 0f);
       Vec2 size = getOrDefault("size", Vec2.origin());
       AnchorType anchor = getOrDefault("anchor", AnchorType.CENTER);
+      float scale = getOrDefault("scale", 1.0f);
 
       float w2 = size.getX() / 2.0f;
       float h2 = size.getY() / 2.0f;
@@ -453,9 +454,14 @@ public class GameObject {
       float anchorX = w2 + anchor.getX() * w2;
       float anchorY = h2 + anchor.getY() * h2;
 
-      localTransformWithoutAnchor = Matrix4.fromTranslate(pos.getX(), pos.getY(), 0)
-          .multiply(Matrix4.fromRotatez((float) Math.toRadians(angle)));
-      localTransform = localTransformWithoutAnchor.multiply(Matrix4.fromTranslate(-anchorX, -anchorY, 0));
+      localTransformWithoutAnchor = Matrix4.identity()
+          .multiply(Matrix4.fromTranslate(pos.getX(), pos.getY(), 0))
+          .multiply(Matrix4.fromRotatez((float) Math.toRadians(angle)))
+          .multiply(Matrix4.fromScale(scale, scale, 1.0f))
+      ;
+      localTransform = localTransformWithoutAnchor
+          .multiply(Matrix4.fromTranslate(-anchorX, -anchorY, 0))
+      ;
 
       if (is("area")) {
         this.boundingBox = calculateBoundingBox(localTransformWithoutAnchor, size, anchor);

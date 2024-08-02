@@ -61,4 +61,8 @@ public interface CoreComponentShortcuts {
     return LayerComponent.layer(layer);
   }
 
+  default ScaleComponent scale(float scale) {
+    return ScaleComponent.scale(scale);
+  }
+
 }

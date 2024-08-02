@@ -96,7 +96,7 @@ public class Component {
    * Registers a setter, remembering the property name. Upon deletion the properties
    * will be removed.
    */
-  public void registerSetter(String name, Consumer<?> setter) {
+  public <E> void registerSetter(String name, Consumer<E> setter) {
     gameObject.registerSetter(name, setter);
     properties.add(name);
   }

@@ -8,37 +8,33 @@ import static com.raylib.Jaylib.Music;
 import static com.raylib.Jaylib.LoadTexture;
 import static com.raylib.Jaylib.LoadMusicStream;
 
-class Asset {
-  private final String name;
-  private final int type;
-  private final Object asset;
-
-  public Asset(String name, int type, Object asset) {
-    this.name = name;
-    this.type = type;
-    this.asset = asset;
-  }
-
-  public Object getAsset() {
-    return asset;
-  }
-}
-
 public class AssetManager {
   private final static Map<String, Asset> assets = new HashMap<>();
 
   public static void loadSprite(String name, String path) {
     Texture sprite = LoadTexture(path);
-    assets.put(name, new Asset(name, 0, sprite));
+    assets.put(name, new Asset(name, AssetType.SPRITE, sprite));
+  }
+
+  public static void loadSprite(String name, String path, SpriteSheet spriteSheet) {
+    Texture sprite = LoadTexture(path);
+    spriteSheet.slice(sprite);
+    assets.put(name, new Asset(name, AssetType.SPRITE_SHEET, spriteSheet));
   }
 
   public static void loadMusic(String name, String path) {
     Music music = LoadMusicStream(path);
-    assets.put(name, new Asset(name, 1, music));
+    assets.put(name, new Asset(name, AssetType.MUSIC, music));
+  }
+
+  public static Asset getAsset(String name) {
+    Asset asset = assets.get(name);
+    return asset;
   }
 
   public static Texture getSprite(String name) {
-    Asset asset = assets.get(name);
+    Asset asset1 = assets.get(name);
+    Asset asset = asset1;
     if (asset != null && asset.getAsset() instanceof Texture) {
       return (Texture) asset.getAsset();
     }

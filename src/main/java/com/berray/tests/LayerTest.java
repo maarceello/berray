@@ -53,7 +53,7 @@ public class LayerTest extends BerrayApplication implements CoreComponentShortcu
     width(1024);
     height(768);
     background(Jaylib.GRAY);
-    title("Add Level Test");
+    title("Layer Test");
   }
 
   public static void main(String[] args) {

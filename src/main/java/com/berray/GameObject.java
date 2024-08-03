@@ -110,6 +110,11 @@ public class GameObject {
     return boundingBox;
   }
 
+  public Rect getCollisionShape() {
+    ensureTransformCalculated();
+    return boundingBox;
+  }
+
   /**
    * Add a GameObject as a child to this gameObject.
    * `components` is an array of:

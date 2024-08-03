@@ -6,14 +6,17 @@ import com.berray.assets.SpriteAtlas;
 import com.berray.components.CoreComponentShortcuts;
 import com.berray.components.core.AnchorType;
 import com.berray.components.core.Component;
+import com.berray.components.core.DebugComponent;
 import com.berray.event.Event;
 import com.berray.math.Collision;
+import com.berray.math.Rect;
 import com.berray.math.Vec2;
 import com.berray.tests.level.LevelBuilder;
 import com.berray.tests.level.LevelGameObject;
 import com.raylib.Jaylib;
 import com.raylib.Raylib;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -22,6 +25,8 @@ import java.util.function.Consumer;
 import static com.berray.assets.Animation.anim;
 import static com.berray.assets.AssetManager.loadSpriteAtlas;
 import static com.berray.assets.SpriteSheet.spriteSheet;
+import static com.berray.components.core.DebugComponent.debug;
+import static com.raylib.Raylib.*;
 
 public class SpriteAtlasTest extends BerrayApplication implements CoreComponentShortcuts {
 
@@ -180,7 +185,7 @@ public class SpriteAtlasTest extends BerrayApplication implements CoreComponentS
           tile.components(
               sprite("wall_botleft"),
               anchor(AnchorType.TOP_LEFT),
-              area(/*{shape: new Rect(vec2(0), 4, 16)}*/),
+              area(new Rect(0, 0, 4, 16)),
               body(true),
               tile().obstacle(true)
           );
@@ -189,7 +194,7 @@ public class SpriteAtlasTest extends BerrayApplication implements CoreComponentS
           tile.components(
               sprite("wall_botright"),
               anchor(AnchorType.TOP_LEFT),
-              area(/*{shape: new Rect(vec2(12, 0), 4, 16)})*/),
+              area(new Rect(12, 0, 4, 16)),
               body(true),
               tile().obstacle(true)
           );
@@ -225,7 +230,7 @@ public class SpriteAtlasTest extends BerrayApplication implements CoreComponentS
           tile.components(
               sprite("wall_top"),
               anchor(AnchorType.TOP_LEFT),
-              area(/*{shape: new Rect(vec2(0, 12), 16, 4)}*/),
+              area(new Rect(0, 12, 16, 4)),
               body(true),
               tile().obstacle(true)
           );
@@ -234,7 +239,7 @@ public class SpriteAtlasTest extends BerrayApplication implements CoreComponentS
           tile.components(
               sprite("wall_left"),
               anchor(AnchorType.TOP_LEFT),
-              area(/*{shape: new Rect(vec2(0), 4, 16)}*/),
+              area(new Rect(0, 0, 4, 16)),
               body(true),
               tile().obstacle(true)
           );
@@ -243,7 +248,7 @@ public class SpriteAtlasTest extends BerrayApplication implements CoreComponentS
           tile.components(
               sprite("wall_right"),
               anchor(AnchorType.TOP_LEFT),
-              area(/*{shape: new Rect(vec2(12, 0), 4, 16)}*/),
+              area(new Rect(12, 0, 4, 16)),
               body(true),
               tile().obstacle(true)
           );
@@ -263,7 +268,7 @@ public class SpriteAtlasTest extends BerrayApplication implements CoreComponentS
 
     GameObject player = level.add(
         sprite("hero").anim("idle"),
-        area(/*{shape: new Rect(vec2(0, 6), 12, 12)}*/),
+        area(new Rect(0, 6, 12, 12)),
         body(),
         anchor(AnchorType.CENTER),
         tile(),
@@ -280,7 +285,7 @@ public class SpriteAtlasTest extends BerrayApplication implements CoreComponentS
         layer("weapon")
     );
 
-    level.add(
+    GameObject ogre = level.add(
         sprite("ogre"),
         anchor(AnchorType.BOTTOM),
         area(/*{scale: 0.5}*/),
@@ -290,18 +295,21 @@ public class SpriteAtlasTest extends BerrayApplication implements CoreComponentS
         layer("actor")
     );
 
+    addDebugInfos(player);
+    addDebugInfos(ogre);
+
     onKeyPress(Raylib.KEY_SPACE, event -> {
       boolean interacted = false;
 
-      for (Collision  col : player.<Collection<Collision>>getOrDefault("collisions", Collections.emptyList())) {
+      for (Collision col : player.<Collection<Collision>>getOrDefault("collisions", Collections.emptyList())) {
         GameObject c = col.getOther();
         if (c.is("chest")) {
-          if (c.get("opened")) {
+          if (c.getProperty("opened")) {
             c.doAction("play", "close");
-            c.set("opened", false);
+            c.setProperty("opened", false);
           } else {
             c.doAction("play", "open");
-            c.set("opened", true);
+            c.setProperty("opened", true);
           }
           interacted = true;
         }
@@ -312,7 +320,47 @@ public class SpriteAtlasTest extends BerrayApplication implements CoreComponentS
       }
     });
 
+    int SPEED = 120;
+
+    onKeyDown(KEY_RIGHT, (event) -> {
+      player.doAction("move", new Vec2(SPEED, 0), frameTime());
+      player.set("flipX", false);
+      sword.set("flipX", false);
+      sword.set("pos", new Vec2(-4, 9));
+    });
+
+    onKeyDown(KEY_LEFT, (event) -> {
+      player.doAction("move", new Vec2(-SPEED, 0), frameTime());
+      player.set("flipX", true);
+      sword.set("flipX", true);
+      sword.set("pos", new Vec2(4, 9));
+    });
+
+    onKeyDown(KEY_UP, (event) -> {
+      player.doAction("move", new Vec2(0, -SPEED), frameTime());
+    });
+
+    onKeyDown(KEY_DOWN, (event) -> {
+      player.doAction("move", new Vec2(0, SPEED), frameTime());
+    });
+
+    Arrays.asList(KEY_LEFT, KEY_RIGHT, KEY_UP, KEY_DOWN).forEach((key) -> {
+      onKeyPress(key, (event) -> {
+        player.doAction("play", "run");
+      });
+      onKeyRelease(key, (event) -> {
+        if (
+            !IsKeyDown(KEY_LEFT)
+                && !IsKeyDown(KEY_RIGHT)
+                && !IsKeyDown(KEY_UP)
+                && !IsKeyDown(KEY_DOWN)
+        ) {
+          player.doAction("play", "idle");
+        }
+      });
+    });
   }
+
 
   @Override
   public void initWindow() {

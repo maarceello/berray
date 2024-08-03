@@ -223,8 +223,7 @@ public class Game {
     Set<String> thisCollisionIgnores = obj.getOrDefault("collisionIgnore", Collections.emptySet());
 
     for (GameObject other : others) {
-      Rect area = obj.getBoundingBox();
-      // TODO: if (checked.has(other.id)) continue;
+      Rect thisBoundingBox = obj.getBoundingBox();
       if (other.getBoundingBox() == null) {
         continue;
       }
@@ -236,7 +235,7 @@ public class Game {
         continue;
       }
 
-      Vec2 res = collides(area, other.getBoundingBox());
+      Vec2 res = collides(thisBoundingBox, other.getBoundingBox());
       if (res != null) {
         Collision col1 = new Collision(obj, other, res);
         obj.trigger("collideUpdate", other, col1);

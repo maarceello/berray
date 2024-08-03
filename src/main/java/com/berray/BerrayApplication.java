@@ -104,6 +104,14 @@ public abstract class BerrayApplication {
     });
   }
 
+  public void onKeyRelease(int key, EventListener eventListener) {
+    game.on("keyUp", (event) -> {
+      int pressedKey = event.getParameter(0);
+      if (pressedKey == key) {
+        eventListener.onEvent(event);
+      }
+    });
+  }
 
   public void trigger(String event, Object... params) {
     game.trigger(event, params);

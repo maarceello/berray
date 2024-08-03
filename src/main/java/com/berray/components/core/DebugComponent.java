@@ -7,6 +7,7 @@ import com.raylib.Raylib;
 
 import static com.raylib.Jaylib.*;
 import static com.raylib.Raylib.DrawLine;
+import static com.raylib.Raylib.DrawText;
 
 public class DebugComponent extends Component {
   public DebugComponent() {
@@ -15,22 +16,20 @@ public class DebugComponent extends Component {
 
   @Override
   public void draw() {
-    GameObject parent = gameObject.getParent();
-    if (parent != null) {
-      GameObject parentsParent = gameObject.getParent().getParent();
-      Matrix4 localTransform = gameObject.getParent().getLocalTransformWithoutAnchor();
-      Matrix4 parentsWorldTransform = parentsParent.getWorldTransform();
+    if (gameObject != null) {
+      GameObject parent = gameObject.getParent();
+      Matrix4 localTransform = gameObject.getLocalTransformWithoutAnchor();
+      Matrix4 parentsWorldTransform = parent.getWorldTransformWithoutAnchor();
       Matrix4 worldTransform = parentsWorldTransform.multiply(localTransform);
       Vec3 pos = worldTransform.multiply(Vec3.center());
       if (pos != null) {
-        AnchorType anchor = parent.getOrDefault("anchor", AnchorType.CENTER);
+        AnchorType anchor = gameObject.getOrDefault("anchor", AnchorType.CENTER);
         drawPoint(pos, LIME);
-        int id = gameObject.getParent().getId();
-        Jaylib.DrawText("#" + id, (int) pos.getX(), (int) pos.getY() - 25, 15, GOLD);
+        int id = gameObject.getId();
+        DrawText("#" + id, (int) pos.getX(), (int) pos.getY() - 25, 15, GOLD);
 
 
-
-        Vec2 size = parent.get("size");
+        Vec2 size = gameObject.get("size");
         if (size != null) {
           Vec2 anchorPoint = anchor.getAnchorPoint(size);
           float width = size.getX();
@@ -46,10 +45,10 @@ public class DebugComponent extends Component {
           drawLine(p4, p2, LIME);
           drawLine(p4, p3, LIME);
 
-          Rect bb = gameObject.getParent().getBoundingBox();
+          Rect bb = gameObject.getBoundingBox();
           if (bb != null) {
             Raylib.Color color = GOLD;
-            AreaComponent area = gameObject.getParent().getComponent(AreaComponent.class);
+            AreaComponent area = gameObject.getComponent(AreaComponent.class);
             if (area != null && area.isColliding()) {
               color = PINK;
             }

@@ -55,7 +55,10 @@ public class Vec3 {
     return new Vec3(y * other.z - z * other.y,
         -x * other.z + z * other.x,
         x * other.y - y * other.x);
+  }
 
+  public static Vec3 origin() {
+    return new Vec3(0,0,0);
   }
 
 

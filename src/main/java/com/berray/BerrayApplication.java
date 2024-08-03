@@ -222,7 +222,7 @@ public abstract class BerrayApplication {
 
     // only add debug infos when the object has a size
     if (gameObject.get("size") != null) {
-      gameObject.add(
+      gameObject.addComponents(
           debug()
       );
     }

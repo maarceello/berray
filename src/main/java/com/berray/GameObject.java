@@ -230,11 +230,10 @@ public class GameObject {
     return parent;
   }
 
-  public void addComponent(Component component) {
-    this.components.put(component.getClass(), component);
-  }
-
   public void draw() {
+    if (paused) {
+      return;
+    }
     for (Component c : components.values()) {
       c.draw();
     }
@@ -391,6 +390,10 @@ public class GameObject {
     eventManager.removeListener(owner);
   }
 
+  public void setPaused(boolean paused) {
+    this.paused = paused;
+  }
+
   public boolean isPaused() {
     return paused;
   }
@@ -421,6 +424,12 @@ public class GameObject {
    */
   public void setTransformDirty() {
     transformDirty = true;
+    // inform all children that the transform is invalid
+    for (GameObject child : children) {
+      if (!child.transformDirty) {
+        child.setTransformDirty();
+      }
+    }
   }
 
   /**
@@ -459,6 +468,7 @@ public class GameObject {
 
   private void ensureTransformCalculated() {
     if (transformDirty || (parent != null && parent.isTransformDirty())) {
+      setTransformDirty(); // be sure to notify children that the transform is recalculated
       Vec2 pos = getOrDefault("pos", Vec2.origin());
       float angle = getOrDefault("angle", 0f);
       Vec2 size = getOrDefault("size", Vec2.origin());
@@ -482,7 +492,7 @@ public class GameObject {
       this.worldTransformWithoutAnchor = parentsWorldTransform.multiply(localTransformWithoutAnchor);
 
       if (is("area")) {
-        this.boundingBox = calculateBoundingBox(localTransformWithoutAnchor, size, anchor);
+        this.boundingBox = calculateBoundingBox(worldTransformWithoutAnchor, size, anchor);
       } else {
         this.boundingBox = null;
       }
@@ -493,20 +503,37 @@ public class GameObject {
   }
 
 
-  protected Rect calculateBoundingBox(Matrix4 localTransformWithoutAnchor, Vec2 size, AnchorType anchor) {
+  protected Rect calculateBoundingBox(Matrix4 worldTransformWithoutAnchor, Vec2 size, AnchorType anchor) {
     if (size.getX() <= 0 || size.getY() <= 0) {
       // a game object without dimensions cannot collide with anything
       return null;
     }
 
-    Vec2 anchorPoint = anchor.getAnchorPoint(size);
+    float x = 0;
+    float y = 0;
     float width = size.getX();
     float height = size.getY();
 
-    Vec3 p1 = worldTransformWithoutAnchor.multiply(anchorPoint.getX(), anchorPoint.getY(), 0);
-    Vec3 p2 = worldTransformWithoutAnchor.multiply(anchorPoint.getX() + width, anchorPoint.getY(), 0);
-    Vec3 p3 = worldTransformWithoutAnchor.multiply(anchorPoint.getX(), anchorPoint.getY() + height, 0);
-    Vec3 p4 = worldTransformWithoutAnchor.multiply(anchorPoint.getX() + width, anchorPoint.getY() + height, 0);
+    // does this game object have any special collision area?
+    Rect localArea = get("localArea");
+    if (localArea != null) {
+      // yes. set these coordinates to the collision rectangle
+      x = localArea.getX();
+      y = localArea.getY();
+      width = localArea.getWidth();
+      height = localArea.getHeight();
+    }
+
+
+    Vec2 anchorPoint = anchor.getAnchorPoint(new Vec2(width, height));
+    float anchorX = anchorPoint.getX();
+    float anchorY = anchorPoint.getY();
+
+
+    Vec3 p1 = worldTransformWithoutAnchor.multiply(x + anchorX, y + anchorY, 0);
+    Vec3 p2 = worldTransformWithoutAnchor.multiply(x + anchorX + width, y + anchorY, 0);
+    Vec3 p3 = worldTransformWithoutAnchor.multiply(x + anchorX, y + anchorY + height, 0);
+    Vec3 p4 = worldTransformWithoutAnchor.multiply(x + anchorX + width, y + anchorY + height, 0);
 
     int x1 = (int) Math.min(p1.getX(), Math.min(p2.getX(), Math.min(p3.getX(), p4.getX())));
     int x2 = (int) Math.max(p1.getX(), Math.max(p2.getX(), Math.max(p3.getX(), p4.getX())));

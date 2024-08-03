@@ -6,7 +6,6 @@ import com.berray.assets.SpriteAtlas;
 import com.berray.components.CoreComponentShortcuts;
 import com.berray.components.core.AnchorType;
 import com.berray.components.core.Component;
-import com.berray.components.core.DebugComponent;
 import com.berray.event.Event;
 import com.berray.math.Collision;
 import com.berray.math.Rect;
@@ -147,12 +146,10 @@ public class SpriteAtlasTest extends BerrayApplication implements CoreComponentS
     LevelGameObject floor = new LevelBuilder()
         .tileWidth(16)
         .tileHeight(16)
-        .tile(' ', (tile) -> {
-          tile.components(
-              sprite("floor").frame(rand(0, 8)),
-              anchor(AnchorType.TOP_LEFT)
-          );
-        })
+        .tile(' ', tile -> tile.components(
+            sprite("floor").frame(rand(0, 8)),
+            anchor(AnchorType.TOP_LEFT)
+        ))
         .level(new String[]{
             "xxxxxxxxxx",
             "          ",
@@ -170,89 +167,71 @@ public class SpriteAtlasTest extends BerrayApplication implements CoreComponentS
     LevelGameObject objects = new LevelBuilder()
         .tileWidth(16)
         .tileHeight(16)
-        .tile('$', (tile) -> {
-          tile.components(
-              sprite("chest"),
-              anchor(AnchorType.TOP_LEFT),
-              area(),
-              body(true),
-              tile().obstacle(true),
-              "chest",
-              property("opened", false)
-          );
-        })
-        .tile('a', (tile) -> {
-          tile.components(
-              sprite("wall_botleft"),
-              anchor(AnchorType.TOP_LEFT),
-              area(new Rect(0, 0, 4, 16)),
-              body(true),
-              tile().obstacle(true)
-          );
-        })
-        .tile('b', (tile) -> {
-          tile.components(
-              sprite("wall_botright"),
-              anchor(AnchorType.TOP_LEFT),
-              area(new Rect(12, 0, 4, 16)),
-              body(true),
-              tile().obstacle(true)
-          );
-        })
-        .tile('c', (tile) -> {
-          tile.components(
-              sprite("wall_topleft"),
-              anchor(AnchorType.TOP_LEFT),
-              area(),
-              body(true),
-              tile().obstacle(true)
-          );
-        })
-        .tile('d', (tile) -> {
-          tile.components(
-              sprite("wall_topright"),
-              anchor(AnchorType.TOP_LEFT),
-              area(),
-              body(true),
-              tile().obstacle(true)
-          );
-        })
-        .tile('w', (tile) -> {
-          tile.components(
-              sprite("wall"),
-              anchor(AnchorType.TOP_LEFT),
-              area(),
-              body(true),
-              tile().obstacle(true)
-          );
-        })
-        .tile('t', (tile) -> {
-          tile.components(
-              sprite("wall_top"),
-              anchor(AnchorType.TOP_LEFT),
-              area(new Rect(0, 12, 16, 4)),
-              body(true),
-              tile().obstacle(true)
-          );
-        })
-        .tile('l', (tile) -> {
-          tile.components(
-              sprite("wall_left"),
-              anchor(AnchorType.TOP_LEFT),
-              area(new Rect(0, 0, 4, 16)),
-              body(true),
-              tile().obstacle(true)
-          );
-        })
-        .tile('r', (tile) -> {
-          tile.components(
-              sprite("wall_right"),
-              anchor(AnchorType.TOP_LEFT),
-              area(new Rect(12, 0, 4, 16)),
-              body(true),
-              tile().obstacle(true)
-          );
-        })
+        .tile('$', tile -> tile.components(
+            sprite("chest"),
+            anchor(AnchorType.TOP_LEFT),
+            area(),
+            body(true),
+            tile().obstacle(true),
+            "chest",
+            property("opened", false)
+        ))
+        .tile('a', tile -> tile.components(
+            sprite("wall_botleft"),
+            anchor(AnchorType.TOP_LEFT),
+            area(new Rect(0, 0, 4, 16)),
+            body(true),
+            tile().obstacle(true)
+        ))
+        .tile('b', tile -> tile.components(
+            sprite("wall_botright"),
+            anchor(AnchorType.TOP_LEFT),
+            area(new Rect(12, 0, 4, 16)),
+            body(true),
+            tile().obstacle(true)
+        ))
+        .tile('c', tile -> tile.components(
+            sprite("wall_topleft"),
+            anchor(AnchorType.TOP_LEFT),
+            area(),
+            body(true),
+            tile().obstacle(true)
+        ))
+        .tile('d', tile -> tile.components(
+            sprite("wall_topright"),
+            anchor(AnchorType.TOP_LEFT),
+            area(),
+            body(true),
+            tile().obstacle(true)
+        ))
+        .tile('w', tile -> tile.components(
+            sprite("wall"),
+            anchor(AnchorType.TOP_LEFT),
+            area(),
+            body(true),
+            tile().obstacle(true)
+        ))
+        .tile('t', tile -> tile.components(
+            sprite("wall_top"),
+            anchor(AnchorType.TOP_LEFT),
+            area(new Rect(0, 12, 16, 4)),
+            body(true),
+            tile().obstacle(true)
+        ))
+        .tile('l', tile -> tile.components(
+            sprite("wall_left"),
+            anchor(AnchorType.TOP_LEFT),
+            area(new Rect(0, 0, 4, 16)),
+            body(true),
+            tile().obstacle(true)
+        ))
+        .tile('r', tile -> tile.components(
+            sprite("wall_right"),
+            anchor(AnchorType.TOP_LEFT),
+            area(new Rect(12, 0, 4, 16)),
+            body(true),
+            tile().obstacle(true)
+        ))
         .level(new String[]{
             "tttttttttt",
             "cwwwwwwwwd",
@@ -285,18 +264,16 @@ public class SpriteAtlasTest extends BerrayApplication implements CoreComponentS
         layer("weapon")
     );
 
-    GameObject ogre = level.add(
+    level.add(
         sprite("ogre"),
         anchor(AnchorType.BOTTOM),
-        area(/*{scale: 0.5}*/),
+        area().scale(0.5f),
         body(true),
         tile().obstacle(true),
         pos(5 * 16, 4 * 16),
         layer("actor")
     );
 
-    addDebugInfos(player);
-    addDebugInfos(ogre);
 
     onKeyPress(Raylib.KEY_SPACE, event -> {
       boolean interacted = false;

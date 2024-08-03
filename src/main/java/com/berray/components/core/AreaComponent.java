@@ -4,6 +4,7 @@ import com.berray.GameObject;
 import com.berray.event.Event;
 import com.berray.math.Collision;
 import com.berray.math.Rect;
+import com.berray.math.Vec2;
 
 import java.util.*;
 
@@ -37,8 +38,12 @@ public class AreaComponent extends Component {
   /** List of tags this object should ignore collisions with. */
   private Set<String> collisionIgnore = new HashSet<>();
 
+  private Rect collisionArea;
+  private float scale = 1.0f;
+
   public AreaComponent(Rect shape) {
     super("area");
+    this.collisionArea = shape;
   }
 
   @Override
@@ -50,21 +55,39 @@ public class AreaComponent extends Component {
     registerAction("isColliding", this::isCollidingWith);
     registerGetter("collisionIgnore", this::getCollisionIgnore);
     registerGetter("collisions", () -> colliding.values());
+    registerGetter("localArea", this::getLocalArea);
+  }
+
+  public AreaComponent scale(float scale) {
+    this.scale = scale;
+    return this;
+  }
+
+  /**
+   * returns collider area in local coordinates.
+   */
+  public Rect getLocalArea() {
+    if (collisionArea != null) {
+      return scale == 1.0f ? collisionArea : new Rect(collisionArea.getX() * scale, collisionArea.getY() * scale, collisionArea.getWidth() * scale, collisionArea.getHeight() * scale);
+    }
+    Vec2 size = gameObject.getOrDefault("size", Vec2.origin());
+    return new Rect(0, 0, size.getX() * scale, size.getY() * scale);
   }
 
   public Set<String> getCollisionIgnore() {
     return collisionIgnore;
   }
 
-  public AreaComponent ignoreCollisionWith(String...tags) {
+  public AreaComponent ignoreCollisionWith(String... tags) {
     collisionIgnore.addAll(Arrays.asList(tags));
     return this;
   }
 
   /**
-   * Checks if this GameObeject is colliding with `other` in this frame.
+   * Checks if this GameObject is colliding with `other` in this frame.
    * Params:
-   * - GameObject other */
+   * - GameObject other
+   */
   public boolean isCollidingWith(List<Object> params) {
     GameObject other = (GameObject) params.get(0);
     return colliding.containsKey(other.getId());

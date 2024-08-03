@@ -10,6 +10,7 @@ import com.raylib.Jaylib;
 import static com.berray.assets.AssetManager.loadMusic;
 import static com.berray.assets.AssetManager.loadSprite;
 import static com.raylib.Jaylib.RED;
+import static com.raylib.Raylib.GetMouseY;
 
 public class ShapeTest  extends BerrayApplication implements CoreComponentShortcuts {
 
@@ -90,8 +91,7 @@ public class ShapeTest  extends BerrayApplication implements CoreComponentShortc
       int mouseY = Jaylib.GetMouseY();
       if (pos != null) {
         // Note: this updates the pos inside the component
-        pos.setY(mouseY);
-        gameObject.set("pos", pos);
+        gameObject.set("pos", new Vec2(pos.getX(), GetMouseY()));
       }
     });
   }

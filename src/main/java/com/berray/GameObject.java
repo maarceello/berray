@@ -110,11 +110,6 @@ public class GameObject {
     return boundingBox;
   }
 
-  public Rect getCollisionShape() {
-    ensureTransformCalculated();
-    return boundingBox;
-  }
-
   /**
    * Add a GameObject as a child to this gameObject.
    * `components` is an array of:
@@ -181,7 +176,7 @@ public class GameObject {
       return;
     }
     // first update all children, then the object itself (depth first traversal)
-    this.children.forEach((child) -> child.update(frameTime));
+    this.children.forEach(child -> child.update(frameTime));
     this.trigger("update", frameTime);
     // trigger game also, to tag bases listeners get notified
     this.game.trigger("update", this, frameTime);
@@ -265,7 +260,7 @@ public class GameObject {
   }
 
   public void registerAction(String name, Consumer<List<Object>> actionMethod) {
-    actionMethods.put(name, (params) -> {
+    actionMethods.put(name, params -> {
       actionMethod.accept(params);
       return null;
     });
@@ -307,10 +302,10 @@ public class GameObject {
   }
 
   public Set<String> getProperties() {
-    Set<String> properties = new HashSet<>();
-    properties.addAll(getterMethods.keySet());
-    properties.addAll(setterMethods.keySet());
-    return properties;
+    Set<String> componentProperties = new HashSet<>();
+    componentProperties.addAll(getterMethods.keySet());
+    componentProperties.addAll(setterMethods.keySet());
+    return componentProperties;
   }
 
   /**
@@ -535,11 +530,11 @@ public class GameObject {
     Vec3 p3 = worldTransformWithoutAnchor.multiply(x + anchorX, y + anchorY + height, 0);
     Vec3 p4 = worldTransformWithoutAnchor.multiply(x + anchorX + width, y + anchorY + height, 0);
 
-    int x1 = (int) Math.min(p1.getX(), Math.min(p2.getX(), Math.min(p3.getX(), p4.getX())));
-    int x2 = (int) Math.max(p1.getX(), Math.max(p2.getX(), Math.max(p3.getX(), p4.getX())));
+    float x1 = Math.min(p1.getX(), Math.min(p2.getX(), Math.min(p3.getX(), p4.getX())));
+    float x2 = Math.max(p1.getX(), Math.max(p2.getX(), Math.max(p3.getX(), p4.getX())));
 
-    int y1 = (int) Math.min(p1.getY(), Math.min(p2.getY(), Math.min(p3.getY(), p4.getY())));
-    int y2 = (int) Math.max(p1.getY(), Math.max(p2.getY(), Math.max(p3.getY(), p4.getY())));
+    float y1 = Math.min(p1.getY(), Math.min(p2.getY(), Math.min(p3.getY(), p4.getY())));
+    float y2 = Math.max(p1.getY(), Math.max(p2.getY(), Math.max(p3.getY(), p4.getY())));
 
     return new Rect(x1, y1, x2 - x1, y2 - y1);
   }

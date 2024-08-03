@@ -6,10 +6,12 @@ import com.raylib.Raylib;
 import java.util.Objects;
 
 public class Vec2 {
-  private float x;
-  private float y;
+  private static final Vec2 ORIGIN = new Vec2(0.0f, 0.0f);
+  private final float x;
+  private final float y;
 
   public Vec2() {
+    this(0, 0);
   }
 
   public Vec2(float x, float y) {
@@ -19,7 +21,7 @@ public class Vec2 {
 
 
   public static Vec2 origin() {
-    return new Vec2(0.0f, 0.0f);
+    return ORIGIN;
   }
 
   public static Vec2 down() {
@@ -35,16 +37,8 @@ public class Vec2 {
     return x;
   }
 
-  public void setX(float x) {
-    this.x = x;
-  }
-
   public float getY() {
     return y;
-  }
-
-  public void setY(float y) {
-    this.y = y;
   }
 
   public Vec2 scale(float value) {
@@ -83,7 +77,6 @@ public class Vec2 {
   public float angle(Vec2 other) {
     return (float) Math.toDegrees(Math.atan2(this.y - other.y, this.x - other.x));
   }
-
 
 
   public Vec2 negate() {
@@ -135,6 +128,6 @@ public class Vec2 {
 
   @Override
   public String toString() {
-    return String.format("(%.3f, %.3f)", x,y);
+    return String.format("(%.3f, %.3f)", x, y);
   }
 }

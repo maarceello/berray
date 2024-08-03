@@ -6,6 +6,7 @@ import com.berray.math.Collision;
 import com.berray.math.Rect;
 import com.berray.math.Vec2;
 import com.raylib.Jaylib;
+import com.raylib.Raylib;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -44,11 +45,11 @@ public class Game {
   }
 
   public float width() {
-    return Jaylib.GetRenderWidth();
+    return Raylib.GetRenderWidth();
   }
 
   public float height() {
-    return Jaylib.GetRenderHeight();
+    return Raylib.GetRenderHeight();
   }
 
   public Vec2 center() {
@@ -221,12 +222,18 @@ public class Game {
   public void checkObj(GameObject obj, List<GameObject> others) {
 
     Set<String> thisCollisionIgnores = obj.getOrDefault("collisionIgnore", Collections.emptySet());
-
+    boolean isStatic = obj.getOrDefault("static", false);
     for (GameObject other : others) {
-      Rect thisBoundingBox = obj.getBoundingBox();
-      if (other.getBoundingBox() == null) {
+      // if both objects are static, don't check them
+      if (isStatic && Boolean.TRUE.equals(other.getOrDefault("static", false))) {
         continue;
       }
+
+      if (other.getBoundingBox() == null) {
+        // cannot check objects without bounding boxes
+        continue;
+      }
+      Rect thisBoundingBox = obj.getBoundingBox();
       // should we ignore the other object based on tags?
       Optional<String> ignoreTag = thisCollisionIgnores.stream()
           .filter(other::is)

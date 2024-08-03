@@ -6,10 +6,12 @@ import com.berray.event.Event;
 import com.berray.event.EventListener;
 import com.berray.math.Vec2;
 import com.raylib.Jaylib;
+import com.raylib.Raylib;
 import com.raylib.Raylib.Vector2;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 import static com.berray.components.core.AnchorComponent.anchor;
 import static com.berray.components.core.DebugComponent.debug;
@@ -31,6 +33,10 @@ public abstract class BerrayApplication {
   protected int targetFps = 60;
 
   protected Timings timings = new Timings();
+
+  // KEY_KB_MENU is the last key code with id 348
+  private int[] keysDown = new int[KEY_KB_MENU];
+
 
   public BerrayApplication width(int width) {
     this.width = width;
@@ -87,7 +93,7 @@ public abstract class BerrayApplication {
   }
 
   public void onKeyPress(int key, EventListener eventListener) {
-    game.on("keyPress", (event) -> {
+    game.on("keyPress", event -> {
       int pressedKey = event.getParameter(0);
       if (pressedKey == key) {
         eventListener.onEvent(event);
@@ -96,7 +102,7 @@ public abstract class BerrayApplication {
   }
 
   public void onKeyDown(int key, EventListener eventListener) {
-    game.on("keyDown", (event) -> {
+    game.on("keyDown", event -> {
       int pressedKey = event.getParameter(0);
       if (pressedKey == key) {
         eventListener.onEvent(event);
@@ -105,7 +111,7 @@ public abstract class BerrayApplication {
   }
 
   public void onKeyRelease(int key, EventListener eventListener) {
-    game.on("keyUp", (event) -> {
+    game.on("keyUp", event -> {
       int pressedKey = event.getParameter(0);
       if (pressedKey == key) {
         eventListener.onEvent(event);
@@ -158,20 +164,20 @@ public abstract class BerrayApplication {
       frameNo++;
       timings.timeCollisionDetection(() -> game.updateCollisions());
       timings.timeUpdate(() -> game.update(frameTime()));
-      timings.timeRaylib(() -> BeginDrawing());
+      timings.timeRaylib(Raylib::BeginDrawing);
       timings.timeDraw(() -> {
         ClearBackground(background);
         game.draw();
       });
-      timings.timeRaylib(() -> EndDrawing());
-      timings.timeInput(() -> processInputs());
+      timings.timeRaylib(Raylib::EndDrawing);
+      timings.timeInput(this::processInputs);
       timings.apply();
     }
     CloseWindow();
   }
 
   protected String timings() {
-    return String.format("CD: %.1f%% \nUP: %.1f%%\nDR: %.1f%%\nIN: %.1f%%\nRL: %.1f%%",
+    return String.format("CD: %.1f%% %nUP: %.1f%%%nDR: %.1f%%%nIN: %.1f%%%nRL: %.1f%%",
         timings.getPercentCollisionDetection(),
         timings.getPercentUpdate(),
         timings.getPercentDraw(),
@@ -188,15 +194,14 @@ public abstract class BerrayApplication {
    */
   public float frameTime() {
     // TODO: return fixed framerate 1.0f/60 when debug == true?
-    return Jaylib.GetFrameTime();
+    return Raylib.GetFrameTime();
   }
 
   /**
    * Returns the Frames per second.
    */
   public int fps() {
-    // TODO: return fixed framerate 1.0f/60 when debug == true?
-    return Jaylib.GetFPS();
+    return Raylib.GetFPS();
   }
 
   /**
@@ -227,9 +232,6 @@ public abstract class BerrayApplication {
       );
     }
   }
-
-  // KEY_KB_MENU is the last key code with id 348
-  private int[] keysDown = new int[KEY_KB_MENU];
 
   private void processInputs() {
     if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
@@ -267,7 +269,7 @@ public abstract class BerrayApplication {
   }
 
   public int rand(int min, int maxExclusive) {
-    return (int) (Math.random() * (maxExclusive - min)) + min;
+    return new Random().nextInt(maxExclusive - min) + min;
   }
 
 }

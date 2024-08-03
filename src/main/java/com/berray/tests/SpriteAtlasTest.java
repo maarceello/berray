@@ -138,7 +138,7 @@ public class SpriteAtlasTest extends BerrayApplication implements CoreComponentS
 
     GameObject level = add(
         pos(Vec2.origin()),
-        scale(3)
+        scale(1)
     );
 
     layers("default", "actor", "weapon");
@@ -252,7 +252,7 @@ public class SpriteAtlasTest extends BerrayApplication implements CoreComponentS
         anchor(AnchorType.CENTER),
         tile(),
         layer("actor"),
-        pos(2 * 16, 2 * 16)
+        pos(2 * 16, 3 * 16)
     );
 
     GameObject sword = player.add(

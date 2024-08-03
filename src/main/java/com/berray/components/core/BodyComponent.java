@@ -16,10 +16,6 @@ public class BodyComponent extends Component {
    */
   private final boolean isStatic;
   /**
-   * true when this object "sits" on another object
-   */
-  private boolean grounded = false;
-  /**
    * current jump force
    */
   private float jumpForce = DEFAULT_JUMP_FORCE;
@@ -85,6 +81,8 @@ public class BodyComponent extends Component {
       if (this.isStatic && otherBody.isStatic) {
         // both objects are static: do nothing to resolve the collision
         return;
+      } else if (collision.getDisplacement().equals(Vec2.origin())) {
+        // do nothing
       } else if (!this.isStatic && !otherBody.isStatic) {
         // both objects are dynamic. bounce the object back, based on their mass ratio
         float totalMass = this.mass + otherBody.mass;
@@ -134,11 +132,11 @@ public class BodyComponent extends Component {
         gameObject.trigger("headbutt", col.getOther());
       }
     }
-  };
+  }
 
   /**
    * Params:
-   *
+   * <p>
    * - float deltaTime
    */
   public void update(Event event) {
@@ -155,7 +153,6 @@ public class BodyComponent extends Component {
 
       if (curPlatform != null) {
         if (
-            // TODO: this prevents from falling when on edge
             !gameObject.<Boolean>doAction("isColliding", curPlatform)
                 || !curPlatform.exists()
                 || !curPlatform.is("body")
@@ -190,11 +187,10 @@ public class BodyComponent extends Component {
           gameObject.trigger("fall");
         }
       }
+
+      this.vel = this.vel.scale(1 - this.drag);
+      gameObject.doAction("move", this.vel, deltaTime);
     }
-
-    this.vel = this.vel.scale(1 - this.drag);
-
-    gameObject.doAction("move", this.vel, deltaTime);
 
   }
 
@@ -204,7 +200,7 @@ public class BodyComponent extends Component {
 
   public void jump(List<Object> params) {
     Float force = jumpForce;
-    if (params.size() > 0) {
+    if (!params.isEmpty()) {
       force = (Float) params.get(0);
     }
     curPlatform = null;

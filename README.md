@@ -24,6 +24,8 @@ WIP
 
 ## core
 
+### Features
+
 - [x] local coordinate system (child objects position is relative to parent position)
   - [x] TODO: fix collision detection
 - [x] localArea should respect anchor
@@ -39,6 +41,9 @@ WIP
   - [ ] skip object combination which are already checked
   - [ ] detect collision with rotated shapes
 
+### Bugs
+
+[ ] fix pong example, collision detection seems broken
 
 ## gui
 - [x] label
@@ -53,7 +58,7 @@ WIP
 - [ ] add 2d camera object
 - [ ] add sprite sheet animation
 - [ ] add bone animation
-
+ 
 ## 3d stack
 
 - [ ] create 3d pipeline

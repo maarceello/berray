@@ -24,7 +24,6 @@ import java.util.function.Consumer;
 import static com.berray.assets.Animation.anim;
 import static com.berray.assets.AssetManager.loadSpriteAtlas;
 import static com.berray.assets.SpriteSheet.spriteSheet;
-import static com.berray.components.core.DebugComponent.debug;
 import static com.raylib.Raylib.*;
 
 public class SpriteAtlasTest extends BerrayApplication implements CoreComponentShortcuts {
@@ -138,10 +137,10 @@ public class SpriteAtlasTest extends BerrayApplication implements CoreComponentS
 
     GameObject level = add(
         pos(Vec2.origin()),
-        scale(1)
+        scale(3)
     );
 
-    layers("default", "actor", "weapon");
+    layers("default", "actor", "weapon", "gui");
 
     LevelGameObject floor = new LevelBuilder()
         .tileWidth(16)
@@ -336,6 +335,13 @@ public class SpriteAtlasTest extends BerrayApplication implements CoreComponentS
         }
       });
     });
+
+    addFpsLabel(
+        color(255, 203, 0)
+    );
+    addTimingsLabel(
+        color(255, 203, 0)
+    );
   }
 
 

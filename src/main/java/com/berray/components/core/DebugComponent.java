@@ -21,7 +21,7 @@ public class DebugComponent extends Component {
       Matrix4 localTransform = gameObject.getLocalTransformWithoutAnchor();
       Matrix4 parentsWorldTransform = parent.getWorldTransformWithoutAnchor();
       Matrix4 worldTransform = parentsWorldTransform.multiply(localTransform);
-      Vec3 pos = worldTransform.multiply(Vec3.center());
+      Vec3 pos = worldTransform.multiply(Vec3.origin());
       if (pos != null) {
         AnchorType anchor = gameObject.getOrDefault("anchor", AnchorType.CENTER);
         drawPoint(pos, LIME);

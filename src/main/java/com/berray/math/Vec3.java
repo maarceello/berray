@@ -1,11 +1,13 @@
 package com.berray.math;
 
 public class Vec3 {
-  float x;
-  float y;
-  float z;
+  public static final Vec3 ORIGIN = new Vec3(0, 0, 0);
+  final float x;
+  final float y;
+  final float z;
 
   public Vec3() {
+    this(0, 0, 0);
   }
 
   public Vec3(float x, float y, float z) {
@@ -18,25 +20,16 @@ public class Vec3 {
     return x;
   }
 
-  public void setX(float x) {
-    this.x = x;
-  }
 
   public float getY() {
     return y;
   }
 
-  public void setY(float y) {
-    this.y = y;
-  }
 
   public float getZ() {
     return z;
   }
 
-  public void setZ(float z) {
-    this.z = z;
-  }
 
   public float length() {
     return (float) Math.sqrt(x * x + y * y + z * z);
@@ -57,12 +50,17 @@ public class Vec3 {
         x * other.y - y * other.x);
   }
 
+  public Vec3 add(Vec3 other) {
+    return new Vec3(x + other.x, y + other.y, z + other.z);
+  }
+
+  public Vec3 sub(Vec3 other) {
+    return new Vec3(x - other.x, y - other.y, z - other.z);
+  }
+
   public static Vec3 origin() {
-    return new Vec3(0,0,0);
+    return ORIGIN;
   }
 
 
-  public static Vec3 center() {
-    return new Vec3(0,0,0);
-  }
 }

@@ -2,10 +2,10 @@ package com.berray;
 
 
 import com.berray.components.core.AnchorType;
+import com.berray.components.core.LayerComponent;
 import com.berray.event.Event;
 import com.berray.event.EventListener;
 import com.berray.math.Vec2;
-import com.raylib.Jaylib;
 import com.raylib.Raylib;
 import com.raylib.Raylib.Vector2;
 
@@ -146,15 +146,9 @@ public abstract class BerrayApplication {
     game();
     if (debug) {
       // add fps display
-      add(label(() -> "FPS: " + fps()),
-          pos(width(), 0),
-          anchor(AnchorType.TOP_RIGHT),
-          "debug");
+      addFpsLabel();
       // add timings display
-      add(label(() -> "Timings:\n" + timings()),
-          pos(width(), 20),
-          anchor(AnchorType.TOP_RIGHT),
-          "debug");
+      addTimingsLabel();
     }
 
     if (targetFps > 0) {
@@ -174,6 +168,24 @@ public abstract class BerrayApplication {
       timings.apply();
     }
     CloseWindow();
+  }
+
+  protected void addTimingsLabel(Object... additionalComponents) {
+    GameObject timingsLabel = add(label(() -> "Timings:\n" + timings()),
+        pos(width(), 20),
+        anchor(AnchorType.TOP_RIGHT),
+        "debug",
+        LayerComponent.layer("gui"));
+    timingsLabel.addComponents(additionalComponents);
+  }
+
+  protected void addFpsLabel(Object... additionalComponents) {
+    GameObject fpsLabel = add(label(() -> "FPS: " + fps()),
+        pos(width(), 0),
+        anchor(AnchorType.TOP_RIGHT),
+        "debug",
+        LayerComponent.layer("gui"));
+    fpsLabel.addComponents(additionalComponents);
   }
 
   protected String timings() {

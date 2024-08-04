@@ -3,7 +3,9 @@ package com.berray.components.core;
 import com.berray.GameObject;
 import com.berray.event.Event;
 import com.berray.math.Collision;
+import com.berray.math.Matrix4;
 import com.berray.math.Vec2;
+import com.berray.math.Vec3;
 
 import java.util.List;
 
@@ -77,23 +79,25 @@ public class BodyComponent extends Component {
     }
 
     BodyComponent otherBody = other.getComponent(BodyComponent.class);
-    if (otherBody != null) {
+    // only try to move an object if the displacement is > 0
+    if (otherBody != null && !collision.getDisplacement().equals(Vec2.origin())) {
       if (this.isStatic && otherBody.isStatic) {
         // both objects are static: do nothing to resolve the collision
         return;
-      } else if (collision.getDisplacement().equals(Vec2.origin())) {
-        // do nothing
-      } else if (!this.isStatic && !otherBody.isStatic) {
+      }
+      if (!this.isStatic && !otherBody.isStatic) {
         // both objects are dynamic. bounce the object back, based on their mass ratio
         float totalMass = this.mass + otherBody.mass;
-        gameObject.doAction("moveBy", collision.getDisplacement().scale(otherBody.mass / totalMass));
-        other.doAction("moveBy", collision.getDisplacement().scale(-this.mass / totalMass));
+        Vec2 displacement = getLocalCoordinateDisplacement(gameObject, collision.getDisplacement());
+        Vec2 reverseDisplacement = getLocalCoordinateDisplacement(other, collision.getDisplacement().negate());
+        gameObject.doAction("moveBy", displacement.scale(otherBody.mass / totalMass));
+        other.doAction("moveBy", reverseDisplacement.scale(this.mass / totalMass));
       } else {
         // if one is static and one is not, resolve the non-static one
         if (!this.isStatic) {
-          gameObject.doAction("moveBy", collision.getDisplacement());
+          gameObject.doAction("moveBy", getLocalCoordinateDisplacement(gameObject, collision.getDisplacement()));
         } else {
-          other.doAction("moveBy", reverseCollision.getDisplacement());
+          other.doAction("moveBy", getLocalCoordinateDisplacement(other, reverseCollision.getDisplacement()));
         }
       }
     }
@@ -102,6 +106,16 @@ public class BodyComponent extends Component {
     reverseCollision.setResolved(true);
     gameObject.trigger("physicsResolve", collision);
     other.trigger("physicsResolve", reverseCollision);
+  }
+
+  /** Calculate the displacement in the objects local coordinate system. */
+  private static Vec2 getLocalCoordinateDisplacement(GameObject gameObject1, Vec2 worldDisplacement) {
+    Matrix4 inverseTransform = gameObject1.getWorldTransformWithoutAnchor().inverse();
+    Vec3 localDisplacement = inverseTransform.multiply(worldDisplacement.getX(), worldDisplacement.getY(), 0);
+    Vec3 localZero = inverseTransform.multiply(Vec3.origin());
+    Vec3 localRelativeDisplacement = localDisplacement.sub(localZero);
+    Vec2 displacement = new Vec2(localRelativeDisplacement.getX(), localRelativeDisplacement.getY());
+    return displacement;
   }
 
   public boolean isFalling() {

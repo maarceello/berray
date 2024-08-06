@@ -24,18 +24,41 @@ WIP
 
 ## core
 
+### Features
+
 - [x] local coordinate system (child objects position is relative to parent position)
-  - [ ] TODO: fix collision detection
+  - [x] TODO: fix collision detection
 - [x] localArea should respect anchor
-- [ ] collision detection: support more shapes (only rect at the moment)
-- [ ] collision detection: skip object combination which are already checked
+- [x] layers
+- [x] sprite animation
+- [x] sprite atlas loading
+- [ ] scenes, scene switching
+- [ ] use and unuse
+  - [ ] on unuse: recheck dependencies of remaining components
+- [ ] events: timing, move out of screen 
+- [ ] collision detection: 
+  - [ ] support more shapes (only rect at the moment)
+  - [ ] skip object combination which are already checked
+  - [ ] detect collision with rotated shapes
+
+### Bugs
+
+[ ] fix pong example, collision detection seems broken
+
+## gui
+- [x] label
+- [ ] button
+- [ ] checkbox
+- [ ] slider
+- [ ] textarea (static), scrollable or autoremove rows after some time
+- [ ] textarea/inputfield (enter text in input field)
 
 ## 2d stack
 
 - [ ] add 2d camera object
 - [ ] add sprite sheet animation
 - [ ] add bone animation
-
+ 
 ## 3d stack
 
 - [ ] create 3d pipeline

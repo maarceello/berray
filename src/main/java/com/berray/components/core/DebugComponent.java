@@ -1,13 +1,13 @@
 package com.berray.components.core;
 
 import com.berray.GameObject;
-import com.berray.math.Matrix4;
-import com.berray.math.Vec2;
-import com.berray.math.Vec3;
+import com.berray.math.*;
 import com.raylib.Jaylib;
 import com.raylib.Raylib;
 
 import static com.raylib.Jaylib.*;
+import static com.raylib.Raylib.DrawLine;
+import static com.raylib.Raylib.DrawText;
 
 public class DebugComponent extends Component {
   public DebugComponent() {
@@ -16,20 +16,20 @@ public class DebugComponent extends Component {
 
   @Override
   public void draw() {
-    GameObject parent = gameObject.getParent();
-    if (parent != null) {
-      GameObject parentsParent = gameObject.getParent().getParent();
-      Matrix4 localTransform = gameObject.getParent().getLocalTransformWithoutAnchor();
-      Matrix4 parentsWorldTransform = parentsParent.getWorldTransform();
+    if (gameObject != null) {
+      GameObject parent = gameObject.getParent();
+      Matrix4 localTransform = gameObject.getLocalTransformWithoutAnchor();
+      Matrix4 parentsWorldTransform = parent.getWorldTransformWithoutAnchor();
       Matrix4 worldTransform = parentsWorldTransform.multiply(localTransform);
-      Vec3 pos = worldTransform.multiply(Vec3.center());
+      Vec3 pos = worldTransform.multiply(Vec3.origin());
       if (pos != null) {
-        AnchorType anchor = parent.getOrDefault("anchor", AnchorType.CENTER);
+        AnchorType anchor = gameObject.getOrDefault("anchor", AnchorType.CENTER);
         drawPoint(pos, LIME);
-        int id = gameObject.getParent().getId();
-        Jaylib.DrawText("#" + id, (int) pos.getX(), (int) pos.getY() - 25, 15, GOLD);
+        int id = gameObject.getId();
+        DrawText("#" + id, (int) pos.getX(), (int) pos.getY() - 25, 15, GOLD);
 
-        Vec2 size = parent.get("size");
+
+        Vec2 size = gameObject.get("size");
         if (size != null) {
           Vec2 anchorPoint = anchor.getAnchorPoint(size);
           float width = size.getX();
@@ -39,21 +39,30 @@ public class DebugComponent extends Component {
           Vec3 p3 = worldTransform.multiply(anchorPoint.getX(), anchorPoint.getY() + height, 0);
           Vec3 p4 = worldTransform.multiply(anchorPoint.getX() + width, anchorPoint.getY() + height, 0);
 
-          int x1 = (int) Math.min(p1.getX(), Math.min(p2.getX(), Math.min(p3.getX(), p4.getX())));
-          int x2 = (int) Math.max(p1.getX(), Math.max(p2.getX(), Math.max(p3.getX(), p4.getX())));
-
-          int y1 = (int) Math.min(p1.getY(), Math.min(p2.getY(), Math.min(p3.getY(), p4.getY())));
-          int y2 = (int) Math.max(p1.getY(), Math.max(p2.getY(), Math.max(p3.getY(), p4.getY())));
-
+          // draw transformed rectangle around the shape
           drawLine(p1, p2, LIME);
           drawLine(p1, p3, LIME);
           drawLine(p4, p2, LIME);
           drawLine(p4, p3, LIME);
 
-          Jaylib.DrawLine(x1, y1, x2, y1, GOLD);
-          Jaylib.DrawLine(x1, y1, x1, y2, GOLD);
-          Jaylib.DrawLine(x1, y2, x2, y2, GOLD);
-          Jaylib.DrawLine(x2, y1, x2, y2, GOLD);
+          Rect bb = gameObject.getBoundingBox();
+          if (bb != null) {
+            Raylib.Color color = GOLD;
+            AreaComponent area = gameObject.getComponent(AreaComponent.class);
+            if (area != null && area.isColliding()) {
+              color = PINK;
+            }
+
+            DrawLine((int) bb.getX(), (int) bb.getY(), (int) (bb.getX() + bb.getWidth()), (int) bb.getY(), color);
+            DrawLine((int) bb.getX(), (int) (bb.getY() + bb.getHeight()), (int) (bb.getX() + bb.getWidth()), (int) (bb.getY() + bb.getHeight()), color);
+            DrawLine((int) bb.getX(), (int) bb.getY(), (int) bb.getX(), (int) (bb.getY() + bb.getHeight()), color);
+            DrawLine((int) (bb.getX() + bb.getWidth()), (int) bb.getY(), (int) (bb.getX() + bb.getWidth()), (int) (bb.getY() + bb.getHeight()), color);
+
+            for (Collision collision : area.getCollisions()) {
+              Vec2 displacement = collision.getDisplacement();
+              DrawLine((int) p1.getX(), (int) p1.getY(), (int) (p1.getX()+displacement.getX()), (int) (p1.getY()+displacement.getY()), GOLD);
+            }
+          }
         }
       }
     }
@@ -61,12 +70,12 @@ public class DebugComponent extends Component {
 
   private static void drawPoint(Vec3 pos, Raylib.Color color) {
     DrawCircleLines((int) pos.getX(), (int) pos.getY(), 10, color);
-    Jaylib.DrawLine((int) pos.getX() - 10, (int) pos.getY() + 10, (int) pos.getX() + 10, (int) pos.getY() - 10, color);
-    Jaylib.DrawLine((int) pos.getX() + 10, (int) pos.getY() + 10, (int) pos.getX() - 10, (int) pos.getY() - 10, color);
+    DrawLine((int) pos.getX() - 10, (int) pos.getY() + 10, (int) pos.getX() + 10, (int) pos.getY() - 10, color);
+    DrawLine((int) pos.getX() + 10, (int) pos.getY() + 10, (int) pos.getX() - 10, (int) pos.getY() - 10, color);
   }
 
   private void drawLine(Vec3 p1, Vec3 p2, Raylib.Color color) {
-    Jaylib.DrawLine((int) p1.getX(), (int) p1.getY(), (int) p2.getX(), (int) p2.getY(), color);
+    DrawLine((int) p1.getX(), (int) p1.getY(), (int) p2.getX(), (int) p2.getY(), color);
   }
 
   public static DebugComponent debug() {

@@ -2,16 +2,17 @@ package com.berray.tests;
 
 import com.berray.BerrayApplication;
 import com.berray.GameObject;
+import com.berray.components.CoreComponentShortcuts;
 import com.berray.components.core.AnchorType;
 import com.berray.math.Vec2;
 import com.raylib.Jaylib;
 
-import static com.berray.AssetManager.loadMusic;
-import static com.berray.AssetManager.loadSprite;
-import static com.berray.components.core.SpriteComponent.sprite;
+import static com.berray.assets.AssetManager.loadMusic;
+import static com.berray.assets.AssetManager.loadSprite;
 import static com.raylib.Jaylib.RED;
+import static com.raylib.Raylib.GetMouseY;
 
-public class ShapeTest  extends BerrayApplication {
+public class ShapeTest  extends BerrayApplication implements CoreComponentShortcuts {
 
   @Override
   public void initWindow() {
@@ -90,8 +91,7 @@ public class ShapeTest  extends BerrayApplication {
       int mouseY = Jaylib.GetMouseY();
       if (pos != null) {
         // Note: this updates the pos inside the component
-        pos.setY(mouseY);
-        gameObject.set("pos", pos);
+        gameObject.set("pos", new Vec2(pos.getX(), GetMouseY()));
       }
     });
   }

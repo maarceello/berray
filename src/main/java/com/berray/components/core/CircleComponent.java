@@ -1,13 +1,26 @@
 package com.berray.components.core;
 
 import com.berray.GameObject;
-import com.berray.math.Rect;
 import com.berray.math.Vec2;
 import com.raylib.Raylib;
 
 import static com.raylib.Jaylib.WHITE;
-import static com.raylib.Raylib.DrawCircle;
+import static com.raylib.Raylib.*;
 
+/**
+ * # CircleComponent
+ *
+ * {@link CircleComponent#circle(float)} provides a circle shape for rendering.
+ *
+ * # Properties
+ *
+ * - localArea (read only) - todo
+ * - size (read only) - size of the circle (2 * radius)
+ *
+ * # Events
+ *
+ * none
+ */
 public class CircleComponent extends Component {
   private final float radius;
 
@@ -22,27 +35,20 @@ public class CircleComponent extends Component {
 
   @Override
   public void draw() {
-    Raylib.rlPushMatrix();
+    rlPushMatrix();
     {
-      Raylib.rlMultMatrixf(gameObject.getWorldTransform().toFloatTransposed());
-      DrawCircle((int) (radius), (int) (radius), radius, WHITE);
+      Color color = gameObject.getOrDefault("color", WHITE);
+      rlMultMatrixf(gameObject.getWorldTransform().toFloatTransposed());
+      DrawCircle((int) (radius), (int) (radius), radius, color);
     }
-    Raylib.rlPopMatrix();
+    rlPopMatrix();
   }
 
 
   @Override
   public void add(GameObject gameObject) {
-    gameObject.registerGetter("localArea", this::localArea);
-    gameObject.registerGetter("size", this::getSize);
-  }
-
-  private Rect localArea() {
-    Vec2 pos = gameObject.get("pos");
-    if (pos == null) {
-      return null;
-    }
-    return new Rect(pos.getX() - radius, pos.getY() - radius, radius * 2, radius * 2);
+    registerGetter("size", this::getSize);
+    registerGetter("render", () -> true);
   }
 
   private Vec2 getSize() {

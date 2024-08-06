@@ -1,13 +1,22 @@
 package com.berray;
 
 
-import com.berray.components.core.*;
+import com.berray.components.core.AnchorType;
+import com.berray.components.core.LayerComponent;
 import com.berray.event.Event;
 import com.berray.event.EventListener;
-import com.berray.math.Rect;
 import com.berray.math.Vec2;
+import com.raylib.Raylib;
+import com.raylib.Raylib.Vector2;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Random;
+
+import static com.berray.components.core.AnchorComponent.anchor;
 import static com.berray.components.core.DebugComponent.debug;
+import static com.berray.components.core.PosComponent.pos;
+import static com.berray.objects.core.Label.label;
 import static com.raylib.Jaylib.*;
 import static com.raylib.Raylib.Color;
 
@@ -20,6 +29,13 @@ public abstract class BerrayApplication {
   private String title = "Berry Application";
 
   protected boolean debug = false;
+  protected int frameNo = 0;
+  protected int targetFps = 60;
+
+  protected Timings timings = new Timings();
+
+  // KEY_KB_MENU is the last key code with id 348
+  private int[] keysDown = new int[KEY_KB_MENU];
 
 
   public BerrayApplication width(int width) {
@@ -55,6 +71,15 @@ public abstract class BerrayApplication {
     return this;
   }
 
+  public BerrayApplication layers(String... layers) {
+    List<String> layerList = Arrays.asList(layers);
+    if (!layerList.contains(Game.DEFAULT_LAYER)) {
+      throw new IllegalStateException("layer list must contain '"+Game.DEFAULT_LAYER+"' layer");
+    }
+    game.setLayers(layerList);
+    return this;
+  }
+
   public GameObject add(Object... component) {
     return game.add(component);
   }
@@ -67,6 +92,32 @@ public abstract class BerrayApplication {
     game.onUpdate(tag, eventListener);
   }
 
+  public void onKeyPress(int key, EventListener eventListener) {
+    game.on("keyPress", event -> {
+      int pressedKey = event.getParameter(0);
+      if (pressedKey == key) {
+        eventListener.onEvent(event);
+      }
+    });
+  }
+
+  public void onKeyDown(int key, EventListener eventListener) {
+    game.on("keyDown", event -> {
+      int pressedKey = event.getParameter(0);
+      if (pressedKey == key) {
+        eventListener.onEvent(event);
+      }
+    });
+  }
+
+  public void onKeyRelease(int key, EventListener eventListener) {
+    game.on("keyUp", event -> {
+      int pressedKey = event.getParameter(0);
+      if (pressedKey == key) {
+        eventListener.onEvent(event);
+      }
+    });
+  }
 
   public void trigger(String event, Object... params) {
     game.trigger(event, params);
@@ -93,20 +144,76 @@ public abstract class BerrayApplication {
     game.on("add", this::addDebugInfos);
 
     game();
+    if (debug) {
+      // add fps display
+      addFpsLabel();
+      // add timings display
+      addTimingsLabel();
+    }
 
-    SetTargetFPS(60);
+    if (targetFps > 0) {
+      SetTargetFPS(targetFps);
+    }
     while (!WindowShouldClose()) {
-      game.checkFrame();
-      game.update();
-      BeginDrawing();
-      {
+      frameNo++;
+      timings.timeCollisionDetection(() -> game.updateCollisions());
+      timings.timeUpdate(() -> game.update(frameTime()));
+      timings.timeRaylib(Raylib::BeginDrawing);
+      timings.timeDraw(() -> {
         ClearBackground(background);
         game.draw();
-        processInputs();
-      }
-      EndDrawing();
+      });
+      timings.timeRaylib(Raylib::EndDrawing);
+      timings.timeInput(this::processInputs);
+      timings.apply();
     }
     CloseWindow();
+  }
+
+  protected void addTimingsLabel(Object... additionalComponents) {
+    GameObject timingsLabel = add(label(() -> "Timings:\n" + timings()),
+        pos(width(), 20),
+        anchor(AnchorType.TOP_RIGHT),
+        "debug",
+        LayerComponent.layer("gui"));
+    timingsLabel.addComponents(additionalComponents);
+  }
+
+  protected void addFpsLabel(Object... additionalComponents) {
+    GameObject fpsLabel = add(label(() -> "FPS: " + fps()),
+        pos(width(), 0),
+        anchor(AnchorType.TOP_RIGHT),
+        "debug",
+        LayerComponent.layer("gui"));
+    fpsLabel.addComponents(additionalComponents);
+  }
+
+  protected String timings() {
+    return String.format("CD: %.1f%% %nUP: %.1f%%%nDR: %.1f%%%nIN: %.1f%%%nRL: %.1f%%",
+        timings.getPercentCollisionDetection(),
+        timings.getPercentUpdate(),
+        timings.getPercentDraw(),
+        timings.getPercentInput(),
+        timings.getPercentRaylib()
+    );
+  }
+
+
+  /**
+   * Returns the time passed since the last frame.
+   * Note: by overriding this method and returning a fixed value you can simulate a constant
+   * framerate even when the application is halted during debugging or similar.
+   */
+  public float frameTime() {
+    // TODO: return fixed framerate 1.0f/60 when debug == true?
+    return Raylib.GetFrameTime();
+  }
+
+  /**
+   * Returns the Frames per second.
+   */
+  public int fps() {
+    return Raylib.GetFPS();
   }
 
   /**
@@ -117,14 +224,22 @@ public abstract class BerrayApplication {
       return;
     }
     GameObject gameObject = event.getParameter(1);
+    addDebugInfos(gameObject);
+  }
+
+  public void addDebugInfos(GameObject gameObject) {
     // if the game object is already a debug object, ignore it
     if (gameObject.is("debug")) {
       return;
     }
-    // add frame around the object
-    Rect area = gameObject.get("localArea");
-    if (area != null) {
-      gameObject.add(
+    // recursively add debug infos
+    for (GameObject child : gameObject.getChildren()) {
+      addDebugInfos(child);
+    }
+
+    // only add debug infos when the object has a size
+    if (gameObject.get("size") != null) {
+      gameObject.addComponents(
           debug()
       );
     }
@@ -132,51 +247,41 @@ public abstract class BerrayApplication {
 
   private void processInputs() {
     if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-      com.raylib.Raylib.Vector2 pos = GetMousePosition();
+      Vector2 pos = GetMousePosition();
       game.trigger("mousePress", new Vec2(pos.x(), pos.y()));
+    }
+
+    for (int i = 0; i < keysDown.length; i++) {
+      int frame = keysDown[i];
+      // check if the key is down?
+      if (IsKeyDown(i)) {
+        if (frame == 0) {
+          // key is pressed this frame
+          trigger("keyPress", i);
+        }
+        // key is still pressed (or pressed the first time)
+        trigger("keyDown", i);
+        keysDown[i] = frameNo;
+      } else {
+        // Key not down, but was down the previous frame? Then it was released this frame.
+        if (frame != 0) {
+          keysDown[i] = 0;
+          trigger("keyUp", i);
+        }
+      }
     }
   }
 
-  // Shortcuts to some common base components
-  public PosComponent pos(float x, float y) {
-    return PosComponent.pos(x, y);
+  public void play(String name) {
+    // TODO: play sound
   }
 
-  public PosComponent pos(Vec2 pos) {
-    return PosComponent.pos(pos);
+  public void destroy(GameObject gameObject) {
+    game.destroy(gameObject);
   }
 
-  public static RectComponent rect(float width, float height) {
-    return RectComponent.rect(width, height);
+  public int rand(int min, int maxExclusive) {
+    return new Random().nextInt(maxExclusive - min) + min;
   }
-
-  public static CircleComponent circle(float radius) {
-    return CircleComponent.circle(radius);
-  }
-
-  public static AnchorComponent anchor(AnchorType anchorType) {
-    return AnchorComponent.anchor(anchorType);
-  }
-
-  public static RotateComponent rotate(float angle) {
-    return RotateComponent.rotate(angle);
-  }
-
-  public static AreaComponent area() {
-    return AreaComponent.area();
-  }
-
-  public static AreaComponent area(Rect shape) {
-    return AreaComponent.area(shape);
-  }
-
-  public TextComponent text(String text) {
-    return TextComponent.text(text);
-  }
-
-  public ColorComponent color(int r, int g, int b) {
-    return ColorComponent.color(r, g, b);
-  }
-
 
 }

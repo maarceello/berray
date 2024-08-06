@@ -3,6 +3,9 @@ package com.berray.math;
 import com.raylib.Jaylib;
 import com.raylib.Raylib;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Rect {
   private float x;
   private float y;
@@ -51,7 +54,21 @@ public class Rect {
     this.height = height;
   }
 
+  public List<Vec2> getPoints() {
+    List<Vec2> points = new ArrayList<>();
+    points.add(new Vec2(x, y));
+    points.add(new Vec2(x, y + height));
+    points.add(new Vec2(x + width, y));
+    points.add(new Vec2(x + width, y + height));
+    return points;
+  }
+
   public Raylib.Rectangle toRectangle() {
-    return new Jaylib.Rectangle(x,y,width,height);
+    return new Jaylib.Rectangle(x, y, width, height);
+  }
+
+  @Override
+  public String toString() {
+    return String.format("(%.3f, %.3f - %.3f, %.3f)", x,y, width, height);
   }
 }

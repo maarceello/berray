@@ -9,7 +9,6 @@ import com.raylib.Raylib;
 import java.util.function.Consumer;
 
 import static com.raylib.Jaylib.*;
-import static com.raylib.Raylib.MeasureText;
 
 public class TextComponent extends Component {
   private String text;
@@ -22,8 +21,14 @@ public class TextComponent extends Component {
   }
 
   public void setText(String text) {
-    this.width = MeasureText(text, fontHeight);
     this.text = text;
+    int newWidth = MeasureText(text, fontHeight);
+    if (newWidth != width && gameObject != null) {
+      // when the width of the text changes, recalculate transform (as the component might
+      // be moved when center or right aligned)
+      gameObject.setTransformDirty();
+    }
+    this.width = newWidth;
   }
 
   private Vec2 getSize() {
@@ -32,31 +37,21 @@ public class TextComponent extends Component {
 
   @Override
   public void draw() {
-    Raylib.rlPushMatrix();
+    rlPushMatrix();
     {
       Raylib.Color color = gameObject.getOrDefault("color", Jaylib.BLACK);
-      Raylib.rlMultMatrixf(gameObject.getWorldTransform().toFloatTransposed());
+      rlMultMatrixf(gameObject.getWorldTransform().toFloatTransposed());
       DrawText(text, 0,0, fontHeight, color);
     }
-    Raylib.rlPopMatrix();
+    rlPopMatrix();
   }
 
   @Override
   public void add(GameObject gameObject) {
-    gameObject.registerGetter("localArea", this::localArea);
-    gameObject.registerGetter("size", this::getSize);
-    gameObject.registerSetter("text", (Consumer<String>) this::setText);
+    registerGetter("size", this::getSize);
+    registerSetter("text", (Consumer<String>) this::setText);
+    registerGetter("render", () -> true);
   }
-
-  private Rect localArea() {
-    Vec2 pos = gameObject.get("pos");
-    if (pos == null) {
-      return null;
-    }
-    int width = MeasureText(text, fontHeight);
-    return new Rect(pos.getX(), pos.getY(), width, fontHeight);
-  }
-
 
   public static TextComponent text(String text) {
     return new TextComponent(text);

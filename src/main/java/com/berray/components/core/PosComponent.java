@@ -3,7 +3,7 @@ package com.berray.components.core;
 import com.berray.GameObject;
 import com.berray.math.Vec2;
 
-import java.util.function.Consumer;
+import java.util.List;
 
 public class PosComponent extends Component {
   private Vec2 pos;
@@ -12,6 +12,35 @@ public class PosComponent extends Component {
   public PosComponent(Vec2 pos) {
     super("pos");
     this.pos = pos;
+  }
+
+  @Override
+  public void add(GameObject gameObject) {
+    registerMethod("pos", this::getPos, this::setPos);
+    registerAction("move", this::move);
+    registerAction("moveBy", this::moveBy);
+  }
+
+  /**
+   * params:
+   * - vec2 velocity
+   * - float deltaTime
+   */
+  public void move(List<Object> params) {
+    Vec2 velocity = (Vec2) params.get(0);
+    float deltaTime = (float) params.get(1);
+    setPos(pos.move(velocity.scale(deltaTime)));
+  }
+
+  /**
+   * params:
+   * - vec2 amount
+   */
+  public void moveBy(List<Object> params) {
+    if (params.get(0) instanceof Vec2) {
+      Vec2 amount = (Vec2) params.get(0);
+      setPos(pos.move(amount));
+    }
   }
 
   // Getter
@@ -28,14 +57,10 @@ public class PosComponent extends Component {
   public static PosComponent pos(float x, float y) {
     return new PosComponent(new Vec2(x, y));
   }
+
   public static PosComponent pos(Vec2 pos) {
     return new PosComponent(pos);
   }
 
-  @Override
-  public void add(GameObject gameObject) {
-    Consumer<Vec2> consumer = this::setPos;
-    gameObject.registerMethod("pos", this::getPos, consumer);
-  }
 
 }

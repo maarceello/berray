@@ -2,19 +2,18 @@ package com.berray;
 
 
 import com.berray.components.core.AnchorType;
-import com.berray.components.core.LayerComponent;
 import com.berray.event.Event;
 import com.berray.event.EventListener;
 import com.berray.math.Vec2;
 import com.raylib.Raylib;
 import com.raylib.Raylib.Vector2;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
+import java.util.function.Consumer;
 
 import static com.berray.components.core.AnchorComponent.anchor;
 import static com.berray.components.core.DebugComponent.debug;
+import static com.berray.components.core.LayerComponent.layer;
 import static com.berray.components.core.PosComponent.pos;
 import static com.berray.objects.core.Label.label;
 import static com.raylib.Jaylib.*;
@@ -37,6 +36,8 @@ public abstract class BerrayApplication {
   // KEY_KB_MENU is the last key code with id 348
   private int[] keysDown = new int[KEY_KB_MENU];
 
+  private Map<String, Consumer<SceneDescription>> scenes = new HashMap<>();
+
 
   public BerrayApplication width(int width) {
     this.width = width;
@@ -57,7 +58,7 @@ public abstract class BerrayApplication {
   }
 
   public Vec2 center() {
-    return new Vec2(width / 2.0f, height / 2.0f);
+    return game.center();
   }
 
   public BerrayApplication title(String title) {
@@ -90,6 +91,10 @@ public abstract class BerrayApplication {
 
   public void onUpdate(String tag, EventListener eventListener) {
     game.onUpdate(tag, eventListener);
+  }
+
+  public void onKeyPress(EventListener eventListener) {
+    game.on("keyPress", eventListener);
   }
 
   public void onKeyPress(int key, EventListener eventListener) {
@@ -174,18 +179,22 @@ public abstract class BerrayApplication {
     GameObject timingsLabel = add(label(() -> "Timings:\n" + timings()),
         pos(width(), 20),
         anchor(AnchorType.TOP_RIGHT),
-        "debug",
-        LayerComponent.layer("gui"));
+        "debug");
     timingsLabel.addComponents(additionalComponents);
+    if (game.getLayers().contains("gui")) {
+      timingsLabel.addComponents(layer("gui"));
+    }
   }
 
   protected void addFpsLabel(Object... additionalComponents) {
     GameObject fpsLabel = add(label(() -> "FPS: " + fps()),
         pos(width(), 0),
         anchor(AnchorType.TOP_RIGHT),
-        "debug",
-        LayerComponent.layer("gui"));
+        "debug");
     fpsLabel.addComponents(additionalComponents);
+    if (game.getLayers().contains("gui")) {
+      fpsLabel.addComponents(layer("gui"));
+    }
   }
 
   protected String timings() {
@@ -282,6 +291,43 @@ public abstract class BerrayApplication {
 
   public int rand(int min, int maxExclusive) {
     return new Random().nextInt(maxExclusive - min) + min;
+  }
+
+
+  /** add scene to game. */
+  public void scene(String name, Consumer<SceneDescription> sceneCreator) {
+    scenes.put(name, sceneCreator);
+  }
+
+
+  /** remove current scene and create new named scene. */
+  public void go(String scene, Object... params) {
+    game.getRoot().getChildren().clear();
+    game.clearEvents();
+    GameObject root = game.getRoot();
+
+    SceneDescription description = new SceneDescription() {
+      @Override
+      public GameObject add(Object... components) {
+        return root.add(components);
+      }
+
+      @Override
+      public void on(String event, EventListener listener) {
+        root.on(event, listener);
+      }
+
+      @Override
+      public <E> E getParameter(int paramNr) {
+        return (E) params[paramNr];
+      }
+
+      @Override
+      public void onKeyPress(EventListener eventListener) {
+        BerrayApplication.this.onKeyPress(eventListener);
+      }
+    };
+    scenes.get(scene).accept(description);
   }
 
 }

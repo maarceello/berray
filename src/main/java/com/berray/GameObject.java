@@ -285,6 +285,13 @@ public class GameObject {
   /**
    * returns registered component property
    */
+  public <E> E get(String property, E defaultValue) {
+    return getOrDefault(property, defaultValue);
+  }
+
+  /**
+   * returns registered component property
+   */
   public <E> E getOrDefault(String property, E defaultValue) {
     E value = get(property);
     return value == null ? defaultValue : value;

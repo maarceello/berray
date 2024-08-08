@@ -39,7 +39,8 @@ public class CircleComponent extends Component {
     {
       Color color = gameObject.getOrDefault("color", WHITE);
       rlMultMatrixf(gameObject.getWorldTransform().toFloatTransposed());
-      DrawCircle((int) (radius), (int) (radius), radius, color);
+      //DrawCircle((int) (radius), (int) (radius), radius, color);
+      DrawCircle(0, 0, radius, color);
     }
     rlPopMatrix();
   }

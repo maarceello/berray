@@ -44,6 +44,10 @@ public class Game {
     this.layers = layers;
   }
 
+  public List<String> getLayers() {
+    return layers;
+  }
+
   public float width() {
     return Raylib.GetRenderWidth();
   }
@@ -280,5 +284,9 @@ public class Game {
    */
   public void destroy(GameObject gameObject) {
     gameObject.getParent().remove(gameObject);
+  }
+
+  public void clearEvents() {
+    eventManager.clear();
   }
 }

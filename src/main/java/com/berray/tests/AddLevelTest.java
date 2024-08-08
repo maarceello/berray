@@ -18,7 +18,6 @@ import static java.lang.Boolean.FALSE;
 
 public class AddLevelTest extends BerrayApplication implements CoreComponentShortcuts {
   private static final int SPEED = 480;
-  private LevelBuilder levelBuilder;
 
   private int score = 0;
 
@@ -35,7 +34,7 @@ public class AddLevelTest extends BerrayApplication implements CoreComponentShor
     loadSprite("spike", "resources/spike.png");
     loadSprite("grass", "resources/grass.png");
 
-    this.levelBuilder = new LevelBuilder();
+    LevelBuilder levelBuilder = new LevelBuilder();
     levelBuilder
         .tileWidth(64)
         .tileHeight(64)
@@ -127,12 +126,6 @@ public class AddLevelTest extends BerrayApplication implements CoreComponentShor
       score++;
     });
   }
-
-
-//  @Override
-//  public float frameTime() {
-//    return 1.0f/60;
-//  }
 
   @Override
   public void initWindow() {

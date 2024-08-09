@@ -32,7 +32,7 @@ WIP
 - [x] layers
 - [x] sprite animation
 - [x] sprite atlas loading
-- [ ] scenes, scene switching
+- [x] scenes, scene switching
 - [ ] use and unuse
   - [ ] on unuse: recheck dependencies of remaining components
 - [ ] events: timing, move out of screen 
@@ -71,3 +71,7 @@ WIP
 
 - [ ] create documentation from javacoc
 
+# Notes
+
+- BerrayApplication supplies 3 default layers: background, default, gui
+  - think about sublayer in one layer (stacking in gui layer)

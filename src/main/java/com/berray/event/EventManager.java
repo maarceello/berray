@@ -32,4 +32,8 @@ public class EventManager {
       listeners.trigger(new Event(eventName, params));
     }
   }
+
+  public void clear() {
+    eventListenersMap.clear();
+  }
 }

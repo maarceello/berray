@@ -4,12 +4,14 @@ package com.berray;
 import com.berray.components.core.AnchorType;
 import com.berray.event.Event;
 import com.berray.event.EventListener;
+import com.berray.math.Rect;
 import com.berray.math.Vec2;
 import com.raylib.Raylib;
 import com.raylib.Raylib.Vector2;
 
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import static com.berray.components.core.AnchorComponent.anchor;
 import static com.berray.components.core.DebugComponent.debug;
@@ -257,7 +259,22 @@ public abstract class BerrayApplication {
   private void processInputs() {
     if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
       Vector2 pos = GetMousePosition();
-      game.trigger("mousePress", new Vec2(pos.x(), pos.y()));
+      Vec2 mousePos = new Vec2(pos.x(), pos.y());
+
+      game.trigger("mousePress", mousePos);
+
+      for (GameObject gameObject : game.getRoot().getGameObjectStream()
+          .filter(gameObject -> gameObject.getBoundingBox() != null)
+          .collect(Collectors.toList())) {
+        Rect boundingBox = gameObject.getBoundingBox();
+        if (boundingBox.contains(mousePos)) {
+          gameObject.trigger("click");
+        }
+      }
+
+
+
+
     }
 
     for (int i = 0; i < keysDown.length; i++) {

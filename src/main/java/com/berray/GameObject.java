@@ -408,6 +408,10 @@ public class GameObject {
     return (parent == null) ? this : parent.getRoot();
   }
 
+  public void onClick(EventListener eventListener) {
+    this.trigger("click");
+  }
+
   /**
    * Update all game objects
    */
@@ -549,6 +553,8 @@ public class GameObject {
   public boolean exists() {
     return parent != null;
   }
+
+
 
   private static class ChildIterator implements Iterator<GameObject> {
     private final List<GameObject> children;

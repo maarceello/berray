@@ -9,7 +9,10 @@ public class Animation {
   private int from;
   private int to;
   private int speed;
-  private boolean loop;
+  /** true when the animation should be repeated. */
+  private boolean loop = false;
+  /** true when the animation reverse at the end and play again from end to start. */
+  private boolean pingpong = false;
   private List<Rect> frames = new ArrayList<>();
 
   public Animation from(int from) {
@@ -24,6 +27,11 @@ public class Animation {
 
   public Animation speed(int speed) {
     this.speed = speed;
+    return this;
+  }
+
+  public Animation pingpong(boolean pingpong) {
+    this.pingpong = pingpong;
     return this;
   }
 
@@ -48,8 +56,12 @@ public class Animation {
     return loop;
   }
 
+  public boolean isPingpong() {
+    return pingpong;
+  }
+
   public int getNumFrames() {
-    return Math.abs(to - from) + 1;
+    return frames.size();
   }
 
   public Rect getFrame(int frameNo) {

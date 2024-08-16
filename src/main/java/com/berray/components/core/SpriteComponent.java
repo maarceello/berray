@@ -1,7 +1,6 @@
 package com.berray.components.core;
 
 import com.berray.GameObject;
-
 import com.berray.assets.Animation;
 import com.berray.assets.Asset;
 import com.berray.assets.AssetType;
@@ -14,8 +13,7 @@ import com.raylib.Raylib;
 import java.util.List;
 
 import static com.berray.assets.AssetManager.getAsset;
-import static com.berray.assets.AssetManager.getSprite;
-import static com.raylib.Jaylib.Texture;
+import static com.berray.assets.AssetManager.getSpriteSheet;
 import static com.raylib.Jaylib.WHITE;
 import static com.raylib.Raylib.*;
 
@@ -86,15 +84,20 @@ public class SpriteComponent extends Component {
     registerGetter("size", this::getSize);
     registerGetter("render", () -> true);
     registerGetter("curAnim", this::getAnim);
-    registerGetter("frame", this::getFrameNo);
+    registerMethod("frame", this::getFrameNo, this::setFrameNo);
     registerSetter("flipX", this::setFlipX);
     registerSetter("flipY", this::setFlipY);
     registerAction("play", this::play);
+    registerAction("stop", this::stop);
     on("update", this::update);
   }
 
   public int getFrameNo() {
     return frameNo;
+  }
+
+  public void setFrameNo(int frameNo) {
+    this.frameNo = frameNo;
   }
 
   public SpriteComponent frame(int frame) {
@@ -107,18 +110,15 @@ public class SpriteComponent extends Component {
   }
 
   public SpriteComponent anim(String animationName) {
-    Asset asset = getAsset(texture);
-    if (asset.getType() == AssetType.SPRITE_SHEET) {
-      SpriteSheet spriteSheet = asset.getAsset();
-      Animation animation = spriteSheet.getAnimation(animationName);
-      if (animation == null) {
-        throw new IllegalStateException("animation " + animationName + " not found in asset " + texture);
-      }
-      this.anim = animationName;
-      this.currentAnimation = animation;
-      this.frameNo = 0;
-      this.frameDuration = 0;
+    SpriteSheet spriteSheet = getSpriteSheet(texture);
+    Animation animation = spriteSheet.getAnimation(animationName);
+    if (animation == null) {
+      throw new IllegalStateException("animation " + animationName + " not found in asset " + texture);
     }
+    this.anim = animationName;
+    this.currentAnimation = animation;
+    this.frameNo = 0;
+    this.frameDuration = 0;
     return this;
   }
 
@@ -146,15 +146,23 @@ public class SpriteComponent extends Component {
             frameNo = 0;
           } else {
             frameNo = currentAnimation.getNumFrames() - 1;
+            // stop animation
+            stop();
           }
         }
       }
     }
   }
 
+  private void stop() {
+    currentAnimation = null;
+    gameObject.trigger("animEnd", anim);
+  }
+
   public void play(List<Object> params) {
     String animationName = (String) params.get(0);
     anim(animationName);
+    gameObject.trigger("animStart", anim);
   }
 
   private Vec2 getSize() {

@@ -9,8 +9,8 @@ import com.berray.objects.core.Label;
 import com.raylib.Jaylib;
 import com.raylib.Raylib;
 
-import static com.berray.assets.AssetManager.loadSprite;
 import static com.berray.assets.Animation.anim;
+import static com.berray.assets.AssetManager.loadSpriteSheet;
 import static com.berray.assets.SpriteSheet.spriteSheet;
 
 public class SpriteTest extends BerrayApplication implements CoreComponentShortcuts {
@@ -22,7 +22,7 @@ public class SpriteTest extends BerrayApplication implements CoreComponentShortc
     game.setGravity(640);
 
 
-    loadSprite("dino", "resources/dino_big.png",
+    loadSpriteSheet("dino", "resources/dino_big.png",
         spriteSheet()
             .sliceX(9)
             .anim("idle", anim()

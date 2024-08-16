@@ -118,6 +118,13 @@ public class Component {
     actions.add(name);
   }
 
+  /**
+   * Registers an action, remembering the action name. Upon deletion the action will be removed.
+   */
+  public void registerAction(String name, Runnable actionMethod) {
+    gameObject.registerAction(name, actionMethod);
+    actions.add(name);
+  }
 
   /**
    * Registers an action, remembering the action name. Upon deletion the action will be removed.

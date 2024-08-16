@@ -178,7 +178,7 @@ public class GameObject {
     // first update all children, then the object itself (depth first traversal)
     this.children.forEach(child -> child.update(frameTime));
     this.trigger("update", frameTime);
-    // trigger game also, to tag bases listeners get notified
+    // trigger game also, so tag bases listeners get notified
     this.game.trigger("update", this, frameTime);
   }
 
@@ -241,11 +241,11 @@ public class GameObject {
     return tags.contains(tag);
   }
 
-  public void registerGetter(String name, Supplier<?> method) {
+  public <E> void registerGetter(String name, Supplier<E> method) {
     getterMethods.put(name, method);
   }
 
-  public void registerSetter(String name, Consumer<?> setter) {
+  public <E> void registerSetter(String name, Consumer<E> setter) {
     setterMethods.put(name, setter);
   }
 
@@ -259,6 +259,7 @@ public class GameObject {
     setterMethods.remove(name);
   }
 
+  /** Registers an action method with parameters and no return value. */
   public void registerAction(String name, Consumer<List<Object>> actionMethod) {
     actionMethods.put(name, params -> {
       actionMethod.accept(params);
@@ -266,6 +267,16 @@ public class GameObject {
     });
   }
 
+  /** Registers an action method without parameters and no return value. */
+  public void registerAction(String name, Runnable actionMethod) {
+    actionMethods.put(name, params -> {
+      actionMethod.run();
+      return null;
+    });
+  }
+
+
+  /** Registers an action method with parameters and which returns a value. */
   public void registerAction(String name, Function<List<Object>, ?> actionMethod) {
     actionMethods.put(name, actionMethod);
   }

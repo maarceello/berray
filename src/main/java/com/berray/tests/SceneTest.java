@@ -2,6 +2,7 @@ package com.berray.tests;
 
 import com.berray.BerrayApplication;
 import com.berray.GameObject;
+import com.berray.assets.CoreAssetShortcuts;
 import com.berray.components.CoreComponentShortcuts;
 import com.berray.components.core.AnchorType;
 import com.berray.math.Vec2;
@@ -11,10 +12,9 @@ import com.raylib.Jaylib;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static com.berray.assets.AssetManager.loadSprite;
 import static com.raylib.Raylib.*;
 
-public class SceneTest extends BerrayApplication implements CoreComponentShortcuts {
+public class SceneTest extends BerrayApplication implements CoreComponentShortcuts, CoreAssetShortcuts {
 
 
   @Override

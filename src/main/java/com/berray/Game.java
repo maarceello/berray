@@ -1,5 +1,6 @@
 package com.berray;
 
+import com.berray.assets.AssetManager;
 import com.berray.event.EventListener;
 import com.berray.event.EventManager;
 import com.berray.math.Collision;
@@ -24,12 +25,19 @@ public class Game {
   private final GameObject root;
   private List<String> layers = new ArrayList<>();
 
-  private EventManager eventManager = new EventManager();
+  private EventManager eventManager;
+  private AssetManager assetManager;
 
   // Constructor
   public Game() {
     root = new GameObject(this);
+    assetManager = new AssetManager();
+    eventManager = new EventManager();
     init();
+  }
+
+  public AssetManager getAssetManager() {
+    return assetManager;
   }
 
   public void init() {

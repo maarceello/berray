@@ -86,6 +86,10 @@ public class SpriteSheet {
     return texture;
   }
 
+  public String getTextureAsset() {
+    return textureAsset;
+  }
+
   public int getSpriteWidth() {
     return spriteWidth;
   }
@@ -104,11 +108,11 @@ public class SpriteSheet {
   /**
    * Slices the texture according to the slice parameters.
    */
-  public void slice() {
+  public void slice(AssetManager assetManager) {
     if (textureAsset == null) {
       throw new IllegalStateException("texture asset name not set");
     }
-    texture = AssetManager.getSprite(textureAsset);
+    texture = assetManager.getSprite(textureAsset);
     int textureWidth = width > 0 ? width : texture.width();
     int textureHeight = height > 0 ? height : texture.height();
 

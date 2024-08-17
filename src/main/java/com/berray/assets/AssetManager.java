@@ -15,13 +15,13 @@ import static com.raylib.Jaylib.LoadTexture;
 import static com.raylib.Jaylib.LoadMusicStream;
 
 public class AssetManager {
-  private final static Map<String, Asset> assets = new HashMap<>();
+  private final Map<String, Asset> assets = new HashMap<>();
 
-  public static void addAsset(Asset asset) {
+  public void addAsset(Asset asset) {
     assets.put(asset.getName(), asset);
   }
 
-  public static void loadSprite(String name, BufferedImage image) {
+  public void loadSprite(String name, BufferedImage image) {
     try {
       ByteArrayOutputStream output = new ByteArrayOutputStream();
       ImageIO.write(image, "png", output);
@@ -34,37 +34,37 @@ public class AssetManager {
     }
   }
 
-  public static void loadSprite(String name, String path) {
+  public void loadSprite(String name, String path) {
     Texture sprite = LoadTexture(path);
     assets.put(name, new Asset(name, AssetType.SPRITE, sprite));
   }
 
-  public static void loadSpriteSheet(String name, String path, SpriteSheet spriteSheet) {
+  public void loadSpriteSheet(String name, String path, SpriteSheet spriteSheet) {
     loadSprite(name+"_texture", path);
     spriteSheet.textureAsset(name+"_texture");
-    spriteSheet.slice();
+    spriteSheet.slice(this);
     assets.put(name, new Asset(name, AssetType.SPRITE_SHEET, spriteSheet));
   }
 
-  public static void loadSpriteSheet(String name, SpriteSheet spriteSheet) {
-    spriteSheet.slice();
+  public void loadSpriteSheet(String name, SpriteSheet spriteSheet) {
+    spriteSheet.slice(this);
     assets.put(name, new Asset(name, AssetType.SPRITE_SHEET, spriteSheet));
   }
 
 
-  public static void loadMusic(String name, String path) {
+  public void loadMusic(String name, String path) {
     Music music = LoadMusicStream(path);
     assets.put(name, new Asset(name, AssetType.MUSIC, music));
   }
 
-  public static void loadSpriteAtlas(String name, String path, SpriteAtlas atlas) {
+  public void loadSpriteAtlas(String name, String path, SpriteAtlas atlas) {
     loadSprite(name+"_texture", path);
     atlas.textureAsset(name+"_texture");
-    atlas.slice();
+    atlas.slice(this);
     addSpriteAtlas(name, atlas);
   }
 
-  public static void addSpriteAtlas(String name, SpriteAtlas atlas) {
+  public void addSpriteAtlas(String name, SpriteAtlas atlas) {
     if (atlas == null) {
       throw  new IllegalArgumentException("atlas must not be null");
     }
@@ -77,12 +77,12 @@ public class AssetManager {
   }
 
 
-  public static Asset getAsset(String name) {
+  public Asset getAsset(String name) {
     Asset asset = assets.get(name);
     return asset;
   }
 
-  public static Texture getSprite(String name) {
+  public Texture getSprite(String name) {
     Asset asset = assets.get(name);
     if (asset != null && asset.getAsset() instanceof Texture) {
       return asset.getAsset();
@@ -90,7 +90,7 @@ public class AssetManager {
     throw new IllegalStateException("texture asset "+name+" not found");
   }
 
-  public static SpriteSheet getSpriteSheet(String name) {
+  public SpriteSheet getSpriteSheet(String name) {
     Asset asset = assets.get(name);
     if (asset != null && asset.getAsset() instanceof SpriteSheet) {
       return asset.getAsset();
@@ -99,7 +99,7 @@ public class AssetManager {
   }
 
 
-  public static Music getMusic(String name) {
+  public Music getMusic(String name) {
     Asset asset = assets.get(name);
     if (asset != null && asset.getAsset() instanceof Music) {
       return (Music) asset.getAsset();

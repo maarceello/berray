@@ -1,6 +1,7 @@
 package com.berray;
 
 
+import com.berray.assets.AssetManager;
 import com.berray.components.core.AnchorType;
 import com.berray.event.Event;
 import com.berray.event.EventListener;
@@ -128,6 +129,10 @@ public abstract class BerrayApplication {
     game.trigger(event, params);
   }
 
+
+  public AssetManager getAssetManager() {
+    return game.getAssetManager();
+  }
 
   public abstract void game();
 

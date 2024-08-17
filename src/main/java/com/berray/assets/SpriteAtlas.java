@@ -20,7 +20,6 @@ public class SpriteAtlas {
   public SpriteAtlas sheet(String sheetName, SpriteSheet sheet) {
     if (textureAsset != null) {
       sheet.textureAsset(textureAsset);
-      sheet.slice();
     }
     sheets.put(sheetName, sheet);
     return this;
@@ -30,11 +29,13 @@ public class SpriteAtlas {
     return sheets;
   }
 
-  public void slice() {
+  public void slice(AssetManager assetManager) {
     for (SpriteSheet sheet: sheets.values()) {
-      if (sheet.getTexture() == null) {
+      if (sheet.getTextureAsset() == null) {
         sheet.textureAsset(textureAsset);
-        sheet.slice();
+      }
+      if (sheet.getTexture() == null) {
+        sheet.slice(assetManager);
       }
     }
   }

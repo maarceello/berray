@@ -1,10 +1,7 @@
 package com.berray.components.core;
 
 import com.berray.GameObject;
-import com.berray.assets.Animation;
-import com.berray.assets.Asset;
-import com.berray.assets.AssetType;
-import com.berray.assets.SpriteSheet;
+import com.berray.assets.*;
 import com.berray.event.Event;
 import com.berray.math.Rect;
 import com.berray.math.Vec2;
@@ -12,8 +9,6 @@ import com.raylib.Raylib;
 
 import java.util.List;
 
-import static com.berray.assets.AssetManager.getAsset;
-import static com.berray.assets.AssetManager.getSpriteSheet;
 import static com.raylib.Jaylib.WHITE;
 import static com.raylib.Raylib.*;
 
@@ -51,7 +46,7 @@ public class SpriteComponent extends Component {
     {
       rlMultMatrixf(gameObject.getWorldTransform().toFloatTransposed());
 
-      Asset asset = getAsset(texture);
+      Asset asset = getAssetManager().getAsset(texture);
       if (asset.getType() == AssetType.SPRITE) {
         DrawTexture(asset.getAsset(), 0, 0, WHITE);
       } else if (asset.getType() == AssetType.SPRITE_SHEET) {
@@ -74,6 +69,8 @@ public class SpriteComponent extends Component {
           rectangle.height(-frameRect.getHeight());
         }
         DrawTextureRec(spriteSheet.getTexture(), rectangle, Vec2.origin().toVector2(), WHITE);
+      } else {
+        throw new IllegalStateException("Illegal asset type for "+texture+": "+asset.getType());
       }
     }
     rlPopMatrix();
@@ -90,6 +87,9 @@ public class SpriteComponent extends Component {
     registerAction("play", this::play);
     registerAction("stop", this::stop);
     on("update", this::update);
+    if (anim != null) {
+      currentAnimation = initializeAnimation(anim);
+    }
   }
 
   public int getFrameNo() {
@@ -109,17 +109,25 @@ public class SpriteComponent extends Component {
     return anim;
   }
 
+
+
   public SpriteComponent anim(String animationName) {
-    SpriteSheet spriteSheet = getSpriteSheet(texture);
+    this.anim = animationName;
+    this.frameNo = 0;
+    this.frameDuration = 0;
+    if (gameObject != null) {
+      currentAnimation = initializeAnimation(animationName);
+    }
+    return this;
+  }
+
+  private Animation initializeAnimation(String animationName) {
+    SpriteSheet spriteSheet = getAssetManager().getSpriteSheet(texture);
     Animation animation = spriteSheet.getAnimation(animationName);
     if (animation == null) {
       throw new IllegalStateException("animation " + animationName + " not found in asset " + texture);
     }
-    this.anim = animationName;
-    this.currentAnimation = animation;
-    this.frameNo = 0;
-    this.frameDuration = 0;
-    return this;
+    return animation;
   }
 
   public void setFlipX(boolean flipX) {
@@ -166,7 +174,7 @@ public class SpriteComponent extends Component {
   }
 
   private Vec2 getSize() {
-    Asset asset = getAsset(texture);
+    Asset asset = getAssetManager().getAsset(texture);
     if (asset.getType() == AssetType.SPRITE) {
       Raylib.Texture texture = asset.getAsset();
       return new Vec2(texture.width(), texture.height());
@@ -175,10 +183,6 @@ public class SpriteComponent extends Component {
       return new Vec2(spriteSheet.getSpriteWidth(), spriteSheet.getSpriteHeight());
     }
     return Vec2.origin();
-  }
-
-  public boolean isRender() {
-    return true;
   }
 
   // Static method to just call "sprite()" get the sprite from the asset manager and put in into the texture for the sprite component

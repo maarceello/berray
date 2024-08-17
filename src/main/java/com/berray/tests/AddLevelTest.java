@@ -2,6 +2,7 @@ package com.berray.tests;
 
 import com.berray.BerrayApplication;
 import com.berray.GameObject;
+import com.berray.assets.CoreAssetShortcuts;
 import com.berray.components.CoreComponentShortcuts;
 import com.berray.components.core.AnchorType;
 import com.berray.math.Vec2;
@@ -9,14 +10,13 @@ import com.berray.tests.level.LevelBuilder;
 import com.berray.tests.level.LevelGameObject;
 import com.raylib.Jaylib;
 
-import static com.berray.assets.AssetManager.loadSprite;
 import static com.berray.objects.addon.ObjectDebug.objectDebug;
 import static com.berray.objects.core.Label.label;
 import static com.raylib.Raylib.*;
 import static java.lang.Boolean.FALSE;
 
 
-public class AddLevelTest extends BerrayApplication implements CoreComponentShortcuts {
+public class AddLevelTest extends BerrayApplication implements CoreComponentShortcuts, CoreAssetShortcuts {
   private static final int SPEED = 480;
 
   private int score = 0;

@@ -1,6 +1,8 @@
 package com.berray.components.core;
 
+import com.berray.Game;
 import com.berray.GameObject;
+import com.berray.assets.AssetManager;
 import com.berray.event.EventListener;
 
 import java.util.HashSet;
@@ -59,6 +61,17 @@ public class Component {
    * Method to draw the component. May be overridden by subclasses.
    */
   public void draw() {
+  }
+
+  protected AssetManager getAssetManager() {
+    if (gameObject == null) {
+      throw new IllegalStateException("component is not added to game object");
+    }
+    Game game = gameObject.getGame();
+    if (game == null) {
+      throw new IllegalStateException("game object is not part of game tree");
+    }
+    return game.getAssetManager();
   }
 
   /**

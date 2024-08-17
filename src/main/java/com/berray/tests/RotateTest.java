@@ -2,17 +2,17 @@ package com.berray.tests;
 
 import com.berray.BerrayApplication;
 import com.berray.GameObject;
+import com.berray.assets.CoreAssetShortcuts;
 import com.berray.components.CoreComponentShortcuts;
 import com.berray.components.core.AnchorType;
 import com.berray.math.Vec2;
 import com.raylib.Jaylib;
 import com.raylib.Raylib;
 
-import static com.berray.assets.AssetManager.loadSprite;
 import static com.berray.components.addon.OrbitComponent.orbit;
 import static com.berray.objects.core.Label.label;
 
-public class RotateTest extends BerrayApplication implements CoreComponentShortcuts {
+public class RotateTest extends BerrayApplication implements CoreComponentShortcuts, CoreAssetShortcuts {
   @Override
   public void game() {
     loadSprite("berry", "resources/berry.png");
@@ -20,7 +20,7 @@ public class RotateTest extends BerrayApplication implements CoreComponentShortc
     debug = true;
 
     add(
-        label(() -> "FPS: "+Raylib.GetFPS()),
+        label(() -> "FPS: " + Raylib.GetFPS()),
         pos(Vec2.origin()),
         anchor(AnchorType.TOP_LEFT),
         color(255, 255, 255)
@@ -58,8 +58,8 @@ public class RotateTest extends BerrayApplication implements CoreComponentShortc
           pos(0, 0),
           area(),
           anchor(AnchorType.CENTER),
-          rotate(-90+i*15),
-          orbit(250, 75, i*15),
+          rotate(-90 + i * 15),
+          orbit(250, 75, i * 15),
           "orbiting"
       );
     }

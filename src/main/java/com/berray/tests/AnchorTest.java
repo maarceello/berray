@@ -1,16 +1,16 @@
 package com.berray.tests;
 
 import com.berray.BerrayApplication;
+import com.berray.assets.CoreAssetShortcuts;
 import com.berray.components.CoreComponentShortcuts;
 import com.berray.components.core.AnchorType;
 import com.berray.math.Vec2;
 import com.raylib.Jaylib;
 import com.raylib.Raylib;
 
-import static com.berray.assets.AssetManager.loadSprite;
 import static com.berray.objects.core.Label.label;
 
-public class AnchorTest extends BerrayApplication implements CoreComponentShortcuts {
+public class AnchorTest extends BerrayApplication implements CoreComponentShortcuts, CoreAssetShortcuts {
   @Override
   public void game() {
     loadSprite("berry", "resources/berry.png");

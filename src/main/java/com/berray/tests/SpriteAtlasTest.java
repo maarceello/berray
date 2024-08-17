@@ -2,6 +2,7 @@ package com.berray.tests;
 
 import com.berray.BerrayApplication;
 import com.berray.GameObject;
+import com.berray.assets.CoreAssetShortcuts;
 import com.berray.assets.SpriteAtlas;
 import com.berray.components.CoreComponentShortcuts;
 import com.berray.components.core.AnchorType;
@@ -22,11 +23,10 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import static com.berray.assets.Animation.anim;
-import static com.berray.assets.AssetManager.loadSpriteAtlas;
 import static com.berray.assets.SpriteSheet.spriteSheet;
 import static com.raylib.Raylib.*;
 
-public class SpriteAtlasTest extends BerrayApplication implements CoreComponentShortcuts {
+public class SpriteAtlasTest extends BerrayApplication implements CoreComponentShortcuts, CoreAssetShortcuts {
 
   @Override
   public void game() {

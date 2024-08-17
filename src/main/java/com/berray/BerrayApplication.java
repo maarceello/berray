@@ -263,18 +263,17 @@ public abstract class BerrayApplication {
 
       game.trigger("mousePress", mousePos);
 
-      for (GameObject gameObject : game.getRoot().getGameObjectStream()
+      List<GameObject> objectsWithBoundingBox = game.getRoot().getGameObjectStream()
           .filter(gameObject -> gameObject.getBoundingBox() != null)
-          .collect(Collectors.toList())) {
+          .collect(Collectors.toList());
+
+      for (GameObject gameObject : objectsWithBoundingBox) {
         Rect boundingBox = gameObject.getBoundingBox();
         if (boundingBox.contains(mousePos)) {
-          gameObject.trigger("click");
+          // todo: calculate mouse pos in object local coordinates
+          gameObject.trigger("click", mousePos);
         }
       }
-
-
-
-
     }
 
     for (int i = 0; i < keysDown.length; i++) {

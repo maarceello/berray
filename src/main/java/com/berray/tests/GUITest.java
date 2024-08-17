@@ -4,7 +4,6 @@ import com.berray.BerrayApplication;
 import com.berray.GameObject;
 import com.berray.components.CoreComponentShortcuts;
 import com.berray.components.core.AnchorType;
-import com.berray.math.Rect;
 import com.raylib.Jaylib;
 
 
@@ -17,6 +16,7 @@ public class GUITest extends BerrayApplication implements CoreComponentShortcuts
     GameObject button = add(
         rect(100, 100),
         pos(100, 100),
+        area(),
         anchor(AnchorType.TOP_LEFT)
     );
 

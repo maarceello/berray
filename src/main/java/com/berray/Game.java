@@ -1,12 +1,12 @@
 package com.berray;
 
 import com.berray.assets.AssetManager;
+import com.berray.assets.DefaultAssetManager;
 import com.berray.event.EventListener;
 import com.berray.event.EventManager;
 import com.berray.math.Collision;
 import com.berray.math.Rect;
 import com.berray.math.Vec2;
-import com.raylib.Jaylib;
 import com.raylib.Raylib;
 
 import java.util.*;
@@ -31,7 +31,7 @@ public class Game {
   // Constructor
   public Game() {
     root = new GameObject(this);
-    assetManager = new AssetManager();
+    assetManager = new DefaultAssetManager();
     eventManager = new EventManager();
     init();
   }

@@ -2,7 +2,6 @@ package com.berray;
 
 
 import com.berray.assets.AssetManager;
-import com.berray.assets.DefaultAssetManager;
 import com.berray.components.core.AnchorType;
 import com.berray.event.Event;
 import com.berray.event.EventListener;

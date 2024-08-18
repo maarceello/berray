@@ -1,7 +1,7 @@
 package com.berray;
 
 import com.berray.assets.AssetManager;
-import com.berray.assets.DefaultAssetManager;
+import com.berray.assets.FolderAssetBundle;
 import com.berray.event.EventListener;
 import com.berray.event.EventManager;
 import com.berray.math.Collision;
@@ -9,6 +9,7 @@ import com.berray.math.Rect;
 import com.berray.math.Vec2;
 import com.raylib.Raylib;
 
+import java.nio.file.FileSystems;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -31,7 +32,7 @@ public class Game {
   // Constructor
   public Game() {
     root = new GameObject(this);
-    assetManager = new DefaultAssetManager();
+    assetManager = new FolderAssetBundle(FileSystems.getDefault().getPath("."));
     eventManager = new EventManager();
     init();
   }

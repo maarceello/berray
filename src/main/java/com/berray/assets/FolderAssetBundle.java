@@ -21,7 +21,11 @@ public class FolderAssetBundle implements AssetBundle, AssetManager {
   );
 
   /** Root folder of the assets. */
-  private Path rootFolder;
+  private final Path rootFolder;
+
+  public FolderAssetBundle(Path rootFolder) {
+    this.rootFolder = rootFolder;
+  }
 
   @Override
   public Iterable<String> getAssetNames() {

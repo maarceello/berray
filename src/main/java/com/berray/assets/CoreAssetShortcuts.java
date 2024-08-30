@@ -1,7 +1,7 @@
 package com.berray.assets;
 
 public interface CoreAssetShortcuts {
-  AssetManager getAssetManager();
+  DefaultAssetManager getAssetManager();
 
 
   default void loadSprite(String name, String path) {

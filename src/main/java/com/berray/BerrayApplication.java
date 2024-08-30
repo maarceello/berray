@@ -1,7 +1,7 @@
 package com.berray;
 
 
-import com.berray.assets.AssetManager;
+import com.berray.assets.DefaultAssetManager;
 import com.berray.components.core.AnchorType;
 import com.berray.event.Event;
 import com.berray.event.EventListener;
@@ -40,6 +40,7 @@ public abstract class BerrayApplication {
   private int[] keysDown = new int[KEY_KB_MENU];
 
   private Map<String, Consumer<SceneDescription>> scenes = new HashMap<>();
+  private Random random = new Random();
 
 
   public BerrayApplication width(int width) {
@@ -78,7 +79,7 @@ public abstract class BerrayApplication {
   public BerrayApplication layers(String... layers) {
     List<String> layerList = Arrays.asList(layers);
     if (!layerList.contains(Game.DEFAULT_LAYER)) {
-      throw new IllegalStateException("layer list must contain '"+Game.DEFAULT_LAYER+"' layer");
+      throw new IllegalStateException("layer list must contain '" + Game.DEFAULT_LAYER + "' layer");
     }
     game.setLayers(layerList);
     return this;
@@ -132,7 +133,7 @@ public abstract class BerrayApplication {
   }
 
 
-  public AssetManager getAssetManager() {
+  public DefaultAssetManager getAssetManager() {
     return game.getAssetManager();
   }
 
@@ -311,17 +312,21 @@ public abstract class BerrayApplication {
   }
 
   public int rand(int min, int maxExclusive) {
-    return new Random().nextInt(maxExclusive - min) + min;
+    return random.nextInt(maxExclusive - min) + min;
   }
 
 
-  /** add scene to game. */
+  /**
+   * add scene to game.
+   */
   public void scene(String name, Consumer<SceneDescription> sceneCreator) {
     scenes.put(name, sceneCreator);
   }
 
 
-  /** remove current scene and create new named scene. */
+  /**
+   * remove current scene and create new named scene.
+   */
   public void go(String scene, Object... params) {
     game.getRoot().getChildren().clear();
     game.clearEvents();

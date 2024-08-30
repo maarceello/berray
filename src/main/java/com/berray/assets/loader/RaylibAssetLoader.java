@@ -1,9 +1,12 @@
-package com.berray.assets;
+package com.berray.assets.loader;
 
+import com.berray.assets.Asset;
+import com.berray.assets.AssetType;
+import com.berray.assets.AssetUtil;
 import com.raylib.Raylib;
 
+import javax.imageio.stream.ImageInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -16,7 +19,7 @@ public class RaylibAssetLoader implements AssetLoader {
   private List<String> supportedExtensions = Arrays.asList("png");
 
   @Override
-  public Asset loadAsset(String name, AssetBundle bundle) {
+  public Asset loadAsset(String name, String params, ImageInputStream stream) {
     Path path = FileSystems.getDefault().getPath(name);
     // is the file a real file on the file system?
     if (Files.isRegularFile(path)) {
@@ -26,7 +29,6 @@ public class RaylibAssetLoader implements AssetLoader {
     }
     try {
       // no, try to load the file from memory
-      InputStream stream = bundle.getAssetData(name);
       byte[] bytes = AssetUtil.toByteArray(stream);
       Raylib.Image raylibImage = Raylib.LoadImageFromMemory(".png", bytes, bytes.length);
       Raylib.Texture texture = Raylib.LoadTextureFromImage(raylibImage);
@@ -37,7 +39,7 @@ public class RaylibAssetLoader implements AssetLoader {
   }
 
   @Override
-  public boolean canLoad(String name, AssetBundle bundle) {
+  public boolean canLoad(String name, ImageInputStream stream) {
     for (String extension : supportedExtensions) {
       if (name.endsWith(extension)) {
         return true;

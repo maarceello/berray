@@ -16,7 +16,7 @@ public class SpriteComponent extends Component {
   /**
    * Name of texture or sprite sheet asset.
    */
-  public String texture;
+  public String textureName;
   /**
    * Name of animation when the asset is a sprite sheet.
    */
@@ -35,9 +35,9 @@ public class SpriteComponent extends Component {
   private boolean flipY;
 
   // Construct
-  public SpriteComponent(String texture) {
+  public SpriteComponent(String textureName) {
     super("sprite");
-    this.texture = texture;
+    this.textureName = textureName;
   }
 
   @Override
@@ -46,7 +46,7 @@ public class SpriteComponent extends Component {
     {
       rlMultMatrixf(gameObject.getWorldTransform().toFloatTransposed());
 
-      Asset asset = getAssetManager().getAsset(texture);
+      Asset asset = getAssetManager().getAsset(textureName);
       if (asset.getType() == AssetType.SPRITE) {
         DrawTexture(asset.getAsset(), 0, 0, WHITE);
       } else if (asset.getType() == AssetType.SPRITE_SHEET) {
@@ -70,7 +70,7 @@ public class SpriteComponent extends Component {
         }
         DrawTextureRec(spriteSheet.getTexture(), rectangle, Vec2.origin().toVector2(), WHITE);
       } else {
-        throw new IllegalStateException("Illegal asset type for "+texture+": "+asset.getType());
+        throw new IllegalStateException("Illegal asset type for "+ textureName +": "+asset.getType());
       }
     }
     rlPopMatrix();
@@ -122,10 +122,10 @@ public class SpriteComponent extends Component {
   }
 
   private Animation initializeAnimation(String animationName) {
-    SpriteSheet spriteSheet = getAssetManager().getSpriteSheet(texture);
+    SpriteSheet spriteSheet = getAssetManager().getAsset(textureName, AssetType.SPRITE_SHEET).getAsset();
     Animation animation = spriteSheet.getAnimation(animationName);
     if (animation == null) {
-      throw new IllegalStateException("animation " + animationName + " not found in asset " + texture);
+      throw new IllegalStateException("animation " + animationName + " not found in asset " + textureName);
     }
     return animation;
   }
@@ -174,7 +174,7 @@ public class SpriteComponent extends Component {
   }
 
   private Vec2 getSize() {
-    Asset asset = getAssetManager().getAsset(texture);
+    Asset asset = getAssetManager().getAsset(textureName);
     if (asset.getType() == AssetType.SPRITE) {
       Raylib.Texture texture = asset.getAsset();
       return new Vec2(texture.width(), texture.height());

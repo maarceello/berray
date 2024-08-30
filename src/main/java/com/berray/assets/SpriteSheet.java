@@ -101,20 +101,27 @@ public class SpriteSheet {
 
   public Rect getFrame(int frameNo) {
     int x = (frameNo) % sliceX;
-    int y = (frameNo) / sliceY;
+    int y = (frameNo) / sliceX;
     return new Rect(this.x + x * spriteWidth, this.y + y * spriteHeight, spriteWidth, spriteHeight);
   }
 
   /**
    * Slices the texture according to the slice parameters.
    */
-  public void slice(AssetManager assetManager) {
+  public SpriteSheet slice(AssetManager assetManager) {
     if (textureAsset == null) {
       throw new IllegalStateException("texture asset name not set");
     }
-    texture = assetManager.getSprite(textureAsset);
-    int textureWidth = width > 0 ? width : texture.width();
-    int textureHeight = height > 0 ? height : texture.height();
+    return slice(assetManager.getAsset(textureAsset).<Raylib.Texture>getAsset());
+  }
+
+  public SpriteSheet slice(Raylib.Texture texture1) {
+    if (texture1 == null) {
+      throw new IllegalStateException("texture must not be null");
+    }
+    this.texture = texture1;
+    int textureWidth = width > 0 ? width : texture1.width();
+    int textureHeight = height > 0 ? height : texture1.height();
 
     this.spriteWidth = textureWidth / sliceX;
     this.spriteHeight = textureHeight / sliceY;
@@ -148,6 +155,7 @@ public class SpriteSheet {
         }
       }
     }
+    return this;
   }
 
 

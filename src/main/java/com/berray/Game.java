@@ -1,7 +1,8 @@
 package com.berray;
 
-import com.berray.assets.AssetManager;
-import com.berray.assets.FolderAssetBundle;
+import com.berray.assets.loader.AssetLoaders;
+import com.berray.assets.DefaultAssetManager;
+import com.berray.assets.loader.RaylibAssetLoader;
 import com.berray.event.EventListener;
 import com.berray.event.EventManager;
 import com.berray.math.Collision;
@@ -15,6 +16,7 @@ import java.util.stream.Collectors;
 
 public class Game {
   public static final String DEFAULT_LAYER = "default";
+  private final AssetLoaders assetLoaders;
   /**
    * Gravity vector.
    */
@@ -27,18 +29,24 @@ public class Game {
   private List<String> layers = new ArrayList<>();
 
   private EventManager eventManager;
-  private AssetManager assetManager;
+  private DefaultAssetManager assetManager;
 
   // Constructor
   public Game() {
     root = new GameObject(this);
-    assetManager = new FolderAssetBundle(FileSystems.getDefault().getPath("."));
+    assetLoaders = new AssetLoaders();
+    assetLoaders.addAssetLoader(new RaylibAssetLoader());
+    assetManager = new DefaultAssetManager(assetLoaders, FileSystems.getDefault().getPath("."));
     eventManager = new EventManager();
     init();
   }
 
-  public AssetManager getAssetManager() {
+  public DefaultAssetManager getAssetManager() {
     return assetManager;
+  }
+
+  public AssetLoaders getAssetLoaders() {
+    return assetLoaders;
   }
 
   public void init() {

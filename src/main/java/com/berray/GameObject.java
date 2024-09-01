@@ -241,15 +241,15 @@ public class GameObject {
     return tags.contains(tag);
   }
 
-  public <E> void registerGetter(String name, Supplier<E> method) {
-    getterMethods.put(name, method);
+  public <E> void registerPropertyGetter(String name, Supplier<E> getter) {
+    getterMethods.put(name, getter);
   }
 
-  public <E> void registerSetter(String name, Consumer<E> setter) {
+  public <E> void registerPropertySetter(String name, Consumer<E> setter) {
     setterMethods.put(name, setter);
   }
 
-  public <E> void registerMethod(String name, Supplier<E> getter, Consumer<E> setter) {
+  public <E> void registerProperty(String name, Supplier<E> getter, Consumer<E> setter) {
     getterMethods.put(name, getter);
     setterMethods.put(name, setter);
   }

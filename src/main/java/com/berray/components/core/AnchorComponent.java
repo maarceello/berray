@@ -33,7 +33,7 @@ public class AnchorComponent extends Component {
 
   @Override
   public void add(GameObject gameObject) {
-    registerMethod("anchor", this::getAnchor, this::setAnchor);
+    registerBoundProperty("anchor", this::getAnchor, this::setAnchor);
   }
 
   public static AnchorComponent anchor(AnchorType anchorType) {

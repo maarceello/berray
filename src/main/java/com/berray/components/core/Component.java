@@ -1,6 +1,8 @@
 package com.berray.components.core;
 
+import com.berray.Game;
 import com.berray.GameObject;
+import com.berray.assets.AssetManager;
 import com.berray.event.EventListener;
 
 import java.util.HashSet;
@@ -61,6 +63,17 @@ public class Component {
   public void draw() {
   }
 
+  protected AssetManager getAssetManager() {
+    if (gameObject == null) {
+      throw new IllegalStateException("component is not added to game object");
+    }
+    Game game = gameObject.getGame();
+    if (game == null) {
+      throw new IllegalStateException("game object is not part of game tree");
+    }
+    return game.getAssetManager();
+  }
+
   /**
    * Method called when the component is added to the game object.
    * May be overridden by subclasses, but remember to call `super.add(gameObject);`.
@@ -118,6 +131,13 @@ public class Component {
     actions.add(name);
   }
 
+  /**
+   * Registers an action, remembering the action name. Upon deletion the action will be removed.
+   */
+  public void registerAction(String name, Runnable actionMethod) {
+    gameObject.registerAction(name, actionMethod);
+    actions.add(name);
+  }
 
   /**
    * Registers an action, remembering the action name. Upon deletion the action will be removed.

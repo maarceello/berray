@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class SpriteSheet {
+  private String textureAsset;
   private int x = 0;
   private int y = 0;
   private int width = -1;
@@ -17,6 +18,16 @@ public class SpriteSheet {
   private Raylib.Texture texture;
   private int spriteWidth;
   private int spriteHeight;
+
+
+  public SpriteSheet(String textureAsset) {
+    this.textureAsset = textureAsset;
+  }
+
+  public SpriteSheet textureAsset(String textureAsset) {
+    this.textureAsset = textureAsset;
+    return this;
+  }
 
   public SpriteSheet anim(String animationName, Animation animation) {
     this.animations.put(animationName, animation);
@@ -75,6 +86,10 @@ public class SpriteSheet {
     return texture;
   }
 
+  public String getTextureAsset() {
+    return textureAsset;
+  }
+
   public int getSpriteWidth() {
     return spriteWidth;
   }
@@ -83,12 +98,30 @@ public class SpriteSheet {
     return spriteHeight;
   }
 
+
+  public Rect getFrame(int frameNo) {
+    int x = (frameNo) % sliceX;
+    int y = (frameNo) / sliceX;
+    return new Rect(this.x + x * spriteWidth, this.y + y * spriteHeight, spriteWidth, spriteHeight);
+  }
+
   /**
    * Slices the texture according to the slice parameters.
    */
-  public void slice(Raylib.Texture texture) {
-    int textureWidth = width > 0 ? width : texture.width();
-    int textureHeight = height > 0 ? height : texture.height();
+  public SpriteSheet slice(AssetManager assetManager) {
+    if (textureAsset == null) {
+      throw new IllegalStateException("texture asset name not set");
+    }
+    return slice(assetManager.getAsset(textureAsset).<Raylib.Texture>getAsset());
+  }
+
+  public SpriteSheet slice(Raylib.Texture texture1) {
+    if (texture1 == null) {
+      throw new IllegalStateException("texture must not be null");
+    }
+    this.texture = texture1;
+    int textureWidth = width > 0 ? width : texture1.width();
+    int textureHeight = height > 0 ? height : texture1.height();
 
     this.spriteWidth = textureWidth / sliceX;
     this.spriteHeight = textureHeight / sliceY;
@@ -97,25 +130,42 @@ public class SpriteSheet {
       int start = animation.getFrom();
       int end = animation.getTo();
       int direction = Integer.signum(end - start);
-      int numFrames = animation.getNumFrames();
+      int numFrames = Math.abs(end - start) + 1;
       for (int frame = start, i = 0; i < numFrames; frame += direction, i++) {
         int x = (frame) % sliceX;
         int y = (frame) / sliceX;
         Rect rect = new Rect(this.x + x * spriteWidth, this.y + y * spriteHeight, spriteWidth, spriteHeight);
         animation.addFrame(rect);
       }
+      // if the animation should reverse from end to start, add these too
+      if (animation.isPingpong()) {
+        for (int frame = end - direction, i = 0; i < numFrames - 2; frame -= direction, i++) {
+          int x = (frame) % sliceX;
+          int y = (frame) / sliceX;
+          Rect rect = new Rect(this.x + x * spriteWidth, this.y + y * spriteHeight, spriteWidth, spriteHeight);
+          animation.addFrame(rect);
+        }
+        // if the animation should not loop around, add the start animation, so the animation can stop there
+        // when the animation loops, the start animation is played anyway.
+        if (!animation.isLoop()) {
+          int x = (start) % sliceX;
+          int y = (start) / sliceX;
+          Rect rect = new Rect(this.x + x * spriteWidth, this.y + y * spriteHeight, spriteWidth, spriteHeight);
+          animation.addFrame(rect);
+        }
+      }
     }
-
-    this.texture = texture;
+    return this;
   }
+
 
   public static SpriteSheet spriteSheet() {
-    return new SpriteSheet();
+    return new SpriteSheet(null);
   }
 
-  public Rect getFrame(int frameNo) {
-    int x = (frameNo) % sliceX;
-    int y = (frameNo) / sliceY;
-    return new Rect(this.x + x * spriteWidth, this.y + y * spriteHeight, spriteWidth, spriteHeight);
+  public static SpriteSheet spriteSheet(String textureAsset) {
+    return new SpriteSheet(textureAsset);
   }
+
+
 }

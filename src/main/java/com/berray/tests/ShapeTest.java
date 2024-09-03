@@ -2,17 +2,16 @@ package com.berray.tests;
 
 import com.berray.BerrayApplication;
 import com.berray.GameObject;
+import com.berray.assets.CoreAssetShortcuts;
 import com.berray.components.CoreComponentShortcuts;
 import com.berray.components.core.AnchorType;
 import com.berray.math.Vec2;
 import com.raylib.Jaylib;
 
-import static com.berray.assets.AssetManager.loadMusic;
-import static com.berray.assets.AssetManager.loadSprite;
 import static com.raylib.Jaylib.RED;
 import static com.raylib.Raylib.GetMouseY;
 
-public class ShapeTest  extends BerrayApplication implements CoreComponentShortcuts {
+public class ShapeTest  extends BerrayApplication implements CoreComponentShortcuts, CoreAssetShortcuts {
 
   @Override
   public void initWindow() {

@@ -2,9 +2,8 @@ package com.berray.components.core;
 
 import com.berray.GameObject;
 import com.berray.math.Vec2;
-import com.raylib.Raylib;
+import com.berray.math.Color;
 
-import static com.raylib.Jaylib.WHITE;
 import static com.raylib.Raylib.*;
 
 /**
@@ -37,10 +36,10 @@ public class CircleComponent extends Component {
   public void draw() {
     rlPushMatrix();
     {
-      Color color = gameObject.getOrDefault("color", WHITE);
+      Color color = gameObject.getOrDefault("color", Color.WHITE);
       rlMultMatrixf(gameObject.getWorldTransform().toFloatTransposed());
       //DrawCircle((int) (radius), (int) (radius), radius, color);
-      DrawCircle(0, 0, radius, color);
+      DrawCircle(0, 0, radius, color.toRaylibColor());
     }
     rlPopMatrix();
   }

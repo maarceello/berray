@@ -51,6 +51,15 @@ Fired when a mouse button is pressed
 Parameters:
 * Vec2 pos - position of the mouse in window coordinates
 
+### hover (on a game object)
+
+Fired when the mouse cursor is moved across an object. Note: the event is only triggered when the mouse cursor moves.
+When the cursor is not moved no additional events are send.
+
+Parameters:
+* Vec2 pos - position of the mouse in window coordinates
+
+
 ### click (on a game object)
 
 Fired when a game object is clicked.
@@ -100,6 +109,12 @@ Parameter:
     - [ ] skip object combination which are already checked
     - [ ] detect collision with rotated shapes
 
+### improvements
+
+- [ ] it should be possible to send event parameters lazy. i.e. add a Supplier as parameter and Events.getParameter()
+      resolves the suppliers value and caches the result. Motivation: the hover event should calculate the mouse positions
+      in object coordinates. This is expensive and maybe there are not even event listeners so the calculation is wasted.  
+
 ### Bugs
 
 [ ] fix pong example, collision detection seems broken
@@ -135,3 +150,7 @@ Parameter:
 
 - BerrayApplication supplies 3 default layers: background, default, gui
     - think about sublayer in one layer (stacking in gui layer)
+
+
+
+https://pixijs.com/

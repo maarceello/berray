@@ -2,8 +2,7 @@ package com.berray.components.core;
 
 import com.berray.GameObject;
 import com.berray.math.Vec2;
-
-import com.raylib.Raylib;
+import com.berray.math.Color;
 
 import static com.raylib.Jaylib.*;
 
@@ -21,9 +20,9 @@ public class RectComponent extends Component {
   public void draw() {
     rlPushMatrix();
     {
-      Raylib.Color color = gameObject.getOrDefault("color", WHITE);
+      Color color = gameObject.getOrDefault("color", Color.WHITE);
       rlMultMatrixf(gameObject.getWorldTransform().toFloatTransposed());
-      DrawRectangle(0,0, (int) width, (int) height, color);
+      DrawRectangle(0,0, (int) width, (int) height, color.toRaylibColor());
     }
     rlPopMatrix();
   }

@@ -71,6 +71,10 @@ public interface CoreComponentShortcuts {
     return TileComponent.tile();
   }
 
+  default MouseComponent mouse() {
+    return MouseComponent.mouse();
+  }
+
   default <E> Property<E> property(String name, E value) {
     return Property.property(name, value);
   }

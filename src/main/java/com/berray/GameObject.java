@@ -105,6 +105,7 @@ public class GameObject {
     return game;
   }
 
+  /** Returns the bounding box of the object in world coordinates. */
   public Rect getBoundingBox() {
     ensureTransformCalculated();
     return boundingBox;
@@ -126,6 +127,7 @@ public class GameObject {
     GameObject gameObject;
     if (components.length > 0 && components[0] instanceof GameObject) {
       gameObject = (GameObject) components[0];
+      gameObject.setGame(game);
       gameObject.addComponents(Arrays.asList(components).subList(1, components.length));
     } else {
       gameObject = new GameObject(game, this);

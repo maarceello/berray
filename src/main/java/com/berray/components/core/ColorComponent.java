@@ -1,23 +1,27 @@
 package com.berray.components.core;
 
 import com.berray.GameObject;
-import com.raylib.Jaylib;
-import com.raylib.Raylib;
+import com.berray.math.Color;
 
 public class ColorComponent extends Component {
-  private final Raylib.Color color;
+  private Color color;
+
   public ColorComponent(int r, int g, int b) {
     super("color");
-    this.color = new Jaylib.Color(r,g,b, 255);
+    this.color = new Color(r, g, b);
   }
 
-  public Raylib.Color getColor() {
+  public Color getColor() {
     return color;
   }
 
   @Override
   public void add(GameObject gameObject) {
-    registerGetter("color", this::getColor);
+    registerBoundProperty("color", this::getColor, this::setColor);
+  }
+
+  private void setColor(Color color) {
+    this.color = color;
   }
 
   public static ColorComponent color(int r, int g, int b) {

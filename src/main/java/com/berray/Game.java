@@ -279,6 +279,11 @@ public class Game {
     eventManager.addEventListener(event, listener);
   }
 
+  public void on(String event, EventListener listener, Object owner) {
+    eventManager.addEventListener(event, listener, owner);
+  }
+
+
   public void trigger(String event, Object... params) {
     eventManager.trigger(event, Arrays.asList(params));
   }

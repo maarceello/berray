@@ -38,6 +38,10 @@ public class Game {
     assetLoaders.addAssetLoader(new RaylibAssetLoader());
     assetManager = new DefaultAssetManager(assetLoaders, FileSystems.getDefault().getPath("."));
     eventManager = new EventManager();
+    assetLoaders = new AssetLoaders();
+    assetLoaders.addAssetLoader(new RaylibAssetLoader());
+    assetManager = new DefaultAssetManager(assetLoaders, FileSystems.getDefault().getPath("."));
+    eventManager = new EventManager();
     init();
   }
 

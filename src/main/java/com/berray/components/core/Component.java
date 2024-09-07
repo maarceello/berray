@@ -165,6 +165,14 @@ public class Component {
   }
 
   /**
+   * Registers an action, remembering the action name. Upon deletion the action will be removed.
+   */
+  public void registerAction(String name, Runnable actionMethod) {
+    gameObject.registerAction(name, actionMethod);
+    actions.add(name);
+  }
+
+  /**
    * Registers an event listener. Upon deletion the event listener will be removed.
    */
   public void on(String eventName, EventListener eventListener) {

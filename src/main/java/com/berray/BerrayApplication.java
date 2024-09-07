@@ -87,6 +87,11 @@ public abstract class BerrayApplication {
     return game.add(component);
   }
 
+  public <E extends GameObject> E add(E gameObject, Object... component) {
+    return game.add(gameObject, component);
+  }
+
+
   public void on(String event, EventListener listener) {
     game.on(event, listener);
   }

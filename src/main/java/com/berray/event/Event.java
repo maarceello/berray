@@ -1,6 +1,7 @@
 package com.berray.event;
 
 import java.util.List;
+import java.util.function.Supplier;
 
 public class Event {
   /** Event name */
@@ -22,7 +23,20 @@ public class Event {
     return parameters;
   }
 
+  @SuppressWarnings("unchecked")
   public <E> E getParameter(int i) {
-    return (E) parameters.get(i);
+    Object value = parameters.get(i);
+    if (value == null) {
+      return null;
+    }
+    // if the parameter value should be calculated
+    if (value instanceof Supplier) {
+      // get calculated value
+      E calculatedValue = ((Supplier<E>) value).get();
+      // and replace the supplier with the calculated value
+      parameters.set(i, calculatedValue);
+      return calculatedValue;
+    }
+    return (E) value;
   }
 }

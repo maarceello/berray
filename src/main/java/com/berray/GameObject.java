@@ -117,39 +117,50 @@ public class GameObject {
    * <p>
    * - a {@link Component}. Components are added to the child gameobject as is.
    * - a {@link String}. I this case the string will be added as a tag to the child gameObject.
-   * - the first component may be an instance of {@link GameObject}. In this case this object is
    * uses as the new object and all components and tags are added to this existing game object.
    */
   public GameObject add(Object... components) {
+    return add(new GameObject(game, this), components);
+  }
+
+  /**
+   * Add a GameObject as a child to this gameObject.
+   * `components` is an array of:
+   * <p>
+   * - a {@link Component}. Components are added to the child gameobject as is.
+   * - a {@link String}. I this case the string will be added as a tag to the child gameObject.
+   * - the first component may be an instance of {@link GameObject}. In this case this object is
+   * uses as the new object and all components and tags are added to this existing game object.
+   */
+  public <E extends GameObject> E add(E gameObject, Object... components) {
     if (components == null) {
-      throw new NullPointerException("components is null");
+      throw new NullPointerException("components must nor be null");
     }
-    GameObject gameObject;
-    if (components.length > 0 && components[0] instanceof GameObject) {
-      gameObject = (GameObject) components[0];
-      gameObject.setGame(game);
-      gameObject.addComponents(Arrays.asList(components).subList(1, components.length));
-    } else {
-      gameObject = new GameObject(game, this);
-      gameObject.addComponents(Arrays.asList(components));
+    if (gameObject == null) {
+      throw new NullPointerException("gameObject must nor be null");
     }
-    // trigger add event for all other interested parties
+    gameObject.setGame(game);
+    gameObject.addComponents(Arrays.asList(components));
+    // trigger "add" event for all other interested parties
     addChild(gameObject);
     return gameObject;
   }
 
   public void remove(GameObject gameObject) {
     children.remove(gameObject);
-    gameObject.destroy();
     gameObject.parent = null;
     gameObject.game = null;
   }
 
-  private void destroy() {
+  public void destroy() {
     for (Component component : components.values()) {
       component.destroy();
     }
     components.clear();
+    // remove all event listeners
+    if (game != null) {
+      game.removeListener(this);
+    }
   }
 
 
@@ -163,12 +174,29 @@ public class GameObject {
     return tags;
   }
 
-  public void addChild(GameObject other) {
+  /** replaces the child at the specified index. Note that the removed child is not {@link #destroy() destoyed}. */
+  public GameObject replaceChild(int index, GameObject other) {
+    GameObject previous = children.set(index, other);
+    previous.parent = null;
+    previous.game = null;
+    other.parent = this;
+    other.setGame(this.game);
+    // force recalculation of bounding rectangle
+    transformDirty = true;
+    trigger("add", this, other);
+    other.trigger("add", this, other);
+    return other ;
+  }
+
+  public GameObject addChild(GameObject other) {
     children.add(other);
     other.parent = this;
     other.setGame(this.game);
+    // force recalculation of bounding rectangle
+    transformDirty = true;
     trigger("add", this, other);
     other.trigger("add", this, other);
+    return other ;
   }
 
 
@@ -213,8 +241,7 @@ public class GameObject {
       }
     }
     // notify component that it was added
-    for (
-        Object c : components) {
+    for (Object c : components) {
       if (c instanceof Component) {
         Component component = (Component) c;
         // trigger add event for the current component
@@ -231,6 +258,7 @@ public class GameObject {
     if (paused) {
       return;
     }
+    ensureTransformCalculated();
     for (Component c : components.values()) {
       c.draw();
     }
@@ -507,23 +535,24 @@ public class GameObject {
       localTransform = localTransformWithoutAnchor
           .multiply(Matrix4.fromTranslate(-anchorX, -anchorY, 0));
 
-      Matrix4 parentsWorldTransform = parent == null ? Matrix4.identity() : parent.getWorldTransformWithoutAnchor();
+      Matrix4 parentsWorldTransformWithoutAnchor = parent == null ? Matrix4.identity() : parent.getWorldTransformWithoutAnchor();
+      Matrix4 parentsWorldTransform = parent == null ? Matrix4.identity() : parent.getWorldTransform();
       this.worldTransformWithoutAnchor = parentsWorldTransform.multiply(localTransformWithoutAnchor);
+
+      worldTransform = parentsWorldTransform.multiply(localTransform);
+      transformDirty = false;
 
       if (is("area")) {
         this.boundingBox = calculateBoundingBox(worldTransformWithoutAnchor, size, anchor);
       } else {
         this.boundingBox = null;
       }
-
-      worldTransform = parentsWorldTransform.multiply(localTransform);
-      transformDirty = false;
     }
   }
 
 
   protected Rect calculateBoundingBox(Matrix4 worldTransformWithoutAnchor, Vec2 size, AnchorType anchor) {
-    if (size.getX() <= 0 || size.getY() <= 0) {
+    if (size.getX() < 0 || size.getY() < 0) {
       // a game object without dimensions cannot collide with anything
       return null;
     }
@@ -559,6 +588,18 @@ public class GameObject {
 
     float y1 = Math.min(p1.getY(), Math.min(p2.getY(), Math.min(p3.getY(), p4.getY())));
     float y2 = Math.max(p1.getY(), Math.max(p2.getY(), Math.max(p3.getY(), p4.getY())));
+
+    // find combined bounding box of this game object and all of its children
+    for (GameObject child : children) {
+      Rect boundingBox = child.getBoundingBox();
+      if (boundingBox != null) {
+        x1 = Math.min(x1, boundingBox.getX());
+        y1 = Math.min(y1, boundingBox.getY());
+        x2 = Math.max(x2, boundingBox.getX() + boundingBox.getWidth());
+        y2 = Math.max(y2, boundingBox.getY() + boundingBox.getHeight());
+      }
+    }
+
 
     return new Rect(x1, y1, x2 - x1, y2 - y1);
   }
@@ -637,5 +678,20 @@ public class GameObject {
       // we don't have more iterators. so we don't have an element to return
       throw new NoSuchElementException();
     }
+  }
+
+
+  public static GameObject make(Object... components) {
+    GameObject object = new GameObject();
+    object.addComponents(components);
+    return object;
+  }
+
+  public static <E extends GameObject> E make(E gameObject, Object... components) {
+    if (gameObject == null) {
+      throw new IllegalArgumentException("gameObject may not be null");
+    }
+    gameObject.addComponents(components);
+    return gameObject;
   }
 }

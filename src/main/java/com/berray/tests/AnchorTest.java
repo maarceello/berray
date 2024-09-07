@@ -4,6 +4,7 @@ import com.berray.BerrayApplication;
 import com.berray.assets.CoreAssetShortcuts;
 import com.berray.components.CoreComponentShortcuts;
 import com.berray.components.core.AnchorType;
+import com.berray.math.Color;
 import com.berray.math.Vec2;
 import com.raylib.Jaylib;
 import com.raylib.Raylib;
@@ -44,6 +45,7 @@ public class AnchorTest extends BerrayApplication implements CoreComponentShortc
       );
       add(
           text("berry"),
+          color(Color.WHITE),
           pos(50+i* xgaps, 400),
           anchor(AnchorType.values()[i])
       );

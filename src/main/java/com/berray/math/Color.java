@@ -51,7 +51,7 @@ public class Color {
 
   public Raylib.Color toRaylibColor() {
     if (raylibColor == null) {
-      raylibColor =  new Jaylib.Color((int) (r * 255), (int) (g * 255), ((int) b * 255), ((int) a * 255));
+      raylibColor =  new Jaylib.Color((int) (r * 255), (int) (g * 255), (int) (b * 255), (int) (a * 255));
     }
     return raylibColor;
   }

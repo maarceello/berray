@@ -19,7 +19,7 @@ public class DebugComponent extends Component {
     if (gameObject != null) {
       GameObject parent = gameObject.getParent();
       Matrix4 localTransform = gameObject.getLocalTransformWithoutAnchor();
-      Matrix4 parentsWorldTransform = parent.getWorldTransformWithoutAnchor();
+      Matrix4 parentsWorldTransform = parent.getWorldTransform();
       Matrix4 worldTransform = parentsWorldTransform.multiply(localTransform);
       Vec3 pos = worldTransform.multiply(Vec3.origin());
       if (pos != null) {
@@ -76,6 +76,7 @@ public class DebugComponent extends Component {
 
   private void drawLine(Vec3 p1, Vec3 p2, Raylib.Color color) {
     DrawLine((int) p1.getX(), (int) p1.getY(), (int) p2.getX(), (int) p2.getY(), color);
+//    DrawLineEx(new Jaylib.Vector2(p1.getX(),p1.getY()), new Jaylib.Vector2(p2.getX(), p2.getY()), 10.0f, color);
   }
 
   public static DebugComponent debug() {

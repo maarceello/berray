@@ -28,11 +28,10 @@ events and can process events from other components.
 
 TODO: explain properties (and how to get and set them), actions (and how to play them)
 
-Events are the communication tool in berray. There are two kinds of events: game events and game object events. 
+Events are the communication tool in berray. There are two kinds of events: game events and game object events.
 Game events are not tied to a specific object, for example keyUp/KeyDown events or mouse events.
 Game Object events always have a sending game object.
 Events can have parameters, there are event type specific. You can see them in the event documentation.
-
 
 # Events
 
@@ -42,6 +41,7 @@ Events can have parameters, there are event type specific. You can see them in t
 
 Fired when the keys are pressed down (multiple events), released (one event) or pressed and released (one event).
 Parameters:
+
 * int keyCode - keyCode of the pressed/released key
 
 ### mousePress
@@ -49,6 +49,7 @@ Parameters:
 Fired when a mouse button is pressed
 
 Parameters:
+
 * Vec2 pos - position of the mouse in window coordinates
 
 ### hover (on a game object)
@@ -57,16 +58,16 @@ Fired when the mouse cursor is moved across an object. Note: the event is only t
 When the cursor is not moved no additional events are send.
 
 Parameters:
-* Vec2 pos - position of the mouse in window coordinates
 
+* Vec2 pos - position of the mouse in window coordinates
 
 ### click (on a game object)
 
 Fired when a game object is clicked.
 
 Parameters:
-* Vec2 pos - position of the mouse in window coordinates
 
+* Vec2 pos - position of the mouse in window coordinates
 
 ## GameObject
 
@@ -87,6 +88,22 @@ Parameter:
 * String propertyName - name of the property
 * Object oldValue - old (replaced) value of the property
 * Object newValue - new value of the property
+
+## triggering events
+
+Events can be triggered on the receiving game object. You can supply as many parameters as needed.
+
+```
+  gameObject.trigger("eventName", param);
+```
+
+If a parameter is expensive to calculate and the event is only sparse subscribed, you can provide the parameter value
+in a `Supplier` to lazily calculate the value. The event system caches the value, so it the Supplier will be called only
+once, regardless how many subscriber processes the event.
+
+```
+  gameObject.trigger("eventName", () -> expensiveCalculation());
+```
 
 # Roadmap
 
@@ -112,8 +129,8 @@ Parameter:
 ### improvements
 
 - [ ] it should be possible to send event parameters lazy. i.e. add a Supplier as parameter and Events.getParameter()
-      resolves the suppliers value and caches the result. Motivation: the hover event should calculate the mouse positions
-      in object coordinates. This is expensive and maybe there are not even event listeners so the calculation is wasted.  
+  resolves the suppliers value and caches the result. Motivation: the hover event should calculate the mouse positions
+  in object coordinates. This is expensive and maybe there are not even event listeners so the calculation is wasted.
 
 ### Bugs
 
@@ -150,7 +167,5 @@ Parameter:
 
 - BerrayApplication supplies 3 default layers: background, default, gui
     - think about sublayer in one layer (stacking in gui layer)
-
-
 
 https://pixijs.com/

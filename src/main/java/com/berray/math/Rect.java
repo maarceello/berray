@@ -73,8 +73,11 @@ public class Rect {
   }
 
   public boolean contains(Vec2 point) {
-    return point.getX() >= x && point.getX() <= x + width &&
-        point.getY() >= y && point.getY() <= y + height;
+    return contains(point.getX(), point.getY());
   }
 
+  public boolean contains(float x, float y) {
+    return x >= this.x && x <= this.x + this.width &&
+        y >= this.y && y <= this.y + this.height;
+  }
 }

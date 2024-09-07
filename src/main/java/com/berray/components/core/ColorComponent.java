@@ -6,9 +6,9 @@ import com.berray.math.Color;
 public class ColorComponent extends Component {
   private Color color;
 
-  public ColorComponent(int r, int g, int b) {
+  public ColorComponent(Color color) {
     super("color");
-    this.color = new Color(r, g, b);
+    this.color = color;
   }
 
   public Color getColor() {
@@ -25,6 +25,10 @@ public class ColorComponent extends Component {
   }
 
   public static ColorComponent color(int r, int g, int b) {
-    return new ColorComponent(r, g, b);
+    return new ColorComponent(new Color(r / 255.0f, g / 255.0f, b / 255.0f));
+  }
+
+  public static ColorComponent color(Color color) {
+    return new ColorComponent(color);
   }
 }

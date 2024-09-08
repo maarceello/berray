@@ -24,43 +24,18 @@ public class SpriteButtonTest extends BerrayApplication implements CoreComponent
     Vec2 center = center();
     add(
         pushButton("testbutton")
-            .neutral(makeButtonComponent("/ui/border", Vec2.origin(), "Button", Color.WHITE))
-            .hover(makeButtonComponent("/ui/border", Vec2.origin(), "Button", new Color(1.0f, 0.8f, 0.0f)))
-            .armed(makeButtonComponent("/ui/border", new Vec2(5,5), "Button", new Color(1.0f, 0.8f, 0.0f)))
-            .pressed(makeButtonComponent("/ui/border", new Vec2(2,2), "Button", new Color(1.0f, 0.8f, 0.0f))),
+            .slice9("/ui/border", "Button", new Vec2(200, 50), 16, Color.WHITE, Color.GOLD),
         pos(center.getX(), center().getY() - 30),
         anchor(AnchorType.CENTER)
     );
 
     add(
         toggleButton("testbutton")
-            .neutral(makeButtonComponent("/ui/border", Vec2.origin(), "Button", Color.WHITE))
-            .hover(makeButtonComponent("/ui/border", Vec2.origin(), "Button", new Color(1.0f, 0.8f, 0.0f)))
-            .armed(makeButtonComponent("/ui/border", new Vec2(5,5), "Button", new Color(1.0f, 0.8f, 0.0f)))
-            .pressed(makeButtonComponent("/ui/border", new Vec2(2,2), "Button", new Color(1.0f, 0.8f, 0.0f))),
+            .slice9("/ui/border", "Togggle Button", new Vec2(250, 50), 16, Color.WHITE, Color.GRAY),
         pos(center.getX(), center().getY() + 30),
         anchor(AnchorType.CENTER)
     );
   }
-
-  private GameObject makeButtonComponent(String assetName, Vec2 pos, String text, Color color) {
-    GameObject button = make(
-        Slice9Component.slice9(assetName, new Vec2(200, 50), 16),
-        area(),
-        pos(pos),
-        anchor(AnchorType.TOP_LEFT),
-        color(color)
-    );
-
-    button.add(
-        text(text),
-        pos(100, 25),
-        anchor(AnchorType.CENTER)
-    );
-
-    return button;
-  }
-
 
   @Override
   public void initWindow() {

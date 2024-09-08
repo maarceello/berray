@@ -2,6 +2,7 @@ package com.berray.objects.gui;
 
 import com.berray.GameObject;
 import com.berray.components.CoreComponentShortcuts;
+import com.berray.components.addon.Slice9Component;
 import com.berray.components.core.AnchorType;
 import com.berray.event.Event;
 import com.berray.math.Color;
@@ -94,12 +95,6 @@ public class Button extends GameObject implements CoreComponentShortcuts {
     // ignore add event when we're the one the child is added to
     if (parent != this) {
       addChild(neutralChild);
-      text = add(
-          text("foo"),
-          pos(0, 0),
-          anchor(AnchorType.TOP_LEFT),
-          color(Color.WHITE)
-      );
     }
     setTransformDirty();
   }
@@ -197,6 +192,39 @@ public class Button extends GameObject implements CoreComponentShortcuts {
     this.pressedChild = make(gameObject, components);
     return this;
   }
+
+  /**
+   * Adds .
+   * TODO: unused at the moment.
+   *
+   * @type initialization
+   */
+  public Button slice9(String assetName, String text, Vec2 size, int slice9ComponentSize, Color neutralColor, Color hoverColor) {
+    this.neutralChild = makeSlice9Component(assetName, size, slice9ComponentSize, Vec2.origin(), text, neutralColor);
+    this.hoverChild = makeSlice9Component(assetName, size, slice9ComponentSize, Vec2.origin(), text, hoverColor);
+    this.armedChild = makeSlice9Component(assetName, size, slice9ComponentSize, new Vec2(5, 5), text, hoverColor);
+    this.pressedChild = makeSlice9Component(assetName, size, slice9ComponentSize, new Vec2(2, 2), text, neutralColor);
+    return this;
+  }
+
+  private GameObject makeSlice9Component(String assetName, Vec2 size, int slice9ComponentSize, Vec2 pos, String text, Color color) {
+    GameObject button = make(
+        Slice9Component.slice9(assetName, size, slice9ComponentSize),
+        area(),
+        pos(pos),
+        anchor(AnchorType.TOP_LEFT),
+        color(color)
+    );
+
+    button.add(
+        text(text),
+        pos(100, 25),
+        anchor(AnchorType.CENTER)
+    );
+
+    return button;
+  }
+
 
   protected GameObject getHoverGameObject() {
     return hoverChild != null ? hoverChild : neutralChild;

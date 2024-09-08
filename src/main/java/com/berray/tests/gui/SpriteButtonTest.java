@@ -4,14 +4,14 @@ import com.berray.BerrayApplication;
 import com.berray.GameObject;
 import com.berray.assets.CoreAssetShortcuts;
 import com.berray.components.CoreComponentShortcuts;
+import com.berray.components.addon.Slice9Component;
 import com.berray.components.core.AnchorType;
+import com.berray.math.Color;
 import com.berray.math.Vec2;
-import com.berray.objects.gui.Button;
-import com.raylib.Jaylib;
 
 import static com.berray.GameObject.make;
-import static com.berray.objects.gui.Button.button;
 import static com.berray.objects.gui.Button.pushButton;
+import static com.berray.objects.gui.Button.toggleButton;
 
 public class SpriteButtonTest extends BerrayApplication implements CoreComponentShortcuts, CoreAssetShortcuts {
 
@@ -19,34 +19,54 @@ public class SpriteButtonTest extends BerrayApplication implements CoreComponent
   @Override
   public void game() {
 
-    loadSprite("/ui/border", "resources/kenny-fantasy-ui-borders/Border/panel-border-005.png");
+    loadSprite("/ui/border", "resources/kenny-fantasy-ui-borders/Panel/panel-005.png");
 
+    Vec2 center = center();
     add(
         pushButton("testbutton")
-            .neutral(makeButtonComponent(128, Vec2.origin(), "neutral")),
+            .neutral(makeButtonComponent("/ui/border", Vec2.origin(), "Button", Color.WHITE))
+            .hover(makeButtonComponent("/ui/border", Vec2.origin(), "Button", new Color(1.0f, 0.8f, 0.0f)))
+            .armed(makeButtonComponent("/ui/border", new Vec2(5,5), "Button", new Color(1.0f, 0.8f, 0.0f)))
+            .pressed(makeButtonComponent("/ui/border", new Vec2(2,2), "Button", new Color(1.0f, 0.8f, 0.0f))),
+        pos(center.getX(), center().getY() - 30),
+        anchor(AnchorType.CENTER)
+    );
 
-        pos(center()),
+    add(
+        toggleButton("testbutton")
+            .neutral(makeButtonComponent("/ui/border", Vec2.origin(), "Button", Color.WHITE))
+            .hover(makeButtonComponent("/ui/border", Vec2.origin(), "Button", new Color(1.0f, 0.8f, 0.0f)))
+            .armed(makeButtonComponent("/ui/border", new Vec2(5,5), "Button", new Color(1.0f, 0.8f, 0.0f)))
+            .pressed(makeButtonComponent("/ui/border", new Vec2(2,2), "Button", new Color(1.0f, 0.8f, 0.0f))),
+        pos(center.getX(), center().getY() + 30),
         anchor(AnchorType.CENTER)
     );
   }
 
-  private GameObject makeButtonComponent(int color, Vec2 pos, String tag) {
-    return make(
-        rect(300, 300),
-        color(color, color, color),
+  private GameObject makeButtonComponent(String assetName, Vec2 pos, String text, Color color) {
+    GameObject button = make(
+        Slice9Component.slice9(assetName, new Vec2(200, 50), 16),
         area(),
         pos(pos),
         anchor(AnchorType.TOP_LEFT),
-        tag
+        color(color)
     );
+
+    button.add(
+        text(text),
+        pos(100, 25),
+        anchor(AnchorType.CENTER)
+    );
+
+    return button;
   }
 
 
   @Override
   public void initWindow() {
     width(1000);
-    height(1000);
-    background(Jaylib.BLACK);
+    height(500);
+    background(Color.BLACK);
     title("Button Test");
   }
 

@@ -4,6 +4,7 @@ import com.berray.BerrayApplication;
 import com.berray.GameObject;
 import com.berray.components.CoreComponentShortcuts;
 import com.berray.components.core.AnchorType;
+import com.berray.math.Color;
 import com.berray.math.Vec2;
 import com.raylib.Jaylib;
 
@@ -68,7 +69,7 @@ public class MouseCalculationTest extends BerrayApplication implements CoreCompo
   public void initWindow() {
     width(1000);
     height(1000);
-    background(Jaylib.GRAY);
+    background(Color.GRAY);
     title("Databinding Test");
   }
 

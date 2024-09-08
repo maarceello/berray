@@ -5,6 +5,7 @@ import com.berray.GameObject;
 import com.berray.assets.CoreAssetShortcuts;
 import com.berray.components.CoreComponentShortcuts;
 import com.berray.components.core.AnchorType;
+import com.berray.math.Color;
 import com.berray.math.Vec2;
 import com.berray.tests.level.LevelBuilder;
 import com.berray.tests.level.LevelGameObject;
@@ -131,7 +132,7 @@ public class AddLevelTest extends BerrayApplication implements CoreComponentShor
   public void initWindow() {
     width(1024);
     height(768);
-    background(Jaylib.GRAY);
+    background(Color.GRAY);
     title("Add Level Test");
   }
 

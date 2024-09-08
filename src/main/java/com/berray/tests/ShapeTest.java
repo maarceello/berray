@@ -5,6 +5,7 @@ import com.berray.GameObject;
 import com.berray.assets.CoreAssetShortcuts;
 import com.berray.components.CoreComponentShortcuts;
 import com.berray.components.core.AnchorType;
+import com.berray.math.Color;
 import com.berray.math.Vec2;
 import com.raylib.Jaylib;
 
@@ -17,7 +18,7 @@ public class ShapeTest  extends BerrayApplication implements CoreComponentShortc
   public void initWindow() {
     width(1024);
     height(768);
-    background(RED);
+    background(Color.RED);
     title("Pong Game");
   }
 

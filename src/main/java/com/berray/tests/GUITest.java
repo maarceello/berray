@@ -4,6 +4,7 @@ import com.berray.BerrayApplication;
 import com.berray.GameObject;
 import com.berray.components.CoreComponentShortcuts;
 import com.berray.components.core.AnchorType;
+import com.berray.math.Color;
 import com.raylib.Jaylib;
 
 
@@ -32,7 +33,7 @@ public class GUITest extends BerrayApplication implements CoreComponentShortcuts
   public void initWindow() {
     width(1024);
     height(768);
-    background(Jaylib.GRAY);
+    background(Color.GRAY);
     title("GUI Test");
   }
 

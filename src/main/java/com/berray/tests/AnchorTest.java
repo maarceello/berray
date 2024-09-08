@@ -57,7 +57,7 @@ public class AnchorTest extends BerrayApplication implements CoreComponentShortc
   public void initWindow() {
     width(1024);
     height(768);
-    background(Jaylib.BLACK);
+    background(Color.BLACK);
     title("Anchor Test");
   }
 

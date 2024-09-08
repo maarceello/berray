@@ -5,6 +5,7 @@ import com.berray.assets.DefaultAssetManager;
 import com.berray.components.core.AnchorType;
 import com.berray.event.Event;
 import com.berray.event.EventListener;
+import com.berray.math.Color;
 import com.berray.math.Vec2;
 import com.raylib.Raylib;
 import com.raylib.Raylib.Vector2;
@@ -18,14 +19,13 @@ import static com.berray.components.core.LayerComponent.layer;
 import static com.berray.components.core.PosComponent.pos;
 import static com.berray.objects.core.Label.label;
 import static com.raylib.Jaylib.*;
-import static com.raylib.Raylib.Color;
 
 
 public abstract class BerrayApplication {
   protected Game game;
   private int width = 800;
   private int height = 640;
-  private Color background = WHITE;
+  private Color background = Color.WHITE;
   private String title = "Berry Application";
 
   protected boolean debug = false;
@@ -176,7 +176,7 @@ public abstract class BerrayApplication {
       timings.timeUpdate(() -> game.update(frameTime()));
       timings.timeRaylib(Raylib::BeginDrawing);
       timings.timeDraw(() -> {
-        ClearBackground(background);
+        ClearBackground(background.toRaylibColor());
         game.draw();
       });
       timings.timeRaylib(Raylib::EndDrawing);

@@ -5,6 +5,7 @@ import com.berray.GameObject;
 import com.berray.assets.CoreAssetShortcuts;
 import com.berray.components.CoreComponentShortcuts;
 import com.berray.components.core.AnchorType;
+import com.berray.math.Color;
 import com.berray.math.Vec2;
 import com.berray.objects.core.Label;
 import com.raylib.Jaylib;
@@ -122,7 +123,7 @@ public class SpriteTest extends BerrayApplication implements CoreComponentShortc
   public void initWindow() {
     width(500);
     height(500);
-    background(Jaylib.GRAY);
+    background(Color.GRAY);
     title("Sprite Sheet Test");
   }
 

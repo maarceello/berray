@@ -68,7 +68,7 @@ public class ButtonTest extends BerrayApplication implements CoreComponentShortc
   public void initWindow() {
     width(1000);
     height(1000);
-    background(Jaylib.BLACK);
+    background(Color.BLACK);
     title("Button Test");
   }
 

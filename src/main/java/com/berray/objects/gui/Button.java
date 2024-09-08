@@ -67,7 +67,7 @@ public class Button extends GameObject implements CoreComponentShortcuts {
       }
     }
     // push button or the toggle button is released
-    replaceChild(0, stillhovered ? getHoverGameObject() : neutralChild);
+    replaceChild(0, stillhovered && hoverChild != null ? hoverChild : neutralChild);
   }
 
 
@@ -85,8 +85,8 @@ public class Button extends GameObject implements CoreComponentShortcuts {
 
   private void onHoverEnter(Event event) {
     // only process hover events when not armed
-    if (!armed) {
-      replaceChild(0, getHoverGameObject());
+    if (!armed && hoverChild != null) {
+      replaceChild(0, hoverChild);
     }
   }
 
@@ -223,11 +223,6 @@ public class Button extends GameObject implements CoreComponentShortcuts {
     );
 
     return button;
-  }
-
-
-  protected GameObject getHoverGameObject() {
-    return hoverChild != null ? hoverChild : neutralChild;
   }
 
   protected GameObject getArmedGameObject() {

@@ -139,8 +139,8 @@ once, regardless how many subscriber processes the event.
 ## gui
 
 - [x] label
-- [ ] button
-- [ ] checkbox
+- [x] button
+- [x] checkbox
 - [ ] slider
 - [ ] textarea (static), scrollable or autoremove rows after some time
 - [ ] textarea/inputfield (enter text in input field)

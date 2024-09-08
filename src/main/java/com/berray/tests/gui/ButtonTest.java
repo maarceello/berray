@@ -69,7 +69,7 @@ public class ButtonTest extends BerrayApplication implements CoreComponentShortc
     width(1000);
     height(1000);
     background(Jaylib.BLACK);
-    title("Databinding Test");
+    title("Button Test");
   }
 
   public static void main(String[] args) {

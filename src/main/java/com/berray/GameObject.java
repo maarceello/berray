@@ -105,7 +105,9 @@ public class GameObject {
     return game;
   }
 
-  /** Returns the bounding box of the object in world coordinates. */
+  /**
+   * Returns the bounding box of the object in world coordinates.
+   */
   public Rect getBoundingBox() {
     ensureTransformCalculated();
     return boundingBox;
@@ -174,7 +176,9 @@ public class GameObject {
     return tags;
   }
 
-  /** replaces the child at the specified index. Note that the removed child is not {@link #destroy() destoyed}. */
+  /**
+   * replaces the child at the specified index. Note that the removed child is not {@link #destroy() destoyed}.
+   */
   public GameObject replaceChild(int index, GameObject other) {
     GameObject previous = children.set(index, other);
     previous.parent = null;
@@ -185,18 +189,18 @@ public class GameObject {
     transformDirty = true;
     trigger("add", this, other);
     other.trigger("add", this, other);
-    return other ;
+    return other;
   }
 
-  public GameObject addChild(GameObject other) {
-    children.add(other);
-    other.parent = this;
-    other.setGame(this.game);
+  public GameObject addChild(GameObject child) {
+    children.add(child);
+    child.parent = this;
+    child.setGame(this.game);
     // force recalculation of bounding rectangle
     transformDirty = true;
-    trigger("add", this, other);
-    other.trigger("add", this, other);
-    return other ;
+    trigger("add", this, child);
+    child.trigger("add", this, child);
+    return child;
   }
 
 
@@ -208,7 +212,7 @@ public class GameObject {
     // first update all children, then the object itself (depth first traversal)
     this.children.forEach(child -> child.update(frameTime));
     this.trigger("update", frameTime);
-    // trigger game also, so tag bases listeners get notified
+    // trigger game also, so tag based listeners get notified
     this.game.trigger("update", this, frameTime);
   }
 
@@ -289,7 +293,9 @@ public class GameObject {
     setterMethods.remove(name);
   }
 
-  /** Registers an action method with parameters and no return value. */
+  /**
+   * Registers an action method with parameters and no return value.
+   */
   public void registerAction(String name, Consumer<List<Object>> actionMethod) {
     actionMethods.put(name, params -> {
       actionMethod.accept(params);
@@ -297,7 +303,9 @@ public class GameObject {
     });
   }
 
-  /** Registers an action method without parameters and no return value. */
+  /**
+   * Registers an action method without parameters and no return value.
+   */
   public void registerAction(String name, Runnable actionMethod) {
     actionMethods.put(name, params -> {
       actionMethod.run();
@@ -306,7 +314,9 @@ public class GameObject {
   }
 
 
-  /** Registers an action method with parameters and which returns a value. */
+  /**
+   * Registers an action method with parameters and which returns a value.
+   */
   public void registerAction(String name, Function<List<Object>, ?> actionMethod) {
     actionMethods.put(name, actionMethod);
   }
@@ -607,7 +617,6 @@ public class GameObject {
   public boolean exists() {
     return parent != null;
   }
-
 
 
   private static class ChildIterator implements Iterator<GameObject> {

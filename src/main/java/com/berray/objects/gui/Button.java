@@ -15,9 +15,24 @@ import java.util.List;
  * Button in Gui.
  */
 public class Button extends GameObject implements CoreComponentShortcuts {
-  public String id;
+  /**
+   * Id to send to Gui Framework when the button is pressed.
+   */
+  private final String id;
+  /**
+   * when true the button is a toggle button (with 2 states), when false the button is a
+   * push button.
+   */
+  private final boolean toggleButton;
 
-  private boolean armed;
+  /**
+   * armed state is when the mouse is down on the button, but not yet released.
+   */
+  private boolean armed = false;
+  /**
+   * used for toggle button: the button is pressed.
+   */
+  private boolean pressed = false;
 
   private GameObject neutralChild;
   private GameObject hoverChild;
@@ -25,8 +40,9 @@ public class Button extends GameObject implements CoreComponentShortcuts {
   private GameObject pressedChild;
   private GameObject text;
 
-  public Button(String id) {
+  public Button(String id, boolean toggleButton) {
     this.id = id;
+    this.toggleButton = toggleButton;
     on("add", this::onAdd);
     on("hoverEnter", this::onHoverEnter);
     on("hoverLeave", this::onHoverLeave);
@@ -39,9 +55,18 @@ public class Button extends GameObject implements CoreComponentShortcuts {
   private void onMouseRelease(Event event) {
     Vec2 absoluteMousePos = event.getParameter(2);
     Rect boundingBox = getBoundingBox();
-    boolean stillhovered = boundingBox.contains(absoluteMousePos);
-    replaceChild(0, stillhovered ? getHoverGameObject() : neutralChild);
     armed = false;
+    boolean stillhovered = boundingBox.contains(absoluteMousePos);
+    if (toggleButton) {
+      // toggle button
+      pressed = !pressed;
+      if (pressed) {
+        replaceChild(0, getPressedGameObject());
+        return;
+      }
+    }
+    // push button or the toggle button is released
+    replaceChild(0, stillhovered ? getHoverGameObject() : neutralChild);
   }
 
 
@@ -53,7 +78,7 @@ public class Button extends GameObject implements CoreComponentShortcuts {
   private void onHoverLeave(Event event) {
     // only process hover events when not armed
     if (!armed) {
-      replaceChild(0, neutralChild);
+      replaceChild(0, pressed ? getPressedGameObject() : neutralChild);
     }
   }
 
@@ -102,12 +127,32 @@ public class Button extends GameObject implements CoreComponentShortcuts {
   }
 
   /**
+   * Sets the game object (components) which is used when the button is neither hovered nor armed nor pressed.
+   *
+   * @type initialization
+   */
+  public Button neutral(GameObject gameObject, Object... components) {
+    this.neutralChild = make(gameObject, components);
+    return this;
+  }
+
+  /**
    * Sets the game object (components) which is used when the button is hovered
    *
    * @type initialization
    */
   public Button hover(Object... components) {
     this.hoverChild = make(components);
+    return this;
+  }
+
+  /**
+   * Sets the game object (components) which is used when the button is hovered
+   *
+   * @type initialization
+   */
+  public Button hover(GameObject gameObject, Object... components) {
+    this.hoverChild = make(gameObject, components);
     return this;
   }
 
@@ -122,6 +167,16 @@ public class Button extends GameObject implements CoreComponentShortcuts {
   }
 
   /**
+   * Sets the game object (components) which is used when the button is armed
+   *
+   * @type initialization
+   */
+  public Button armed(GameObject gameObject, Object... components) {
+    this.armedChild = make(gameObject, components);
+    return this;
+  }
+
+  /**
    * Sets the game object (components) which is used when the button is pressed.
    * TODO: unused at the moment.
    *
@@ -129,6 +184,17 @@ public class Button extends GameObject implements CoreComponentShortcuts {
    */
   public Button pressed(Object... components) {
     this.pressedChild = make(components);
+    return this;
+  }
+
+  /**
+   * Sets the game object (components) which is used when the button is pressed.
+   * TODO: unused at the moment.
+   *
+   * @type initialization
+   */
+  public Button pressed(GameObject gameObject, Object... components) {
+    this.pressedChild = make(gameObject, components);
     return this;
   }
 
@@ -145,11 +211,31 @@ public class Button extends GameObject implements CoreComponentShortcuts {
   }
 
   /**
-   * creates a new button
+   * Creates a new push button. The button can be pressed and is released when the mouse button is released.
+   * Note that the "pressed" component is not used in this button type.
    *
    * @param id action id to send when the button is pressed. may be <code>null</code>, then no button event is sent.
    */
-  public static Button button(String id) {
-    return new Button(id);
+  public static Button pushButton(String id) {
+    return new Button(id, false);
+  }
+
+  /**
+   * Creates a new toggle button. The button can be pressed and is on the "pressed" state. Pressing the button
+   * again moves the button in the neutral state again.
+   *
+   * @param id action id to send when the button is pressed. may be <code>null</code>, then no button event is sent.
+   */
+  public static Button toggleButton(String id) {
+    return new Button(id, true);
+  }
+
+  /**
+   * Creates a new button.
+   *
+   * @param id action id to send when the button is pressed. may be <code>null</code>, then no button event is sent.
+   */
+  public static Button button(String id, boolean toggleButton) {
+    return new Button(id, toggleButton);
   }
 }

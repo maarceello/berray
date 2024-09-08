@@ -4,9 +4,11 @@ import com.berray.BerrayApplication;
 import com.berray.GameObject;
 import com.berray.components.CoreComponentShortcuts;
 import com.berray.components.core.AnchorType;
+import com.berray.math.Color;
 import com.berray.math.Vec2;
 import com.raylib.Jaylib;
 
+import static com.berray.GameObject.make;
 import static com.berray.objects.gui.Button.button;
 
 public class ButtonTest extends BerrayApplication implements CoreComponentShortcuts {
@@ -19,49 +21,47 @@ public class ButtonTest extends BerrayApplication implements CoreComponentShortc
         pos(center)
     );
 
-
     for (AnchorType type : AnchorType.values()/* Arrays.asList(AnchorType.CENTER)*/) {
       int x = type.ordinal() % 3;
       int y = type.ordinal() / 3;
+      boolean toggle = type.ordinal() % 2 == 1;
+
+      GameObject neutral = makeButtonComponent(128, Vec2.origin(), "neutral");
+      GameObject hover = makeButtonComponent(180, Vec2.origin(), "hover");
+      GameObject armed = makeButtonComponent(180, new Vec2(5.0f, 5.0f), "armed");
+      GameObject pressed = makeButtonComponent(180, new Vec2(3.0f, 3.0f), "pressed");
 
       root.add(
-          button("testbutton")
-              .neutral(
-                  rect(300, 300),
-                  color(128, 128, 128),
-                  area(),
-                  "neutral"
-                  ,anchor(AnchorType.TOP_LEFT)
-                  //, DebugComponent.debug()
-              )
-              .hover(
-                  rect(300, 300),
-                  color(180, 180, 180),
-                  area(),
-                  "hover"
-                  ,anchor(AnchorType.TOP_LEFT)
-              )
-              .armed(
-                  rect(300, 300),
-                  color(180, 180, 180),
-                  pos(5.0f, 5.0f),
-                  area(),
-                  "armed"
-                  ,anchor(AnchorType.TOP_LEFT)
-              ),
+          button("testbutton", toggle)
+              .neutral(neutral)
+              .hover(hover)
+              .armed(armed)
+              .pressed(pressed),
           pos(20 + x * 470 - center.getX(), 20 + y * 470 - center.getY()),
-          anchor(type)
-          //, DebugComponent.debug()
+          anchor(type),
+          toggle ? "toggle" : "push"
       );
     }
+  }
 
-//    add(
-//        Label.label(() -> "BB: " + button.getBoundingBox()),
-//        color(255, 255, 255),
-//        pos(0, 0),
-//        anchor(AnchorType.TOP_LEFT)
-//    );
+  private GameObject makeButtonComponent(int color, Vec2 pos, String tag) {
+    GameObject buttonComponent = make(
+        rect(300, 300),
+        color(color, color, color),
+        area(),
+        pos(pos),
+        anchor(AnchorType.TOP_LEFT),
+        tag
+    );
 
+    buttonComponent.add(
+        text(tag),
+        pos(150, 150),
+        color(Color.BLACK),
+        anchor(AnchorType.CENTER)
+    );
+
+    return buttonComponent;
   }
 
   @Override

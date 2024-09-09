@@ -294,6 +294,18 @@ public class GameObject {
   }
 
   /**
+   * Checks if the new property is different from the old value and fires an <code>propertyChange</code> event if they are.
+   * For convenience the new property is returned.
+   */
+  public <E> E firePropertyChange(String propertyName, E oldValue, E newValue) {
+    if (!Objects.equals(oldValue, newValue)) {
+      trigger("propertyChange", propertyName, oldValue, newValue);
+    }
+
+    return newValue;
+  }
+
+  /**
    * Registers an action method with parameters and no return value.
    */
   public void registerAction(String name, Consumer<List<Object>> actionMethod) {

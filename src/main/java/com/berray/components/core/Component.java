@@ -103,7 +103,7 @@ public class Component {
    */
   public <E> void registerBoundProperty(String name, Supplier<E> getter, Consumer<E> setter) {
     gameObject.registerProperty(name, getter, newValue ->
-        setter.accept(firePropertyChange(name, getter.get(), newValue))
+        setter.accept(gameObject.firePropertyChange(name, getter.get(), newValue))
     );
     properties.add(name);
   }
@@ -135,7 +135,7 @@ public class Component {
    */
   public <E> void registerBoundSetter(String name, Supplier<E> getter, Consumer<E> setter) {
     gameObject.registerPropertySetter(name, (E newValue) ->
-        setter.accept(firePropertyChange(name, getter.get(), newValue))
+        setter.accept(gameObject.firePropertyChange(name, getter.get(), newValue))
     );
     properties.add(name);
   }
@@ -192,15 +192,4 @@ public class Component {
     gameObject.removeListener(this);
   }
 
-  /**
-   * Checks if the new property is different from the old value and fires an <code>propertyChange</code> event if they are.
-   * For convenience the new property is returned.
-   */
-  protected <E> E firePropertyChange(String propertyName, E oldValue, E newValue) {
-    if (!Objects.equals(oldValue, newValue)) {
-      gameObject.trigger("propertyChange", propertyName, oldValue, newValue);
-    }
-
-    return newValue;
-  }
 }

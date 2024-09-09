@@ -27,11 +27,21 @@ import com.berray.math.Vec3;
  * @trigger mouseCLick when the left mouse button is pressed and released over the component.
  * Parameter: GameObject which is clicked, Vec2 position of the mouse in component coordinate system,
  * Vec2 position of the mouse in world coordinate system
+ * @trigger dragStart when the left mouse button is pressed, the mouse is moved and there is currently not a drag ongoing.
+ * Parameter: GameObject which is clicked, Vec2 position of the mouse in component coordinate system,
+ * Vec2 position of the mouse in world coordinate system
+ * @trigger dragFinish when the left mouse button is released and a drag was currently ongoing
+ * Parameter: GameObject which is was clicked, Vec2 position of the mouse in component coordinate system,
+ * Vec2 position of the mouse in world coordinate system
+ * @trigger dragging when the left mouse button is released and the mouse is moved
+ * Parameter: GameObject which is was clicked, Vec2 position of the mouse in component coordinate system,
+ * Vec2 position of the mouse in world coordinate system
  */
 public class MouseComponent extends Component {
   private boolean hoveredThisFrame = false;
   private boolean hoveredLastFrame = false;
   private boolean pressed = false;
+  private boolean dragging = false;
 
   public MouseComponent() {
     super("mouse", "area");
@@ -61,8 +71,13 @@ public class MouseComponent extends Component {
       if (gameObject.getBoundingBox().contains(mousePos)) {
         gameObject.trigger("mouseClick", gameObject, localPos, mousePos);
       }
+      this.pressed = false;
+
+      if (dragging) {
+        gameObject.trigger("dragFinish", gameObject, localPos, mousePos);
+        dragging = false;
+      }
     }
-    this.pressed = false;
   }
 
   private Vec2 worldPosToLocalPos(Vec2 mousePos) {
@@ -84,7 +99,18 @@ public class MouseComponent extends Component {
     Vec2 mousePos = event.getParameter(0);
     if (gameObject.getBoundingBox().contains(mousePos)) {
       hoveredThisFrame = true;
-      gameObject.trigger("hover", this, worldPosToLocalPos(mousePos), mousePos);
+      gameObject.trigger("hover", gameObject, worldPosToLocalPos(mousePos), mousePos);
+    }
+
+    if (pressed) {
+      // moving the mouse while pressing the buttons means dragging the mouse
+
+      Vec2 localPos = worldPosToLocalPos(mousePos);
+      if (!dragging) {
+        gameObject.trigger("dragStart", gameObject, localPos, mousePos);
+        dragging = true;
+      }
+      gameObject.trigger("dragging", gameObject, localPos, mousePos);
     }
   }
 

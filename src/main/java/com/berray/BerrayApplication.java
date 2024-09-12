@@ -5,6 +5,7 @@ import com.berray.assets.DefaultAssetManager;
 import com.berray.components.core.AnchorType;
 import com.berray.event.Event;
 import com.berray.event.EventListener;
+import com.berray.math.Color;
 import com.berray.math.Vec2;
 import com.raylib.Raylib;
 import com.raylib.Raylib.Vector2;
@@ -18,14 +19,13 @@ import static com.berray.components.core.LayerComponent.layer;
 import static com.berray.components.core.PosComponent.pos;
 import static com.berray.objects.core.Label.label;
 import static com.raylib.Jaylib.*;
-import static com.raylib.Raylib.Color;
 
 
 public abstract class BerrayApplication {
   protected Game game;
   private int width = 800;
   private int height = 640;
-  private Color background = WHITE;
+  private Color background = Color.WHITE;
   private String title = "Berry Application";
 
   protected boolean debug = false;
@@ -86,6 +86,11 @@ public abstract class BerrayApplication {
   public GameObject add(Object... component) {
     return game.add(component);
   }
+
+  public <E extends GameObject> E add(E gameObject, Object... component) {
+    return game.add(gameObject, component);
+  }
+
 
   public void on(String event, EventListener listener) {
     game.on(event, listener);
@@ -171,7 +176,7 @@ public abstract class BerrayApplication {
       timings.timeUpdate(() -> game.update(frameTime()));
       timings.timeRaylib(Raylib::BeginDrawing);
       timings.timeDraw(() -> {
-        ClearBackground(background);
+        ClearBackground(background.toRaylibColor());
         game.draw();
       });
       timings.timeRaylib(Raylib::EndDrawing);
@@ -261,9 +266,16 @@ public abstract class BerrayApplication {
   }
 
   private void processInputs() {
+    Vector2 mousePosRaylib = GetMousePosition();
+    Vec2 currentMousePos = new Vec2(mousePosRaylib.x(), mousePosRaylib.y());
+
+    game.trigger("mouseMove", currentMousePos);
+
     if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-      Vector2 pos = GetMousePosition();
-      game.trigger("mousePress", new Vec2(pos.x(), pos.y()));
+      game.trigger("mousePress", currentMousePos);
+    }
+    if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
+      game.trigger("mouseRelease", currentMousePos);
     }
 
     for (int i = 0; i < keysDown.length; i++) {

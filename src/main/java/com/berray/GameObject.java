@@ -105,6 +105,9 @@ public class GameObject {
     return game;
   }
 
+  /**
+   * Returns the bounding box of the object in world coordinates.
+   */
   public Rect getBoundingBox() {
     ensureTransformCalculated();
     return boundingBox;
@@ -116,38 +119,50 @@ public class GameObject {
    * <p>
    * - a {@link Component}. Components are added to the child gameobject as is.
    * - a {@link String}. I this case the string will be added as a tag to the child gameObject.
-   * - the first component may be an instance of {@link GameObject}. In this case this object is
    * uses as the new object and all components and tags are added to this existing game object.
    */
   public GameObject add(Object... components) {
+    return add(new GameObject(game, this), components);
+  }
+
+  /**
+   * Add a GameObject as a child to this gameObject.
+   * `components` is an array of:
+   * <p>
+   * - a {@link Component}. Components are added to the child gameobject as is.
+   * - a {@link String}. I this case the string will be added as a tag to the child gameObject.
+   * - the first component may be an instance of {@link GameObject}. In this case this object is
+   * uses as the new object and all components and tags are added to this existing game object.
+   */
+  public <E extends GameObject> E add(E gameObject, Object... components) {
     if (components == null) {
-      throw new NullPointerException("components is null");
+      throw new NullPointerException("components must nor be null");
     }
-    GameObject gameObject;
-    if (components.length > 0 && components[0] instanceof GameObject) {
-      gameObject = (GameObject) components[0];
-      gameObject.addComponents(Arrays.asList(components).subList(1, components.length));
-    } else {
-      gameObject = new GameObject(game, this);
-      gameObject.addComponents(Arrays.asList(components));
+    if (gameObject == null) {
+      throw new NullPointerException("gameObject must nor be null");
     }
-    // trigger add event for all other interested parties
+    gameObject.setGame(game);
+    gameObject.addComponents(Arrays.asList(components));
+    // trigger "add" event for all other interested parties
     addChild(gameObject);
     return gameObject;
   }
 
   public void remove(GameObject gameObject) {
     children.remove(gameObject);
-    gameObject.destroy();
     gameObject.parent = null;
     gameObject.game = null;
   }
 
-  private void destroy() {
+  public void destroy() {
     for (Component component : components.values()) {
       component.destroy();
     }
     components.clear();
+    // remove all event listeners
+    if (game != null) {
+      game.removeListener(this);
+    }
   }
 
 
@@ -161,12 +176,31 @@ public class GameObject {
     return tags;
   }
 
-  public void addChild(GameObject other) {
-    children.add(other);
+  /**
+   * replaces the child at the specified index. Note that the removed child is not {@link #destroy() destoyed}.
+   */
+  public GameObject replaceChild(int index, GameObject other) {
+    GameObject previous = children.set(index, other);
+    previous.parent = null;
+    previous.game = null;
     other.parent = this;
     other.setGame(this.game);
+    // force recalculation of bounding rectangle
+    transformDirty = true;
     trigger("add", this, other);
     other.trigger("add", this, other);
+    return other;
+  }
+
+  public GameObject addChild(GameObject child) {
+    children.add(child);
+    child.parent = this;
+    child.setGame(this.game);
+    // force recalculation of bounding rectangle
+    transformDirty = true;
+    trigger("add", this, child);
+    child.trigger("add", this, child);
+    return child;
   }
 
 
@@ -178,7 +212,7 @@ public class GameObject {
     // first update all children, then the object itself (depth first traversal)
     this.children.forEach(child -> child.update(frameTime));
     this.trigger("update", frameTime);
-    // trigger game also, so tag bases listeners get notified
+    // trigger game also, so tag based listeners get notified
     this.game.trigger("update", this, frameTime);
   }
 
@@ -211,8 +245,7 @@ public class GameObject {
       }
     }
     // notify component that it was added
-    for (
-        Object c : components) {
+    for (Object c : components) {
       if (c instanceof Component) {
         Component component = (Component) c;
         // trigger add event for the current component
@@ -229,6 +262,7 @@ public class GameObject {
     if (paused) {
       return;
     }
+    ensureTransformCalculated();
     for (Component c : components.values()) {
       c.draw();
     }
@@ -241,15 +275,15 @@ public class GameObject {
     return tags.contains(tag);
   }
 
-  public <E> void registerGetter(String name, Supplier<E> method) {
-    getterMethods.put(name, method);
+  public <E> void registerPropertyGetter(String name, Supplier<E> getter) {
+    getterMethods.put(name, getter);
   }
 
-  public <E> void registerSetter(String name, Consumer<E> setter) {
+  public <E> void registerPropertySetter(String name, Consumer<E> setter) {
     setterMethods.put(name, setter);
   }
 
-  public <E> void registerMethod(String name, Supplier<E> getter, Consumer<E> setter) {
+  public <E> void registerProperty(String name, Supplier<E> getter, Consumer<E> setter) {
     getterMethods.put(name, getter);
     setterMethods.put(name, setter);
   }
@@ -259,7 +293,21 @@ public class GameObject {
     setterMethods.remove(name);
   }
 
-  /** Registers an action method with parameters and no return value. */
+  /**
+   * Checks if the new property is different from the old value and fires an <code>propertyChange</code> event if they are.
+   * For convenience the new property is returned.
+   */
+  public <E> E firePropertyChange(String propertyName, E oldValue, E newValue) {
+    if (!Objects.equals(oldValue, newValue)) {
+      trigger("propertyChange", propertyName, oldValue, newValue);
+    }
+
+    return newValue;
+  }
+
+  /**
+   * Registers an action method with parameters and no return value.
+   */
   public void registerAction(String name, Consumer<List<Object>> actionMethod) {
     actionMethods.put(name, params -> {
       actionMethod.accept(params);
@@ -267,7 +315,9 @@ public class GameObject {
     });
   }
 
-  /** Registers an action method without parameters and no return value. */
+  /**
+   * Registers an action method without parameters and no return value.
+   */
   public void registerAction(String name, Runnable actionMethod) {
     actionMethods.put(name, params -> {
       actionMethod.run();
@@ -276,7 +326,9 @@ public class GameObject {
   }
 
 
-  /** Registers an action method with parameters and which returns a value. */
+  /**
+   * Registers an action method with parameters and which returns a value.
+   */
   public void registerAction(String name, Function<List<Object>, ?> actionMethod) {
     actionMethods.put(name, actionMethod);
   }
@@ -419,6 +471,10 @@ public class GameObject {
     return (parent == null) ? this : parent.getRoot();
   }
 
+  public void onClick(EventListener eventListener) {
+    this.trigger("click");
+  }
+
   /**
    * Update all game objects
    */
@@ -501,23 +557,24 @@ public class GameObject {
       localTransform = localTransformWithoutAnchor
           .multiply(Matrix4.fromTranslate(-anchorX, -anchorY, 0));
 
-      Matrix4 parentsWorldTransform = parent == null ? Matrix4.identity() : parent.getWorldTransformWithoutAnchor();
+      Matrix4 parentsWorldTransformWithoutAnchor = parent == null ? Matrix4.identity() : parent.getWorldTransformWithoutAnchor();
+      Matrix4 parentsWorldTransform = parent == null ? Matrix4.identity() : parent.getWorldTransform();
       this.worldTransformWithoutAnchor = parentsWorldTransform.multiply(localTransformWithoutAnchor);
+
+      worldTransform = parentsWorldTransform.multiply(localTransform);
+      transformDirty = false;
 
       if (is("area")) {
         this.boundingBox = calculateBoundingBox(worldTransformWithoutAnchor, size, anchor);
       } else {
         this.boundingBox = null;
       }
-
-      worldTransform = parentsWorldTransform.multiply(localTransform);
-      transformDirty = false;
     }
   }
 
 
   protected Rect calculateBoundingBox(Matrix4 worldTransformWithoutAnchor, Vec2 size, AnchorType anchor) {
-    if (size.getX() <= 0 || size.getY() <= 0) {
+    if (size.getX() < 0 || size.getY() < 0) {
       // a game object without dimensions cannot collide with anything
       return null;
     }
@@ -554,12 +611,25 @@ public class GameObject {
     float y1 = Math.min(p1.getY(), Math.min(p2.getY(), Math.min(p3.getY(), p4.getY())));
     float y2 = Math.max(p1.getY(), Math.max(p2.getY(), Math.max(p3.getY(), p4.getY())));
 
+    // find combined bounding box of this game object and all of its children
+    for (GameObject child : children) {
+      Rect boundingBox = child.getBoundingBox();
+      if (boundingBox != null) {
+        x1 = Math.min(x1, boundingBox.getX());
+        y1 = Math.min(y1, boundingBox.getY());
+        x2 = Math.max(x2, boundingBox.getX() + boundingBox.getWidth());
+        y2 = Math.max(y2, boundingBox.getY() + boundingBox.getHeight());
+      }
+    }
+
+
     return new Rect(x1, y1, x2 - x1, y2 - y1);
   }
 
   public boolean exists() {
     return parent != null;
   }
+
 
   private static class ChildIterator implements Iterator<GameObject> {
     private final List<GameObject> children;
@@ -629,5 +699,20 @@ public class GameObject {
       // we don't have more iterators. so we don't have an element to return
       throw new NoSuchElementException();
     }
+  }
+
+
+  public static GameObject make(Object... components) {
+    GameObject object = new GameObject();
+    object.addComponents(components);
+    return object;
+  }
+
+  public static <E extends GameObject> E make(E gameObject, Object... components) {
+    if (gameObject == null) {
+      throw new IllegalArgumentException("gameObject may not be null");
+    }
+    gameObject.addComponents(components);
+    return gameObject;
   }
 }

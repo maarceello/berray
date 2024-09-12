@@ -2,6 +2,7 @@ package com.berray.components;
 
 import com.berray.Property;
 import com.berray.components.core.*;
+import com.berray.math.Color;
 import com.berray.math.Rect;
 import com.berray.math.Vec2;
 
@@ -47,6 +48,11 @@ public interface CoreComponentShortcuts {
     return ColorComponent.color(r, g, b);
   }
 
+  default ColorComponent color(Color color) {
+    return ColorComponent.color(color);
+  }
+
+
   default SpriteComponent sprite(String spriteId) {
     return SpriteComponent.sprite(spriteId);
   }
@@ -69,6 +75,10 @@ public interface CoreComponentShortcuts {
 
   default TileComponent tile() {
     return TileComponent.tile();
+  }
+
+  default MouseComponent mouse() {
+    return MouseComponent.mouse();
   }
 
   default <E> Property<E> property(String name, E value) {

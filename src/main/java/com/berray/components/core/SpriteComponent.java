@@ -1,10 +1,14 @@
 package com.berray.components.core;
 
 import com.berray.GameObject;
-import com.berray.assets.*;
+import com.berray.assets.Animation;
+import com.berray.assets.Asset;
+import com.berray.assets.AssetType;
+import com.berray.assets.SpriteSheet;
 import com.berray.event.Event;
 import com.berray.math.Rect;
 import com.berray.math.Vec2;
+import com.raylib.Jaylib;
 import com.raylib.Raylib;
 
 import java.util.List;
@@ -33,6 +37,7 @@ public class SpriteComponent extends Component {
 
   private boolean flipX;
   private boolean flipY;
+  private Vec2 size;
 
   // Construct
   public SpriteComponent(String textureName) {
@@ -48,7 +53,13 @@ public class SpriteComponent extends Component {
 
       Asset asset = getAssetManager().getAsset(textureName);
       if (asset.getType() == AssetType.SPRITE) {
-        DrawTexture(asset.getAsset(), 0, 0, WHITE);
+        if (size == null) {
+          DrawTexture(asset.getAsset(), 0, 0, WHITE);
+        } else {
+          Texture texture = asset.getAsset();
+          Raylib.Rectangle rectangle = new Jaylib.Rectangle(0, 0, texture.width(), texture.height());
+          DrawTexturePro(asset.getAsset(), rectangle, new Jaylib.Rectangle(0, 0, size.getX(), size.getY()), Vec2.origin().toVector2(), 0, WHITE);
+        }
       } else if (asset.getType() == AssetType.SPRITE_SHEET) {
         SpriteSheet spriteSheet = asset.getAsset();
 
@@ -68,9 +79,16 @@ public class SpriteComponent extends Component {
         if (flipY) {
           rectangle.height(-frameRect.getHeight());
         }
-        DrawTextureRec(spriteSheet.getTexture(), rectangle, Vec2.origin().toVector2(), WHITE);
+        // DrawTextureRec(@ByVal @Cast("Texture2D*") Texture texture, @ByVal Rectangle source, @ByVal Vector2 _position, @ByVal Color tint);            // Draw a part of a texture defined by a rectangle
+        // DrawTexturePro(@ByVal @Cast("Texture2D*") Texture texture, @ByVal Rectangle source, @ByVal Rectangle dest, @ByVal Vector2 origin, float rotation, @ByVal Color tint); // Draw a part of a texture defined by a rectangle with 'pro' parameters
+
+        if (size == null) {
+          DrawTextureRec(spriteSheet.getTexture(), rectangle, Vec2.origin().toVector2(), WHITE);
+        } else {
+          DrawTexturePro(spriteSheet.getTexture(), rectangle, new Jaylib.Rectangle(0, 0, size.getX(), size.getY()), Vec2.origin().toVector2(), 0, WHITE);
+        }
       } else {
-        throw new IllegalStateException("Illegal asset type for "+ textureName +": "+asset.getType());
+        throw new IllegalStateException("Illegal asset type for " + textureName + ": " + asset.getType());
       }
     }
     rlPopMatrix();
@@ -78,12 +96,12 @@ public class SpriteComponent extends Component {
 
   @Override
   public void add(GameObject gameObject) {
-    registerGetter("size", this::getSize);
+    registerBoundProperty("size", this::getSize, this::setSize);
     registerGetter("render", () -> true);
     registerGetter("curAnim", this::getAnim);
-    registerMethod("frame", this::getFrameNo, this::setFrameNo);
-    registerSetter("flipX", this::setFlipX);
-    registerSetter("flipY", this::setFlipY);
+    registerBoundProperty("frame", this::getFrameNo, this::setFrameNo);
+    registerBoundProperty("flipX", this::isFlipX, this::setFlipX);
+    registerBoundProperty("flipY", this::isFlipY, this::setFlipY);
     registerAction("play", this::play);
     registerAction("stop", this::stop);
     on("update", this::update);
@@ -110,7 +128,6 @@ public class SpriteComponent extends Component {
   }
 
 
-
   public SpriteComponent anim(String animationName) {
     this.anim = animationName;
     this.frameNo = 0;
@@ -132,6 +149,14 @@ public class SpriteComponent extends Component {
 
   public void setFlipX(boolean flipX) {
     this.flipX = flipX;
+  }
+
+  public boolean isFlipY() {
+    return flipY;
+  }
+
+  public boolean isFlipX() {
+    return flipX;
   }
 
   public void setFlipY(boolean flipY) {
@@ -174,6 +199,9 @@ public class SpriteComponent extends Component {
   }
 
   private Vec2 getSize() {
+    if (size != null) {
+      return size;
+    }
     Asset asset = getAssetManager().getAsset(textureName);
     if (asset.getType() == AssetType.SPRITE) {
       Raylib.Texture texture = asset.getAsset();
@@ -183,6 +211,10 @@ public class SpriteComponent extends Component {
       return new Vec2(spriteSheet.getSpriteWidth(), spriteSheet.getSpriteHeight());
     }
     return Vec2.origin();
+  }
+
+  public void setSize(Vec2 size) {
+    this.size = size;
   }
 
   // Static method to just call "sprite()" get the sprite from the asset manager and put in into the texture for the sprite component

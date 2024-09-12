@@ -4,6 +4,7 @@ import com.berray.BerrayApplication;
 import com.berray.GameObject;
 import com.berray.components.CoreComponentShortcuts;
 import com.berray.components.core.AnchorType;
+import com.berray.math.Color;
 import com.berray.math.Vec2;
 import com.raylib.Jaylib;
 import com.raylib.Raylib;
@@ -39,7 +40,7 @@ public class CollisionTest extends BerrayApplication implements CoreComponentSho
   public void initWindow() {
     width(1024);
     height(768);
-    background(Jaylib.BLACK);
+    background(Color.BLACK);
     title("Anchor Test");
   }
 

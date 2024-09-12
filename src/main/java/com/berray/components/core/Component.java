@@ -7,6 +7,7 @@ import com.berray.event.EventListener;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -89,19 +90,31 @@ public class Component {
   }
 
   /**
-   * Registers a method, remembering the property name. Upon deletion the properties will be removed.
+   * Registers a property, remembering the property name. Upon deletion the properties will be removed.
    */
-  public <E> void registerMethod(String name, Supplier<E> getter, Consumer<E> setter) {
-    gameObject.registerMethod(name, getter, setter);
+  public <E> void registerProperty(String name, Supplier<E> getter, Consumer<E> setter) {
+    gameObject.registerProperty(name, getter, setter);
     properties.add(name);
   }
+
+  /**
+   * Registers a property which triggers a <code>propertyChange</code> event when the property is changed.
+   * The property name is remembered. Upon deletion the properties will be removed.
+   */
+  public <E> void registerBoundProperty(String name, Supplier<E> getter, Consumer<E> setter) {
+    gameObject.registerProperty(name, getter, newValue ->
+        setter.accept(gameObject.firePropertyChange(name, getter.get(), newValue))
+    );
+    properties.add(name);
+  }
+
 
   /**
    * Registers a getter, remembering the property name. Upon deletion the properties
    * will be removed.
    */
-  public void registerGetter(String name, Supplier<?> method) {
-    gameObject.registerGetter(name, method);
+  public void registerGetter(String name, Supplier<?> getter) {
+    gameObject.registerPropertyGetter(name, getter);
     properties.add(name);
   }
 
@@ -110,10 +123,22 @@ public class Component {
    * will be removed.
    */
   public <E> void registerSetter(String name, Consumer<E> setter) {
-    gameObject.registerSetter(name, setter);
+    gameObject.registerPropertySetter(name, setter);
     properties.add(name);
   }
 
+  /**
+   * Registers a property setter which triggers a <code>propertyChange</code> event when the property is changed.
+   * The property name is remembered. Upon deletion the properties will be removed.
+   * <p>
+   * Note: to compare the old and the new value the getter is needed too.
+   */
+  public <E> void registerBoundSetter(String name, Supplier<E> getter, Consumer<E> setter) {
+    gameObject.registerPropertySetter(name, (E newValue) ->
+        setter.accept(gameObject.firePropertyChange(name, getter.get(), newValue))
+    );
+    properties.add(name);
+  }
 
   /**
    * Registers an action, remembering the action name. Upon deletion the action will be removed.
@@ -140,10 +165,17 @@ public class Component {
   }
 
   /**
-   * Registers an action, remembering the action name. Upon deletion the action will be removed.
+   * Registers an event listener. Upon deletion the event listener will be removed.
    */
-  public void on(String name, EventListener eventListener) {
-    gameObject.on(name, eventListener, this);
+  public void on(String eventName, EventListener eventListener) {
+    gameObject.on(eventName, eventListener, this);
+  }
+
+  /**
+   * Registers an event listener on the game obeject. Upon deletion the event listener will be removed.
+   */
+  public void onGame(String eventName, EventListener eventListener) {
+    gameObject.getGame().on(eventName, eventListener, this);
   }
 
   /**

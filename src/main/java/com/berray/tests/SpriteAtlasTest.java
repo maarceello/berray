@@ -9,6 +9,7 @@ import com.berray.components.core.AnchorType;
 import com.berray.components.core.Component;
 import com.berray.event.Event;
 import com.berray.math.Collision;
+import com.berray.math.Color;
 import com.berray.math.Rect;
 import com.berray.math.Vec2;
 import com.berray.tests.level.LevelBuilder;
@@ -349,7 +350,7 @@ public class SpriteAtlasTest extends BerrayApplication implements CoreComponentS
   public void initWindow() {
     width(500);
     height(500);
-    background(Jaylib.GRAY);
+    background(Color.GRAY);
     title("Sprite Atlas Test");
   }
 

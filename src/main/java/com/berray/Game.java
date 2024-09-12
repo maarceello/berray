@@ -33,7 +33,7 @@ public class Game {
 
   // Constructor
   public Game() {
-    root = new GameObject(this);
+    root = new GameObject(this).add("root");
     assetLoaders = new AssetLoaders();
     assetLoaders.addAssetLoader(new RaylibAssetLoader());
     assetManager = new DefaultAssetManager(assetLoaders, FileSystems.getDefault().getPath("."));
@@ -94,6 +94,12 @@ public class Game {
     return root;
   }
 
+  public <E extends GameObject> E add(E gameObject, Object... components) {
+    E newGameObject = root.add(gameObject, components);
+    // forward add events from the new game object to game event manager
+    newGameObject.on("add", event -> eventManager.trigger(event.getName(), event.getParameters()));
+    return newGameObject;
+  }
   /**
    * Add a game object to the game
    */
@@ -279,6 +285,11 @@ public class Game {
     eventManager.addEventListener(event, listener);
   }
 
+  public void on(String event, EventListener listener, Object owner) {
+    eventManager.addEventListener(event, listener, owner);
+  }
+
+
   public void trigger(String event, Object... params) {
     eventManager.trigger(event, Arrays.asList(params));
   }
@@ -300,10 +311,15 @@ public class Game {
    * removes the game object and all of its children from the game.
    */
   public void destroy(GameObject gameObject) {
+    gameObject.destroy();
     gameObject.getParent().remove(gameObject);
   }
 
   public void clearEvents() {
     eventManager.clear();
+  }
+
+  public void removeListener(Object owner) {
+    eventManager.removeListener(owner);
   }
 }

@@ -71,4 +71,13 @@ public class Rect {
   public String toString() {
     return String.format("(%.3f, %.3f - %.3f, %.3f)", x,y, width, height);
   }
+
+  public boolean contains(Vec2 point) {
+    return contains(point.getX(), point.getY());
+  }
+
+  public boolean contains(float x, float y) {
+    return x >= this.x && x <= this.x + this.width &&
+        y >= this.y && y <= this.y + this.height;
+  }
 }

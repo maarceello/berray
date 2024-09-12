@@ -32,25 +32,51 @@ public class Slider extends GameObject implements CoreComponentShortcuts {
   private float min;
   private float max;
 
-  private float value = 20;
+  private float value;
 
 
-  private GameObject left;
-  private GameObject right;
-  private GameObject knob;
+  private GameObject leftBorder;
+  private GameObject rightBorder;
+  private GameObject leftBar;
+  private GameObject rightBar;
+  private GameObject handle;
+
+  private float leftInset;
+  private float rightInset;
 
 
 
-  public Slider(Vec2 size, float min, float max) {
+  public Slider(Vec2 size, float min, float max, float value) {
     this.size = size;
     this.min = min;
     this.max = max;
+    this.value = value;
     on("add", this::onAdd);
     on("mouseClick", this::onMouseClick);
     on("dragging", this::onMouseDragging);
     registerProperty("size", () -> size, newSize -> this.size = newSize);
     registerProperty("value", () -> value, this::setValue);
     registerPropertyGetter("render", () -> true);
+  }
+
+  public Slider leftBorder(GameObject object) {
+    this.leftBorder = object;
+    return this;
+  }
+
+  public Slider rightBorder(GameObject object) {
+    this.rightBorder = object;
+    return this;
+  }
+
+  public Slider leftBar(GameObject object) {
+    this.leftBar = object;
+    return this;
+  }
+
+  public Slider rightBar(GameObject object) {
+    this.rightBar = object;
+    return this;
   }
 
   private void onMouseDragging(Event event) {
@@ -74,34 +100,64 @@ public class Slider extends GameObject implements CoreComponentShortcuts {
     }
     firePropertyChange("value", this.value, value);
     this.value = value;
-    left.set("size", new Vec2(size.getX() * value / (max - min), size.getY()));
-    right.set("size", new Vec2(size.getX() * (1 - value / (max - min)), size.getY()));
-    right.set("pos", new Vec2(size.getX() * (value / (max - min)),0));
-    knob.set("pos", new Vec2(size.getX() * (value / (max - min)),size.getY() / 2.0f));
+
+    updateChildPositions();
+  }
+
+  private void updateChildPositions() {
+    if (leftBorder != null) {
+      leftBorder.set("pos", Vec2.origin());
+      leftBorder.set("anchor", AnchorType.TOP_LEFT);
+    }
+
+    if (rightBorder != null) {
+      rightBorder.set("pos", new Vec2(size.getX(), 0));
+      rightBorder.set("anchor", AnchorType.TOP_RIGHT);
+    }
+
+    float width = size.getX() - leftInset - rightInset;
+
+    leftBar.set("pos", new Vec2(leftInset, 0));
+    leftBar.set("size", new Vec2(width * value / (max - min), size.getY()));
+    leftBar.set("anchor", AnchorType.TOP_LEFT);
+
+    rightBar.set("size", new Vec2(width * (1 - value / (max - min)), size.getY()));
+    rightBar.set("pos", new Vec2(leftInset + width * (value / (max - min)),0));
+    rightBar.set("anchor", AnchorType.TOP_LEFT);
+
+    if (handle != null) {
+      handle.set("pos", new Vec2(leftInset + width * (value / (max - min)), size.getY() / 2.0f));
+    }
   }
 
   private void onAdd(Event event) {
     GameObject parent = event.getParameter(0);
     // ignore add event when we're the one the child is added to
     if (parent != this) {
-      left = add(
-          rect(size.getX() * value / (max - min), size.getY()),
-          pos(0,0),
-          anchor(AnchorType.TOP_LEFT),
-          color(Color.GOLD)
-      );
-      right = add(
-          rect(size.getX() * (1 - value / (max - min)), size.getY()),
-          pos(size.getX() * (value / (max - min)),0),
-          anchor(AnchorType.TOP_LEFT),
-          color(Color.GRAY)
-      );
-      knob = add(
+      leftInset = 0;
+      rightInset = 0;
+      if (leftBorder != null) {
+        add(leftBorder);
+        leftInset = leftBorder.<Vec2>get("size").getX();
+      }
+      if (rightBorder != null) {
+        add(rightBorder);
+        rightInset = rightBorder.<Vec2>get("size").getX();
+      }
+      if (leftBar != null) {
+        add(leftBar);
+      }
+      if (rightBar != null) {
+        add(rightBar);
+      }
+      handle = add(
           rect(size.getY() * 1.2f, size.getY() * 1.2f),
           pos(size.getX() * (value / (max - min)),size.getY() / 2.0f),
           anchor(AnchorType.CENTER),
           color(Color.WHITE)
       );
+
+      updateChildPositions();
     }
     setTransformDirty();
   }

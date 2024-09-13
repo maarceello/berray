@@ -115,6 +115,10 @@ public class SpriteSheet {
     return slice(assetManager.getAsset(textureAsset).<Raylib.Texture>getAsset());
   }
 
+  public int getNumFrames() {
+    return sliceX * sliceY;
+  }
+
   public SpriteSheet slice(Raylib.Texture texture1) {
     if (texture1 == null) {
       throw new IllegalStateException("texture must not be null");

@@ -141,15 +141,17 @@ once, regardless how many subscriber processes the event.
 - [x] label
 - [x] button
 - [x] checkbox
-- [ ] slider
+- [x] slider
 - [ ] textarea (static), scrollable or autoremove rows after some time
 - [ ] textarea/inputfield (enter text in input field)
+- [ ] Simple gridbased layout helper
 
 ## 2d stack
 
 - [ ] add 2d camera object
 - [ ] add sprite sheet animation
 - [ ] add bone animation
+- [ ] sprite stacking
 
 ## 3d stack
 

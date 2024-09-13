@@ -1,4 +1,4 @@
-package com.berray.tests.gui;
+package com.berray.objects.gui;
 
 import com.berray.GameObject;
 import com.berray.components.CoreComponentShortcuts;
@@ -146,9 +146,23 @@ public class Slider extends GameObject implements CoreComponentShortcuts {
       }
       if (leftBar != null) {
         add(leftBar);
+      } else {
+        leftBar = add(
+            rect(1,1),
+            pos(0,0),
+            color(Color.GOLD),
+            anchor(AnchorType.TOP_LEFT)
+        );
       }
       if (rightBar != null) {
         add(rightBar);
+      } else {
+        rightBar = add(
+            rect(1,1),
+            pos(0,0),
+            color(Color.WHITE),
+            anchor(AnchorType.TOP_LEFT)
+        );
       }
       handle = add(
           rect(size.getY() * 1.2f, size.getY() * 1.2f),
@@ -174,5 +188,9 @@ public class Slider extends GameObject implements CoreComponentShortcuts {
     super.addComponents(components);
   }
 
+
+  public static Slider slider(Vec2 size, float min, float max, float value) {
+    return new Slider(size, min, max, value);
+  }
 
 }

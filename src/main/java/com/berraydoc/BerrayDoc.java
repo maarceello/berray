@@ -1,18 +1,22 @@
 package com.berraydoc;
 
-import com.berray.components.core.Component;
 import com.github.javaparser.ParseResult;
 import com.github.javaparser.ast.CompilationUnit;
-import com.github.javaparser.ast.NodeList;
+import com.github.javaparser.ast.ImportDeclaration;
+import com.github.javaparser.ast.PackageDeclaration;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
-import com.github.javaparser.ast.body.TypeDeclaration;
+import com.github.javaparser.ast.body.MethodDeclaration;
+import com.github.javaparser.ast.comments.Comment;
+import com.github.javaparser.ast.comments.JavadocComment;
+import com.github.javaparser.ast.expr.Name;
+import com.github.javaparser.ast.expr.SimpleName;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
-import com.github.javaparser.ast.visitor.GenericVisitorAdapter;
 import com.github.javaparser.utils.SourceRoot;
 
 import java.io.IOException;
 import java.nio.file.FileSystems;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class BerrayDoc {
 
@@ -20,45 +24,104 @@ public class BerrayDoc {
     SourceRoot sourceRoot = new SourceRoot(FileSystems.getDefault().getPath("./src/main/java"));
     List<ParseResult<CompilationUnit>> parseResults = sourceRoot.tryToParse();
 
+    System.out.println("----------------");
     for (ParseResult<CompilationUnit> parseResult : parseResults) {
-      CompilationUnit result = parseResult.getResult().get();
-      NodeList<TypeDeclaration<?>> types = result.getTypes();
-      for (TypeDeclaration<?> type : types) {
-        if (type instanceof ClassOrInterfaceDeclaration) {
-          ClassOrInterfaceDeclaration classOrInterface = (ClassOrInterfaceDeclaration) type;
-          if (isExtending(classOrInterface, Component.class)) {
-            System.out.println("type: " + type.getNameAsString());
-            System.out.println(classOrInterface.getComment());
-            List<com.github.javaparser.ast.comments.Comment> comments = type.getAllContainedComments();
-            System.out.println(comments);
-          }
-        }
+      FindJavaDocVisitor visitor = new FindJavaDocVisitor();
+      visitor.visit(parseResult.getResult().get(), "");
+      visitor.finishedClasses.forEach(c -> {
+        System.out.println(visitor.packageName + "." + c.getName());
+        System.out.println("  "+c.extendedClasses);
+      });
+    }
+  }
+
+  private static class FindJavaDocVisitor extends BerrayVisitorAdapter<Boolean, String> {
+    private Map<String, String> imports = new HashMap<>();
+    private Deque<ClassDocumentation> classStack = new ArrayDeque<>();
+    private String packageName;
+    private List<ClassDocumentation> finishedClasses = new ArrayList<>();
+
+    @Override
+    public Boolean visit(PackageDeclaration packageDeclaration, String arg) {
+      this.packageName = packageDeclaration.getName().asString();
+      return super.visit(packageDeclaration, arg);
+    }
+
+    @Override
+    public Boolean visit(ImportDeclaration importDeclaration, String arg) {
+      Name name = importDeclaration.getName();
+      imports.put(name.getIdentifier(), name.getQualifier().get().asString());
+      return super.visit(importDeclaration, arg);
+    }
+
+    @Override
+    public Boolean visit(ClassOrInterfaceDeclaration n, String arg) {
+      // create new class documentation holder and place them on the stack
+      classStack.add(new ClassDocumentation(getClassName(n.getName().getIdentifier())));
+      try {
+        return super.visit(n, arg);
+      } finally {
+        finishedClasses.add(classStack.pop());
       }
     }
 
-    System.out.println("----------------");
-    for (ParseResult<CompilationUnit> parseResult : parseResults) {
-      new FindJavaDocVisitor().visit(parseResult.getResult().get(), "");
+    private String getClassName(String thisClassName) {
+      if (classStack.isEmpty()) {
+        return thisClassName;
+      }
+
+      // The stack contains outer classes. append the outer classnames to this class name
+      return classStack.stream()
+          .map(ClassDocumentation::getName)
+          .collect(Collectors.joining("."))
+          +"."+thisClassName;
     }
 
-  }
-
-  private static boolean isExtending(ClassOrInterfaceDeclaration classOrInterface, Class<Component> componentClass) {
-      for (ClassOrInterfaceType extendedType : classOrInterface.getExtendedTypes()) {
-        if (extendedType.getNameAsString().equals(Component.class.getSimpleName())) {
-          return true;
-        }
-
-    }
-    return false;
-  }
-
-
-
-  private static class FindJavaDocVisitor extends GenericVisitorAdapter<Boolean, String> {
     @Override
-    public Boolean visit(ClassOrInterfaceDeclaration n, String arg) {
+    public Boolean visitExtendsType(ClassOrInterfaceType n, String arg) {
+      classStack.peek().addExtends(getFullQualifiedName(n.getName()));
+      return super.visitExtendsType(n, arg);
+    }
+
+    @Override
+    public Boolean visit(MethodDeclaration n, String arg) {
+      if (n.getComment().isPresent()) {
+        Comment comment = n.getComment().get();
+      }
       return super.visit(n, arg);
     }
+
+    private String getFullQualifiedName(SimpleName name) {
+      String lastPart = name.getIdentifier();
+      if (imports.containsKey(lastPart)) {
+        return imports.get(lastPart)+"."+lastPart;
+      }
+      return packageName+"."+lastPart;
+    }
+
+  }
+
+
+  private static class ClassDocumentation {
+    private String name;
+    private List<String> extendedClasses = new ArrayList<>();
+
+    public ClassDocumentation(String name) {
+      this.name = name;
+    }
+
+    public String getName() {
+      return name;
+    }
+
+    public void addExtends(String name) {
+      extendedClasses.add(name);
+    }
+  }
+
+  private static class MethodDocumentation {
+    private String name;
+    private String documentation;
+    private List<String> params = new ArrayList<>();
   }
 }

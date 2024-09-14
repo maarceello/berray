@@ -8,7 +8,6 @@ import com.github.javaparser.ast.ImportDeclaration;
 import com.github.javaparser.ast.PackageDeclaration;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
-import com.github.javaparser.ast.comments.Comment;
 import com.github.javaparser.ast.expr.Name;
 import com.github.javaparser.ast.expr.SimpleName;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
@@ -27,19 +26,14 @@ public class BerrayDoc {
 
     List<ClassDocumentation> classes = new ArrayList<>();
 
-    System.out.println("----------------");
     for (ParseResult<CompilationUnit> parseResult : parseResults) {
       FindJavaDocVisitor visitor = new FindJavaDocVisitor();
-      visitor.visit(parseResult.getResult().get(), "");
-      visitor.finishedClasses
-          .stream().filter(c -> c.extendedClasses.contains(Component.class.getName()))
-          .forEach(c -> {
-            System.out.println(visitor.packageName + "." + c.getName());
-            System.out.println("  extends " + c.extendedClasses);
-            System.out.println("  " + c.classJavaDoc);
-            System.out.println(c.methods);
-            classes.add(c);
-          });
+      parseResult.getResult().ifPresent(result -> {
+        visitor.visit(result, "");
+        visitor.finishedClasses
+            .stream().filter(c -> c.extendedClasses.contains(Component.class.getName()))
+            .forEach(classes::add);
+      });
     }
     System.out.println(new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(classes));
   }
@@ -59,7 +53,7 @@ public class BerrayDoc {
     @Override
     public Boolean visit(ImportDeclaration importDeclaration, String arg) {
       Name name = importDeclaration.getName();
-      imports.put(name.getIdentifier(), name.getQualifier().get().asString());
+      name.getQualifier().ifPresent(qualifier -> imports.put(name.getIdentifier(), qualifier.asString()));
       return super.visit(importDeclaration, arg);
     }
 
@@ -99,10 +93,7 @@ public class BerrayDoc {
 
     @Override
     public Boolean visit(MethodDeclaration n, String arg) {
-      if (n.getComment().isPresent()) {
-        Comment comment = n.getComment().get();
-        classStack.peek().addMethod(new MethodDocumentation(n.getName().asString(), comment.asString()));
-      }
+      n.getComment().ifPresent(comment -> classStack.peek().addMethod(new MethodDocumentation(n.getName().asString(), comment.asString())));
       return super.visit(n, arg);
     }
 

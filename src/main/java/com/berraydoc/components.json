@@ -1,0 +1,150 @@
+[
+  {
+    "name": "SpriteAtlasTest.SpinComponent",
+    "classJavaDoc": "\n   * custom component for this test.\n   ",
+    "methods": []
+  },
+  {
+    "name": "CircleComponent",
+    "classJavaDoc": "\n * # CircleComponent\n *\n * {@link CircleComponent#circle(float)} provides a circle shape for rendering.\n *\n * # Properties\n *\n * - localArea (read only) - todo\n * - size (read only) - size of the circle (2 * radius)\n *\n * # Events\n *\n * none\n ",
+    "methods": []
+  },
+  {
+    "name": "RotateComponent",
+    "classJavaDoc": null,
+    "methods": []
+  },
+  {
+    "name": "OrbitComponent",
+    "classJavaDoc": " changes the position of the game object so it orbits its parent. ",
+    "methods": []
+  },
+  {
+    "name": "TileComponent",
+    "classJavaDoc": null,
+    "methods": []
+  },
+  {
+    "name": "LayerComponent",
+    "classJavaDoc": "\n * Component to place the object in a specific render layer.\n ",
+    "methods": []
+  },
+  {
+    "name": "MouseComponent",
+    "classJavaDoc": "\n * Component to supply hoverEnter and hoverLeave events and drag events.\n * Note: needs \"area\" component so the component can check if the mouse cursor is over this game object\n *\n * @precondition area to check if the mouse cursor is over the component\n * @trigger hover when the curser is moved over the component. Parameter: GameObject which is hovered, Vec2 position\n * of the mouse in component coordinate system, Vec2 position of the mouse in world coordinate system\n * @trigger hoverEnter when the curser is enters the component. Parameter: GameObject which is hovered, Vec2 position\n * of the mouse in component coordinate system, Vec2 position of the mouse in world coordinate system\n * @trigger hoverLeave when the curser is leaves the component. Parameter: GameObject which is hovered, Vec2 position\n * of the mouse in component coordinate system, Vec2 position of the mouse in world coordinate system\n * @trigger mousePress when the left mouse button is pressed down while the mouse curser is over the component.\n * Parameter: GameObject which is clicked, Vec2 position of the mouse in component coordinate system,\n * Vec2 position of the mouse in world coordinate system\n * @trigger mouseRelease when the left mouse button is released when is was previously pressed down over the component.\n * Note that the event is even sent when the mouse left the component.\n * Parameter: GameObject which is clicked, Vec2 position of the mouse in component coordinate system,\n * Vec2 position of the mouse in world coordinate system\n * @trigger mouseCLick when the left mouse button is pressed and released over the component.\n * Parameter: GameObject which is clicked, Vec2 position of the mouse in component coordinate system,\n * Vec2 position of the mouse in world coordinate system\n * @trigger dragStart when the left mouse button is pressed, the mouse is moved and there is currently not a drag ongoing.\n * Parameter: GameObject which is clicked, Vec2 position of the mouse in component coordinate system,\n * Vec2 position of the mouse in world coordinate system\n * @trigger dragFinish when the left mouse button is released and a drag was currently ongoing\n * Parameter: GameObject which is was clicked, Vec2 position of the mouse in component coordinate system,\n * Vec2 position of the mouse in world coordinate system\n * @trigger dragging when the left mouse button is released and the mouse is moved\n * Parameter: GameObject which is was clicked, Vec2 position of the mouse in component coordinate system,\n * Vec2 position of the mouse in world coordinate system\n ",
+    "methods": [
+      {
+        "name": "isHovered",
+        "documentation": "/**\n   * Returns if the mouse cursor is over the component (hovered).\n   *\n   * @type property\n   */"
+      },
+      {
+        "name": "mouse",
+        "documentation": "/**\n   * creates a new mouse() component.\n   */"
+      }
+    ]
+  },
+  {
+    "name": "PosComponent",
+    "classJavaDoc": null,
+    "methods": [
+      {
+        "name": "move",
+        "documentation": "/**\n   * params:\n   * - vec2 velocity\n   * - float deltaTime\n   */"
+      },
+      {
+        "name": "moveBy",
+        "documentation": "/**\n   * params:\n   * - vec2 amount\n   */"
+      },
+      {
+        "name": "getPos",
+        "documentation": "// Getter"
+      },
+      {
+        "name": "pos",
+        "documentation": "// Static method to just call \"pos()\""
+      }
+    ]
+  },
+  {
+    "name": "Slice9Component",
+    "classJavaDoc": null,
+    "methods": [
+      {
+        "name": "slice9",
+        "documentation": "/**\n   * Creates a new slice9 sprite\n   *\n   * @param textureName name of the texture\n   * @param size        size in which to stretch the component\n   * @param sizes       size from top, bottom, left and right of the corner components.\n   */"
+      }
+    ]
+  },
+  {
+    "name": "RectComponent",
+    "classJavaDoc": null,
+    "methods": []
+  },
+  {
+    "name": "ColorComponent",
+    "classJavaDoc": null,
+    "methods": []
+  },
+  {
+    "name": "SpriteComponent",
+    "classJavaDoc": null,
+    "methods": [
+      {
+        "name": "sprite",
+        "documentation": "// Static method to just call \"sprite()\" get the sprite from the asset manager and put in into the texture for the sprite component"
+      }
+    ]
+  },
+  {
+    "name": "AreaComponent",
+    "classJavaDoc": "\n * # AreaComponent\n *\n * {@link AreaComponent#area()} provides collision detection for the game object.\n *\n * # Properties\n *\n * - worldArea (read only) - returns the current absolute positioning of the collision area\n *\n * # Events\n *\n * | Event         | Direction | Description |\n * |---------------|-----------|---|\n * | collideUpdate | consumed  | triggered by collision detection when this object collides with another. |\n * | update        | consumed  | triggered by main update loop. used to keep track of objects which collides this frame and which doesn't collide anymore |\n * | collide       | triggered | triggered when a collision starts |\n * | collideEnd    | triggered | triggered when a collision ends |\n ",
+    "methods": [
+      {
+        "name": "getLocalArea",
+        "documentation": "/**\n   * returns collider area in local coordinates.\n   */"
+      },
+      {
+        "name": "isCollidingWith",
+        "documentation": "/**\n   * Checks if this GameObject is colliding with `other` in this frame.\n   * Params:\n   * - GameObject other\n   */"
+      },
+      {
+        "name": "isColliding",
+        "documentation": "/**\n   * Returns true when this game object is colliding with anything this frame.\n   */"
+      }
+    ]
+  },
+  {
+    "name": "DebugComponent",
+    "classJavaDoc": null,
+    "methods": []
+  },
+  {
+    "name": "AnchorComponent",
+    "classJavaDoc": "\n * # AnchorComponent\n *\n * {@link AnchorComponent#anchor(AnchorType)} provides an anchor point for rendering shapes.\n *\n * # Properties\n *\n * - anchor (read only) - returns the current anchor point for this game object\n *\n * # Events\n *\n * none\n ",
+    "methods": []
+  },
+  {
+    "name": "TextComponent",
+    "classJavaDoc": null,
+    "methods": []
+  },
+  {
+    "name": "BodyComponent",
+    "classJavaDoc": null,
+    "methods": [
+      {
+        "name": "getLocalCoordinateDisplacement",
+        "documentation": "/** Calculate the displacement in the objects local coordinate system. */"
+      },
+      {
+        "name": "update",
+        "documentation": "/**\n   * Params:\n   * <p>\n   * - float deltaTime\n   */"
+      }
+    ]
+  },
+  {
+    "name": "ScaleComponent",
+    "classJavaDoc": null,
+    "methods": []
+  }
+]

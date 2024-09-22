@@ -60,24 +60,45 @@ public class Slider extends GameObject implements CoreComponentShortcuts {
   }
 
   public Slider leftBorder(GameObject object) {
+    addRequiredComponents(object);
     this.leftBorder = object;
     return this;
   }
 
   public Slider rightBorder(GameObject object) {
+    addRequiredComponents(object);
     this.rightBorder = object;
     return this;
   }
 
   public Slider leftBar(GameObject object) {
+    addRequiredComponents(object);
     this.leftBar = object;
     return this;
   }
 
   public Slider rightBar(GameObject object) {
+    addRequiredComponents(object);
     this.rightBar = object;
     return this;
   }
+
+  public Slider handle(GameObject object) {
+    addRequiredComponents(object);
+    object.set("anchor", AnchorType.CENTER);
+    this.handle = object;
+    return this;
+  }
+
+  private void addRequiredComponents(GameObject object) {
+    if (!object.is("pos")) {
+      object.addComponents(pos(Vec2.origin()));
+    }
+    if (!object.is("anchor")) {
+      object.addComponents(anchor(AnchorType.TOP_LEFT));
+    }
+  }
+
 
   private void onMouseDragging(Event event) {
     Vec2 relativePos = event.getParameter(1);
@@ -150,12 +171,16 @@ public class Slider extends GameObject implements CoreComponentShortcuts {
       if (rightBar != null) {
         add(rightBar);
       }
-      handle = add(
-          rect(size.getY() * 1.2f, size.getY() * 1.2f),
-          pos(size.getX() * (value / (max - min)),size.getY() / 2.0f),
-          anchor(AnchorType.CENTER),
-          color(Color.WHITE)
-      );
+      if (handle != null) {
+        add(handle);
+      } else {
+        handle = add(
+            rect(size.getY() * 1.2f, size.getY() * 1.2f),
+            pos(size.getX() * (value / (max - min)), size.getY() / 2.0f),
+            anchor(AnchorType.CENTER),
+            color(Color.WHITE)
+        );
+      }
 
       updateChildPositions();
     }

@@ -1,19 +1,29 @@
 package com.berray.components;
 
+import com.berray.GameObject;
 import com.berray.Property;
 import com.berray.components.core.*;
 import com.berray.math.Color;
 import com.berray.math.Rect;
 import com.berray.math.Vec2;
+import com.berray.math.Vec3;
 
 public interface CoreComponentShortcuts {
 
-  default PosComponent pos(float x, float y) {
-    return PosComponent.pos(x, y);
+  default GameObject make(Object... components) {
+    return GameObject.makeGameObject(components);
   }
 
-  default PosComponent pos(Vec2 pos) {
-    return PosComponent.pos(pos);
+  default <E extends GameObject> E make(E gameObject, Object... components) {
+    return GameObject.makeGameObject(gameObject, components);
+  }
+
+  default PosComponent2d pos(float x, float y) {
+    return PosComponent2d.pos(x, y);
+  }
+
+  default PosComponent2d pos(Vec2 pos) {
+    return PosComponent2d.pos(pos);
   }
 
   default RectComponent rect(float width, float height) {
@@ -73,6 +83,10 @@ public interface CoreComponentShortcuts {
     return ScaleComponent.scale(scale);
   }
 
+  default ScaleComponent scale(float scaleX, float scaleY, float scaleZ) {
+    return ScaleComponent.scale(scaleX, scaleY, scaleZ);
+  }
+
   default TileComponent tile() {
     return TileComponent.tile();
   }
@@ -84,4 +98,14 @@ public interface CoreComponentShortcuts {
   default <E> Property<E> property(String name, E value) {
     return Property.property(name, value);
   }
+
+  // 3d components
+  default PosComponent3d pos(float x, float y, float z) {
+    return PosComponent3d.pos(x, y, z);
+  }
+
+  default PosComponent3d pos(Vec3 pos) {
+    return PosComponent3d.pos(pos);
+  }
+
 }

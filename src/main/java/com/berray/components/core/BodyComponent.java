@@ -119,21 +119,28 @@ public class BodyComponent extends Component {
   }
 
   public boolean isFalling() {
-    Vec2 gravityDirection = gameObject.getGame().getGravityDirection();
-    return gravityDirection != null && this.vel.dot(gravityDirection) > 0;
+    Vec3 gravityDirection = gameObject.getGame().getGravityDirection();
+    if (gravityDirection == null) {
+      return false;
+    }
+    return this.vel.dot(new Vec2(gravityDirection.getX(), gravityDirection.getY())) > 0;
   }
 
   public boolean isJumping() {
-    Vec2 gravityDirection = gameObject.getGame().getGravityDirection();
-    return gravityDirection != null && this.vel.dot(gravityDirection) < 0;
+    Vec3 gravityDirection = gameObject.getGame().getGravityDirection();
+    if (gravityDirection == null) {
+      return false;
+    }
+    return this.vel.dot(new Vec2(gravityDirection.getX(), gravityDirection.getY())) < 0;
   }
 
   private void onPhysicsResolve(Event event) {
     Collision col = event.getParameter(0);
-    Vec2 gravity = gameObject.getGame().getGravity();
+    Vec3 gravity = gameObject.getGame().getGravity();
     if (gravity != null) {
-      if (col.isBottom(gravity) && this.isFalling()) {
-        this.vel = this.vel.reject(gravity.normalize());
+      Vec2 gravity2d = new Vec2(gravity.getX(), gravity.getY());
+      if (col.isBottom(gravity2d) && this.isFalling()) {
+        this.vel = this.vel.reject(gravity2d.normalize());
         curPlatform = col.getOther();
         lastPlatformPos = curPlatform.get("pos");
         if (willFall) {
@@ -141,8 +148,8 @@ public class BodyComponent extends Component {
         } else {
           gameObject.trigger("ground", curPlatform);
         }
-      } else if (col.isTop(gravity) && this.isJumping()) {
-        this.vel = this.vel.reject(gravity.normalize());
+      } else if (col.isTop(gravity2d) && this.isJumping()) {
+        this.vel = this.vel.reject(gravity2d.normalize());
         gameObject.trigger("headbutt", col.getOther());
       }
     }
@@ -155,57 +162,60 @@ public class BodyComponent extends Component {
    */
   public void update(Event event) {
     float deltaTime = event.getParameter(0);
-    if (gameObject.getGame().getGravityDirection() != null && !this.isStatic) {
-      if (willFall) {
-        curPlatform = null;
-        lastPlatformPos = null;
-        gameObject.trigger("fallOff");
-        willFall = false;
-      }
-
-      boolean addGravity = true;
-
-      if (curPlatform != null) {
-        if (
-            !gameObject.<Boolean>doAction("isColliding", curPlatform)
-                || !curPlatform.exists()
-                || !curPlatform.is("body")
-        ) {
-          willFall = true;
-        } else {
-          if (
-              lastPlatformPos != null
-                  && !curPlatform.<Vec2>get("pos").equals(lastPlatformPos)
-                  && stickToPlatform) {
-            gameObject.doAction("moveBy", curPlatform.<Vec2>get("pos").sub(lastPlatformPos));
-          }
-          lastPlatformPos = curPlatform.get("pos");
-          addGravity = false;
-        }
-      }
-
-      if (addGravity) {
-        Vec2 prevVel = this.vel;
-
-        // Apply gravity
-        Vec2 gravity = gameObject.getGame().getGravity();
-        this.vel = this.vel.add(gravity.scale(this.gravityScale * deltaTime));
-
-        // Clamp velocity
-        float maxVel = MAX_VEL;
-        if (this.vel.lengthSquared() > maxVel * maxVel) {
-          this.vel = this.vel.normalize().scale(maxVel);
-        }
-
-        if (prevVel.dot(gravity) < 0 && this.vel.dot(gravity) >= 0) {
-          gameObject.trigger("fall");
-        }
-      }
-
-      this.vel = this.vel.scale(1 - this.drag);
-      gameObject.doAction("move", this.vel, deltaTime);
+    Vec3 gravityDirection = gameObject.getGame().getGravityDirection();
+    if (gravityDirection == null || isStatic) {
+      return;
     }
 
+    if (willFall) {
+      curPlatform = null;
+      lastPlatformPos = null;
+      gameObject.trigger("fallOff");
+      willFall = false;
+    }
+
+    boolean addGravity = true;
+
+    if (curPlatform != null) {
+      if (
+          !gameObject.<Boolean>doAction("isColliding", curPlatform)
+              || !curPlatform.exists()
+              || !curPlatform.is("body")
+      ) {
+        willFall = true;
+      } else {
+        if (
+            lastPlatformPos != null
+                && !curPlatform.<Vec2>get("pos").equals(lastPlatformPos)
+                && stickToPlatform) {
+          gameObject.doAction("moveBy", curPlatform.<Vec2>get("pos").sub(lastPlatformPos));
+        }
+        lastPlatformPos = curPlatform.get("pos");
+        addGravity = false;
+      }
+    }
+
+    if (addGravity) {
+      Vec2 prevVel = this.vel;
+
+      // Apply gravity
+      Vec3 gravity3d = gameObject.getGame().getGravity();
+      Vec2 gravity = new Vec2(gravity3d.getX(), gravity3d.getY());
+      this.vel = this.vel.add(gravity.scale(this.gravityScale * deltaTime));
+
+      // Clamp velocity
+      float maxVel = MAX_VEL;
+      if (this.vel.lengthSquared() > maxVel * maxVel) {
+        this.vel = this.vel.normalize().scale(maxVel);
+      }
+
+      if (prevVel.dot(gravity) < 0 && this.vel.dot(gravity) >= 0) {
+        gameObject.trigger("fall");
+      }
+    }
+
+    this.vel = this.vel.scale(1 - this.drag);
+    gameObject.doAction("move", this.vel, deltaTime);
   }
 
   public boolean isGrounded() {
@@ -213,6 +223,10 @@ public class BodyComponent extends Component {
   }
 
   public void jump(List<Object> params) {
+    Vec3 gravityDirection = gameObject.getGame().getGravityDirection();
+    if (gravityDirection == null) {
+      return;
+    }
     Float force = jumpForce;
     if (!params.isEmpty()) {
       force = (Float) params.get(0);
@@ -220,7 +234,7 @@ public class BodyComponent extends Component {
     curPlatform = null;
     lastPlatformPos = null;
     // jump in the opposite direction as the gravity
-    this.vel = gameObject.getGame().getGravityDirection().scale(-force);
+    this.vel = new Vec2(gravityDirection.getX(), gravityDirection.getY()).scale(-force);
   }
 
   public static BodyComponent body(boolean isStatic) {

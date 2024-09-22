@@ -105,6 +105,11 @@ once, regardless how many subscriber processes the event.
   gameObject.trigger("eventName", () -> expensiveCalculation());
 ```
 
+
+# 3D Stack
+
+Note: the default coordinate system uses y as the up vector.
+
 # Roadmap
 
 ## core

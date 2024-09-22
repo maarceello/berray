@@ -26,7 +26,7 @@ public class ShapeTest  extends BerrayApplication implements CoreComponentShortc
   public void game() {
 
     loadSprite("berry", "resources/berry.png");
-    loadMusic("wind", "resources/wind.mp3");
+    //loadMusic("wind", "resources/wind.mp3");
 
     debug = true;
 

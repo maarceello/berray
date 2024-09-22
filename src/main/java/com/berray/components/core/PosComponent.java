@@ -1,15 +1,15 @@
 package com.berray.components.core;
 
 import com.berray.GameObject;
-import com.berray.math.Vec2;
+import com.berray.math.Matrix4;
 
 import java.util.List;
 
-public class PosComponent extends Component {
-  private Vec2 pos;
+/** Adds a position vector to the Game Object. */
+public abstract class PosComponent<E> extends Component {
+  protected E pos;
 
-  // Constructor
-  public PosComponent(Vec2 pos) {
+  public PosComponent(E pos) {
     super("pos");
     this.pos = pos;
   }
@@ -17,8 +17,9 @@ public class PosComponent extends Component {
   @Override
   public void add(GameObject gameObject) {
     registerBoundProperty("pos", this::getPos, this::setPos);
-    registerAction("move", this::move);
-    registerAction("moveBy", this::moveBy);
+    registerGetter("posTransform", this::getTransform);
+    registerAction("move", this::moveAction);
+    registerAction("moveBy", this::moveByAction);
   }
 
   /**
@@ -26,41 +27,35 @@ public class PosComponent extends Component {
    * - vec2 velocity
    * - float deltaTime
    */
-  public void move(List<Object> params) {
-    Vec2 velocity = (Vec2) params.get(0);
+  public void moveAction(List<Object> params) {
+    E velocity = (E) params.get(0);
     float deltaTime = (float) params.get(1);
-    setPos(pos.move(velocity.scale(deltaTime)));
+    setPos(move(pos, velocity, deltaTime));
   }
+
 
   /**
    * params:
    * - vec2 amount
    */
-  public void moveBy(List<Object> params) {
-    if (params.get(0) instanceof Vec2) {
-      Vec2 amount = (Vec2) params.get(0);
-      setPos(pos.move(amount));
-    }
+  public void moveByAction(List<Object> params) {
+    E amount = (E) params.get(0);
+    setPos(move(pos, amount));
   }
 
-  // Getter
-  public Vec2 getPos() {
+  /** Moves the vector <code>pos</code> by amount <code>amount</code>*/
+  protected abstract E move(E pos, E amount);
+
+  protected abstract E move(E pos, E amount, float scale);
+
+  protected abstract Matrix4 getTransform();
+
+  public E getPos() {
     return pos;
   }
 
-  public void setPos(Vec2 pos) {
+  public void setPos(E pos) {
     this.pos = pos;
     this.gameObject.setTransformDirty();
   }
-
-  // Static method to just call "pos()"
-  public static PosComponent pos(float x, float y) {
-    return new PosComponent(new Vec2(x, y));
-  }
-
-  public static PosComponent pos(Vec2 pos) {
-    return new PosComponent(pos);
-  }
-
-
 }

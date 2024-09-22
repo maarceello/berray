@@ -117,7 +117,7 @@ public class Button extends GameObject implements CoreComponentShortcuts {
    * @type initialization
    */
   public Button neutral(Object... components) {
-    this.neutralChild = make(components);
+    this.neutralChild = makeGameObject(components);
     return this;
   }
 
@@ -127,7 +127,7 @@ public class Button extends GameObject implements CoreComponentShortcuts {
    * @type initialization
    */
   public Button neutral(GameObject gameObject, Object... components) {
-    this.neutralChild = make(gameObject, components);
+    this.neutralChild = makeGameObject(gameObject, components);
     return this;
   }
 
@@ -137,7 +137,7 @@ public class Button extends GameObject implements CoreComponentShortcuts {
    * @type initialization
    */
   public Button hover(Object... components) {
-    this.hoverChild = make(components);
+    this.hoverChild = makeGameObject(components);
     return this;
   }
 
@@ -147,7 +147,7 @@ public class Button extends GameObject implements CoreComponentShortcuts {
    * @type initialization
    */
   public Button hover(GameObject gameObject, Object... components) {
-    this.hoverChild = make(gameObject, components);
+    this.hoverChild = makeGameObject(gameObject, components);
     return this;
   }
 
@@ -157,7 +157,7 @@ public class Button extends GameObject implements CoreComponentShortcuts {
    * @type initialization
    */
   public Button armed(Object... components) {
-    this.armedChild = make(components);
+    this.armedChild = makeGameObject(components);
     return this;
   }
 
@@ -167,7 +167,7 @@ public class Button extends GameObject implements CoreComponentShortcuts {
    * @type initialization
    */
   public Button armed(GameObject gameObject, Object... components) {
-    this.armedChild = make(gameObject, components);
+    this.armedChild = makeGameObject(gameObject, components);
     return this;
   }
 
@@ -178,7 +178,7 @@ public class Button extends GameObject implements CoreComponentShortcuts {
    * @type initialization
    */
   public Button pressed(Object... components) {
-    this.pressedChild = make(components);
+    this.pressedChild = makeGameObject(components);
     return this;
   }
 
@@ -189,7 +189,7 @@ public class Button extends GameObject implements CoreComponentShortcuts {
    * @type initialization
    */
   public Button pressed(GameObject gameObject, Object... components) {
-    this.pressedChild = make(gameObject, components);
+    this.pressedChild = makeGameObject(gameObject, components);
     return this;
   }
 
@@ -208,7 +208,7 @@ public class Button extends GameObject implements CoreComponentShortcuts {
   }
 
   private GameObject makeSlice9Component(String assetName, Vec2 size, int slice9ComponentSize, Vec2 pos, String text, Color color) {
-    GameObject button = make(
+    GameObject button = makeGameObject(
         Slice9Component.slice9(assetName, size, slice9ComponentSize),
         area(),
         pos(pos),

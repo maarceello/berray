@@ -4,13 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EventListeners {
-  private List<EventListenerWrapper> eventListener = new ArrayList<>();
+  private final List<EventListenerWrapper> eventListener = new ArrayList<>();
 
-  public void addEventListener(EventListener eventListener, Object owner) {
+  public void addEventListener(EventListener<?> eventListener, Object owner) {
     this.eventListener.add(new EventListenerWrapper(eventListener, owner));
   }
 
-  public void trigger(Event event) {
+  public void  trigger(Event event) {
     eventListener.forEach(listener -> listener.eventListener.onEvent(event));
   }
 
@@ -19,11 +19,12 @@ public class EventListeners {
   }
 
   public static class EventListenerWrapper {
-    private EventListener eventListener;
-    private Object owner;
+    private final EventListener<Event> eventListener;
+    private final Object owner;
 
-    public EventListenerWrapper(EventListener eventListener, Object owner) {
-      this.eventListener = eventListener;
+    @SuppressWarnings("unchecked")
+    public <E extends Event> EventListenerWrapper(EventListener<E> eventListener, Object owner) {
+      this.eventListener = (EventListener<Event>) eventListener;
       this.owner = owner;
     }
   }

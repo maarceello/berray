@@ -4,12 +4,10 @@ import com.berray.BerrayApplication;
 import com.berray.GameObject;
 import com.berray.assets.CoreAssetShortcuts;
 import com.berray.components.CoreComponentShortcuts;
-import com.berray.components.addon.Slice9Component;
 import com.berray.components.core.AnchorType;
 import com.berray.math.Color;
 import com.berray.math.Vec2;
 
-import static com.berray.GameObject.make;
 import static com.berray.objects.gui.Button.pushButton;
 import static com.berray.objects.gui.Button.toggleButton;
 

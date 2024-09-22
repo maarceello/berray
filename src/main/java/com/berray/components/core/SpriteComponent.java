@@ -96,6 +96,7 @@ public class SpriteComponent extends Component {
 
   @Override
   public void add(GameObject gameObject) {
+    super.add(gameObject);
     registerBoundProperty("size", this::getSize, this::setSize);
     registerGetter("render", () -> true);
     registerGetter("curAnim", this::getAnim);

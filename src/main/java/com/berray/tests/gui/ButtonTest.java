@@ -6,9 +6,7 @@ import com.berray.components.CoreComponentShortcuts;
 import com.berray.components.core.AnchorType;
 import com.berray.math.Color;
 import com.berray.math.Vec2;
-import com.raylib.Jaylib;
 
-import static com.berray.GameObject.make;
 import static com.berray.objects.gui.Button.button;
 
 public class ButtonTest extends BerrayApplication implements CoreComponentShortcuts {

@@ -29,7 +29,7 @@ public class GameObject {
   /**
    * Components for this game object.
    */
-  private final Map<Class<?>, Component> components;
+  protected final Map<Class<?>, Component> components;
 
   /**
    * registered getter methods from components.
@@ -110,8 +110,8 @@ public class GameObject {
     // tell each childs the game instance
     children.forEach(child -> child.setGame(game));
     if (game != null) {
-      // copy event creators from game
-      eventManager.addEventTypeCreators(game.getEventTypeFactory());
+      // fire event that the object was added to the scene graoh
+      trigger("sceneGraphAdded", this);
     }
   }
 
@@ -379,6 +379,10 @@ public class GameObject {
     return getOrDefault(property, defaultValue);
   }
 
+  public boolean canWrite(String property) {
+    return setterMethods.containsKey(property);
+  }
+
   /**
    * returns registered component property
    */
@@ -496,10 +500,6 @@ public class GameObject {
 
   public GameObject getRoot() {
     return (parent == null) ? this : parent.getRoot();
-  }
-
-  public void onClick(EventListener eventListener) {
-    this.trigger("click");
   }
 
   /**

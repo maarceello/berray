@@ -14,21 +14,8 @@ public class EventManager {
    * event-name -> registered event listeners.
    */
   private Map<String, EventListeners> eventListenersMap = new HashMap<>();
-  private EventTypeFactory eventTypeFactory;
 
-  public EventManager() {
-    this.eventTypeFactory = new EventTypeFactory();
-  }
-
-  public EventManager(EventTypeFactory eventTypeFactory) {
-    this.eventTypeFactory = eventTypeFactory;
-  }
-
-  public void addEventTypeCreators(EventTypeFactory factory) {
-    eventTypeFactory.copyAll(factory);
-  }
-
-  public void addEventListener(String event, EventListener eventListener) {
+  public <E extends Event> void addEventListener(String event, EventListener<E> eventListener) {
     addEventListener(event, eventListener, null);
   }
 
@@ -42,7 +29,7 @@ public class EventManager {
 
   public void trigger(String eventName, List<Object> params) {
     EventListeners listeners = eventListenersMap.get(eventName);
-    Event event = eventTypeFactory.createEvent(eventName, params);
+    Event event = EventTypeFactory.getInstance().createEvent(eventName, params);
     if (listeners != null) {
       listeners.trigger(event);
     }

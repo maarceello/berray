@@ -3,10 +3,7 @@ package com.berray.components;
 import com.berray.GameObject;
 import com.berray.Property;
 import com.berray.components.core.*;
-import com.berray.math.Color;
-import com.berray.math.Rect;
-import com.berray.math.Vec2;
-import com.berray.math.Vec3;
+import com.berray.math.*;
 
 public interface CoreComponentShortcuts {
 
@@ -41,6 +38,11 @@ public interface CoreComponentShortcuts {
   default RotateComponent rotate(float angle) {
     return RotateComponent.rotate(angle);
   }
+
+  default Rotate3dComponent rotate(Quaternion quaternion) {
+    return Rotate3dComponent.rotate(quaternion);
+  }
+
 
   default AreaComponent area() {
     return AreaComponent.area();

@@ -11,7 +11,12 @@ public class EventListeners {
   }
 
   public void  trigger(Event event) {
-    eventListener.forEach(listener -> listener.eventListener.onEvent(event));
+    try {
+      eventListener.forEach(listener -> listener.eventListener.onEvent(event));
+    }
+    catch (ClassCastException e) {
+      throw new IllegalStateException(event.getName(), e);
+    }
   }
 
   public void removeListener(Object owner) {

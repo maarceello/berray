@@ -2,6 +2,8 @@ package com.berray.components.core;
 
 import com.berray.GameObject;
 import com.berray.math.Matrix4;
+import com.berray.math.Quaternion;
+import com.berray.math.Vec3;
 
 public class Rotate3dComponent extends Component {
 
@@ -76,4 +78,8 @@ public class Rotate3dComponent extends Component {
     return new Rotate3dComponent(rotateX, rotateY, rotateZ);
   }
 
+  public static Rotate3dComponent rotate(Quaternion quaternion) {
+    Vec3 euler = quaternion.toEuler();
+    return new Rotate3dComponent(euler.getX(), euler.getY(), euler.getZ());
+  }
 }

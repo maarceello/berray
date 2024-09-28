@@ -3,11 +3,12 @@ package com.berray.tests.gui;
 import com.berray.GameObject;
 import com.berray.components.CoreComponentShortcuts;
 import com.berray.components.core.AnchorType;
+import com.berray.components.core.Component;
 import com.berray.event.Event;
 import com.berray.math.Color;
 import com.berray.math.Vec2;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
 /** Test for a horizontal slider.
@@ -77,11 +78,20 @@ public class Slider extends GameObject implements CoreComponentShortcuts {
     return this;
   }
 
+  public Slider leftBar(Component ... components) {
+    return leftBar(makeGameObject(components));
+  }
+
   public Slider rightBar(GameObject object) {
     addRequiredComponents(object);
     this.rightBar = object;
     return this;
   }
+
+  public Slider rightBar(Component ... components) {
+    return rightBar(makeGameObject(components));
+  }
+
 
   public Slider handle(GameObject object) {
     addRequiredComponents(object);
@@ -89,6 +99,11 @@ public class Slider extends GameObject implements CoreComponentShortcuts {
     this.handle = object;
     return this;
   }
+
+  public Slider handle(Component ... components) {
+    return handle(makeGameObject(components));
+  }
+
 
   private void addRequiredComponents(GameObject object) {
     if (!object.is("pos")) {
@@ -123,6 +138,11 @@ public class Slider extends GameObject implements CoreComponentShortcuts {
     this.value = value;
 
     updateChildPositions();
+  }
+
+  @Override
+  protected void ensureTransformCalculated() {
+    super.ensureTransformCalculated();
   }
 
   private void updateChildPositions() {
@@ -189,14 +209,28 @@ public class Slider extends GameObject implements CoreComponentShortcuts {
 
   @Override
   public void addComponents(List<Object> components) {
-    // first add our own components
-    super.addComponents(Arrays.asList(
-        area(),
-        mouse(),
-        pos(0, 0))
-    );
+    List<Object> allComponents = new ArrayList<>();
+    List<Object> existingComponents = new ArrayList<>(this.components.values());
+    existingComponents.addAll(components);
+
+    if (!hasComponent(existingComponents, "pos")) {
+      allComponents.add( pos(0,0));
+    }
+    if (!hasComponent(existingComponents, "area")) {
+      allComponents.add(area());
+    }
+    if (!hasComponent(existingComponents, "mouse")) {
+      allComponents.add(mouse());
+    }
+    allComponents.addAll(components);
     // then add the supplied components. these may overwrite our own components.
-    super.addComponents(components);
+    super.addComponents(allComponents);
+  }
+
+  private boolean hasComponent(List<Object> components, String tag) {
+    return components.stream()
+        .filter(Component.class::isInstance)
+        .anyMatch(c -> ((Component) c).getTag().equals(tag));
   }
 
 

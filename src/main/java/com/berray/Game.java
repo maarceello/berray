@@ -34,27 +34,24 @@ public class Game {
   private EventManager eventManager;
   private DefaultAssetManager assetManager;
 
-  private EventTypeFactory eventTypeFactory = new EventTypeFactory();
 
   // Constructor
   public Game() {
     root = new GameObject(this).add("root");
-    // default: 2d rendering
     assetLoaders = new AssetLoaders();
     assetLoaders.addAssetLoader(new RaylibAssetLoader());
     assetManager = new DefaultAssetManager(assetLoaders, FileSystems.getDefault().getPath("."));
+    EventTypeFactory eventTypeFactory = EventTypeFactory.getInstance();
     eventTypeFactory.registerEventType("propertyChange", PropertyChangeEvent::new);
     eventTypeFactory.registerEventType("update", UpdateEvent::new);
     eventTypeFactory.registerEventType("add", AddEvent::new);
     eventTypeFactory.registerEventType("keyPress", KeyEvent::new);
     eventTypeFactory.registerEventType("keyDown", KeyEvent::new);
     eventTypeFactory.registerEventType("keyUp", KeyEvent::new);
-    eventManager = new EventManager(eventTypeFactory);
+    eventTypeFactory.registerEventType("mouseMove", MouseMoveEvent::new);
+    eventTypeFactory.registerEventType("sceneGraphAdded", SceneGraphAddedEvent::new);
+    eventManager = new EventManager();
     init();
-  }
-
-  public EventTypeFactory getEventTypeFactory() {
-    return eventTypeFactory;
   }
 
   public DefaultAssetManager getAssetManager() {

@@ -18,7 +18,6 @@ public class Root3D extends GameObject {
     Camera3D camera = get("camera");
     if (camera != null) {
       BeginMode3D(camera);
-      //DrawGrid(10, 1.0f);
       super.draw();
       EndMode3D();
     }

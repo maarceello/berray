@@ -15,6 +15,31 @@ public class RectComponent extends Component {
     this.size = new Vec2(width, height);
   }
 
+
+  @Override
+  public void add(GameObject gameObject) {
+    super.add(gameObject);
+    registerBoundProperty("size", this::getSize, this::setSize);
+    registerBoundProperty("fill", this::getFill, this::setFill);
+    registerGetter("render", () -> true);
+  }
+
+  private Vec2 getSize() {
+    return size;
+  }
+
+  public void setSize(Vec2 size) {
+    this.size = size;
+  }
+
+  public boolean getFill() {
+    return fill;
+  }
+
+  public void setFill(boolean fill) {
+    this.fill = fill;
+  }
+
   public RectComponent fill(boolean fill) {
     this.fill = fill;
     return this;
@@ -33,22 +58,6 @@ public class RectComponent extends Component {
       }
     }
     rlPopMatrix();
-  }
-
-
-  @Override
-  public void add(GameObject gameObject) {
-    super.add(gameObject);
-    registerBoundProperty("size", this::getSize, this::setSize);
-    registerGetter("render", () -> true);
-  }
-
-  private Vec2 getSize() {
-    return size;
-  }
-
-  public void setSize(Vec2 size) {
-    this.size = size;
   }
 
   public static RectComponent rect(float width, float height) {

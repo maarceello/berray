@@ -222,13 +222,13 @@ public class Slider extends GameObject implements CoreComponentShortcuts {
     List<Object> existingComponents = new ArrayList<>(this.components.values());
     existingComponents.addAll(components);
 
-    if (!hasComponent(existingComponents, "pos")) {
+    if (!containsComponent(existingComponents, "pos")) {
       allComponents.add( pos(0,0));
     }
-    if (!hasComponent(existingComponents, "area")) {
+    if (!containsComponent(existingComponents, "area")) {
       allComponents.add(area());
     }
-    if (!hasComponent(existingComponents, "mouse")) {
+    if (!containsComponent(existingComponents, "mouse")) {
       allComponents.add(mouse());
     }
     allComponents.addAll(components);
@@ -236,11 +236,6 @@ public class Slider extends GameObject implements CoreComponentShortcuts {
     super.addComponents(allComponents);
   }
 
-  private boolean hasComponent(List<Object> components, String tag) {
-    return components.stream()
-        .filter(Component.class::isInstance)
-        .anyMatch(c -> ((Component) c).getTag().equals(tag));
-  }
 
 
 }

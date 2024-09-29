@@ -21,6 +21,7 @@ public class RowBuilder {
   private int columnSpan = 1;
   private AnchorType align = null;
   private Color backgroundColor = null;
+  private DefaultBuilders componentBuilder = new DefaultBuilders();
 
   public RowBuilder(float height) {
     this.height = height;
@@ -56,7 +57,7 @@ public class RowBuilder {
    * add label with placeholder.
    */
   public RowBuilder label(String text) {
-    return addCell(DefaultBuilders.labelBuilder(text, null));
+    return addCell(componentBuilder.labelBuilder(text, null));
 
   }
 
@@ -64,14 +65,21 @@ public class RowBuilder {
    * add label with placeholder.
    */
   public RowBuilder label(String text, Color foregroundColor) {
-    return addCell(DefaultBuilders.labelBuilder(text, foregroundColor));
+    return addCell(componentBuilder.labelBuilder(text, foregroundColor));
   }
 
   /**
    * add slider
    */
   public RowBuilder slider(String property, float min, float max) {
-    return addCell(DefaultBuilders.sliderBuilder(property, min, max));
+    return addCell(componentBuilder.sliderBuilder(property, min, max));
+  }
+
+  /**
+   * add checkbox
+   */
+  public RowBuilder checkbox(String property) {
+    return addCell(componentBuilder.checkboxBuilder(property));
   }
 
   public RowBuilder skip() {

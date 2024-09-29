@@ -27,9 +27,9 @@ public class GuiPanelTest extends BerrayApplication implements CoreComponentShor
   public void game() {
     background(Color.BLACK);
 
-    EventListenerCapable object = new ReflectionDomainObject(new Player(1.0f, 10.0f));
+    EventListenerCapable player = new ReflectionDomainObject(new Player(1.0f, 10.0f));
     GameObject playerImage = add(
-        circle(10),
+        circle(10).fill(false),
         pos(0, 0),
         anchor(AnchorType.CENTER),
         color(Color.GOLD)
@@ -38,7 +38,7 @@ public class GuiPanelTest extends BerrayApplication implements CoreComponentShor
     GameObject panel = add(
         makePanel()
             .columnWidths(50.0f, 100.0f, 200.0f)
-            .bind(object)
+            .bind(player)
             .color(Color.BLACK, Color.GOLD)
             .frame(5, Color.WHITE)
             .row(makeRow(20)
@@ -57,13 +57,19 @@ public class GuiPanelTest extends BerrayApplication implements CoreComponentShor
                 .align(AnchorType.TOP_RIGHT).label("${pos.y} px")
                 .slider("y", 0, height())
             )
+            .row(makeRow(20)
+                .skip()
+                .align(AnchorType.TOP_RIGHT).label("Fill: ")
+                .checkbox("checked")
+            )
             .buildGameObject()
     );
     panel.set("anchor", AnchorType.CENTER);
     panel.set("pos", center());
 
-    object.onPropertyChange(event -> {
-      playerImage.set("pos", new Vec2(object.getProperty("x"), object.getProperty("y")));
+    player.onPropertyChange(event -> {
+      playerImage.set("pos", new Vec2(player.getProperty("x"), player.getProperty("y")));
+      playerImage.set("fill", player.getProperty("checked"));
     });
   }
 
@@ -107,6 +113,7 @@ public class GuiPanelTest extends BerrayApplication implements CoreComponentShor
     private float x;
     private float y;
     private MutableVec2 pos;
+    private boolean checked;
 
     public Player(float x, float y) {
       this.x = x;
@@ -138,6 +145,14 @@ public class GuiPanelTest extends BerrayApplication implements CoreComponentShor
 
     public void setPos(MutableVec2 pos) {
       this.pos = pos;
+    }
+
+    public boolean getChecked() {
+      return checked;
+    }
+
+    public void setChecked(boolean checked) {
+      this.checked = checked;
     }
   }
 

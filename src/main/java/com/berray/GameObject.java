@@ -238,7 +238,7 @@ public class GameObject {
       } else if (c instanceof Component) {
         Component component = (Component) c;
         if (this.components.containsKey(component.getClass())) {
-          throw new IllegalArgumentException("Component "+component.getClass()+" is already registered in object with tags "+tags);
+          throw new IllegalArgumentException("Component " + component.getClass() + " is already registered in object with tags " + tags);
         }
         component.setId(nextComponentId.incrementAndGet());
         this.components.put(component.getClass(), component);
@@ -305,11 +305,11 @@ public class GameObject {
 
   public <E> void registerProperty(String name, Supplier<E> getter, Consumer<E> setter) {
     if (getterMethods.containsKey(name)) {
-      throw new IllegalStateException("property getter "+name+" already registered with "+getterMethods.get(name));
+      throw new IllegalStateException("property getter " + name + " already registered with " + getterMethods.get(name));
     }
     getterMethods.put(name, getter);
     if (setterMethods.containsKey(name)) {
-      throw new IllegalStateException("property setter "+name+" already registered with "+setterMethods.get(name));
+      throw new IllegalStateException("property setter " + name + " already registered with " + setterMethods.get(name));
     }
     setterMethods.put(name, setter);
   }
@@ -406,7 +406,7 @@ public class GameObject {
   public <E> void set(String property, E value) {
     Consumer<E> setterMethod = (Consumer<E>) setterMethods.get(property);
     if (setterMethod == null) {
-      throw new IllegalStateException("cannot find setter for property " + property + " in gameobject with tags " + tags);
+      throw new IllegalStateException("cannot find setter for property " + property + " in gameobject " + getClass().getSimpleName() + " with tags " + tags);
     }
     setterMethod.accept(value);
   }
@@ -665,6 +665,12 @@ public class GameObject {
     return parent != null;
   }
 
+  protected boolean containsComponent(List<Object> components, String tag) {
+    return components.stream()
+        .filter(Component.class::isInstance)
+        .anyMatch(c -> ((Component) c).getTag().equals(tag));
+  }
+
 
   private static class ChildIterator implements Iterator<GameObject> {
     private final List<GameObject> children;
@@ -734,6 +740,7 @@ public class GameObject {
       // we don't have more iterators. so we don't have an element to return
       throw new NoSuchElementException();
     }
+
   }
 
 

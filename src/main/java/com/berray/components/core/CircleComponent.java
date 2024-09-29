@@ -22,10 +22,19 @@ import static com.raylib.Raylib.*;
  */
 public class CircleComponent extends Component {
   private float radius;
+  private boolean fill = true;
 
   public CircleComponent(float radius) {
     super("circle");
     this.radius = radius;
+  }
+
+  @Override
+  public void add(GameObject gameObject) {
+    registerGetter("size", this::getSize);
+    registerGetter("render", () -> true);
+    registerBoundProperty("radius", this::getRadius, this::setRadius);
+    registerBoundProperty("fill", this::getFill, this::setFill);
   }
 
   public float getRadius() {
@@ -37,27 +46,37 @@ public class CircleComponent extends Component {
     gameObject.setTransformDirty();
   }
 
+  private Vec2 getSize() {
+    return new Vec2(radius * 2, radius * 2);
+  }
+
+  public boolean getFill() {
+    return fill;
+  }
+
+  public void setFill(boolean fill) {
+    this.fill = fill;
+  }
+
+  public CircleComponent fill(boolean fill) {
+    this.fill = fill;
+    return this;
+  }
+
+
   @Override
   public void draw() {
     rlPushMatrix();
     {
       Color color = gameObject.getOrDefault("color", Color.WHITE);
       rlMultMatrixf(gameObject.getWorldTransform().toFloatTransposed());
-      DrawCircle((int) radius, (int) radius, radius, color.toRaylibColor());
+      if (fill) {
+        DrawCircle((int) radius, (int) radius, radius, color.toRaylibColor());
+      } else {
+        DrawCircleLines((int) radius, (int) radius, radius, color.toRaylibColor());
+      }
     }
     rlPopMatrix();
-  }
-
-
-  @Override
-  public void add(GameObject gameObject) {
-    registerGetter("size", this::getSize);
-    registerGetter("render", () -> true);
-    registerBoundProperty("radius", this::getRadius, this::setRadius);
-  }
-
-  private Vec2 getSize() {
-    return new Vec2(radius * 2, radius * 2);
   }
 
   public static CircleComponent circle(float radius) {

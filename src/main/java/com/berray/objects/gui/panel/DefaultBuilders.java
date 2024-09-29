@@ -5,6 +5,7 @@ import com.berray.components.core.AnchorType;
 import com.berray.event.PropertyChangeEvent;
 import com.berray.math.Color;
 import com.berray.math.Vec2;
+import com.berray.objects.gui.Button;
 import com.berray.objects.gui.EventListenerCapable;
 import com.berray.objects.gui.PropertyResolveService;
 import com.berray.objects.gui.Slider;
@@ -16,11 +17,14 @@ import static com.berray.components.core.AnchorComponent.anchor;
 import static com.berray.components.core.ColorComponent.color;
 import static com.berray.components.core.RectComponent.rect;
 import static com.berray.components.core.TextComponent.text;
+import static com.berray.objects.gui.Button.button;
 
-/** Default panel builders */
+/**
+ * Default panel builders
+ */
 public class DefaultBuilders {
 
-  public static Function<PanelBuilder, GameObject> labelBuilder(String text, Color foregroundColor) {
+  public Function<PanelBuilder, GameObject> labelBuilder(String text, Color foregroundColor) {
     return (PanelBuilder panelBuilder) -> {
       Color color = foregroundColor != null ? foregroundColor : panelBuilder.getForegroundColor();
       EventListenerCapable dataObject = panelBuilder.getDataObject();
@@ -36,7 +40,7 @@ public class DefaultBuilders {
     };
   }
 
-  public static  Function<PanelBuilder, GameObject> sliderBuilder(String property, float min, float max) {
+  public Function<PanelBuilder, GameObject> sliderBuilder(String property, float min, float max) {
     return (panelBuilder) -> {
       Color foregroundColor = panelBuilder.getForegroundColor();
       EventListenerCapable dataObject = panelBuilder.getDataObject();
@@ -72,4 +76,41 @@ public class DefaultBuilders {
   }
 
 
+  public Function<PanelBuilder, GameObject> checkboxBuilder(String property) {
+    return (PanelBuilder panelBuilder) -> {
+      EventListenerCapable dataObject = panelBuilder.getDataObject();
+
+      Button button = makeGameObject(
+          button("testbutton", true)
+              .square()
+              .neutral(
+                  rect(20, 20).fill(false),
+                  color(Color.GOLD),
+                  anchor(AnchorType.TOP_LEFT)
+              )
+              .pressed(
+                  rect(20, 20).fill(true),
+                  color(Color.GOLD),
+                  anchor(AnchorType.TOP_LEFT)
+              ),
+          anchor(AnchorType.TOP_LEFT)
+      );
+      if (dataObject != null) {
+        dataObject.onPropertyChange(event ->
+            {
+              if (event.getPropertyName().equals("checked")) {
+                button.set("pressed", event.getNewValue());
+              }
+            }
+        );
+        button.on("propertyChange", (PropertyChangeEvent event) ->
+        {
+          if (event.getPropertyName().equals("pressed")) {
+            dataObject.setProperty(property, event.getNewValue());
+          }
+        });
+      }
+      return button;
+    };
+  }
 }

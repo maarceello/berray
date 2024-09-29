@@ -98,7 +98,7 @@ public class ReflectionDomainObject implements EventListenerCapable {
     }
     try {
       setterMethod.invoke(wrappedObject, value);
-    } catch (IllegalAccessException | InvocationTargetException e) {
+    } catch (Exception e) {
       throw new IllegalStateException("cannot set property "+name+" in domain object type "+wrappedObject.getClass().getName(), e);
     }
     eventManager.trigger("propertyChange", Arrays.asList(name, old, value));

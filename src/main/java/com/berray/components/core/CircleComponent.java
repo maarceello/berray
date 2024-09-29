@@ -21,7 +21,7 @@ import static com.raylib.Raylib.*;
  * none
  */
 public class CircleComponent extends Component {
-  private final float radius;
+  private float radius;
 
   public CircleComponent(float radius) {
     super("circle");
@@ -32,14 +32,18 @@ public class CircleComponent extends Component {
     return radius;
   }
 
+  public void setRadius(float radius) {
+    this.radius = radius;
+    gameObject.setTransformDirty();
+  }
+
   @Override
   public void draw() {
     rlPushMatrix();
     {
       Color color = gameObject.getOrDefault("color", Color.WHITE);
       rlMultMatrixf(gameObject.getWorldTransform().toFloatTransposed());
-      //DrawCircle((int) (radius), (int) (radius), radius, color);
-      DrawCircle(0, 0, radius, color.toRaylibColor());
+      DrawCircle((int) radius, (int) radius, radius, color.toRaylibColor());
     }
     rlPopMatrix();
   }
@@ -49,6 +53,7 @@ public class CircleComponent extends Component {
   public void add(GameObject gameObject) {
     registerGetter("size", this::getSize);
     registerGetter("render", () -> true);
+    registerBoundProperty("radius", this::getRadius, this::setRadius);
   }
 
   private Vec2 getSize() {

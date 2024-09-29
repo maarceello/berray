@@ -1,4 +1,4 @@
-package com.berray.tests.gui;
+package com.berray.objects.gui;
 
 import com.berray.GameObject;
 import com.berray.components.CoreComponentShortcuts;
@@ -55,8 +55,8 @@ public class Slider extends GameObject implements CoreComponentShortcuts {
     on("add", this::onAdd);
     on("mouseClick", this::onMouseClick);
     on("dragging", this::onMouseDragging);
-    registerProperty("size", () -> size, newSize -> this.size = newSize);
-    registerProperty("value", () -> value, this::setValue);
+    registerProperty("size", this::getSize, this::setSize);
+    registerProperty("value", this::getValue, this::setValue);
     registerPropertyGetter("render", () -> true);
   }
 
@@ -127,6 +127,10 @@ public class Slider extends GameObject implements CoreComponentShortcuts {
     setValue(min + (max - min) * percent);
   }
 
+  public float getValue() {
+    return value;
+  }
+
   private void setValue(float value) {
     if (value < min) {
       value = min;
@@ -140,10 +144,15 @@ public class Slider extends GameObject implements CoreComponentShortcuts {
     updateChildPositions();
   }
 
-  @Override
-  protected void ensureTransformCalculated() {
-    super.ensureTransformCalculated();
+  public Vec2 getSize() {
+    return size;
   }
+
+  public void setSize(Vec2 size) {
+    this.size = size;
+    setTransformDirty();
+  }
+
 
   private void updateChildPositions() {
     if (leftBorder != null) {

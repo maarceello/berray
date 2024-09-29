@@ -237,6 +237,9 @@ public class GameObject {
         addTag(c.toString());
       } else if (c instanceof Component) {
         Component component = (Component) c;
+        if (this.components.containsKey(component.getClass())) {
+          throw new IllegalArgumentException("Component "+component.getClass()+" is already registered in object with tags "+tags);
+        }
         component.setId(nextComponentId.incrementAndGet());
         this.components.put(component.getClass(), component);
         this.tags.add(component.getTag());
@@ -301,7 +304,13 @@ public class GameObject {
   }
 
   public <E> void registerProperty(String name, Supplier<E> getter, Consumer<E> setter) {
+    if (getterMethods.containsKey(name)) {
+      throw new IllegalStateException("property getter "+name+" already registered with "+getterMethods.get(name));
+    }
     getterMethods.put(name, getter);
+    if (setterMethods.containsKey(name)) {
+      throw new IllegalStateException("property setter "+name+" already registered with "+setterMethods.get(name));
+    }
     setterMethods.put(name, setter);
   }
 

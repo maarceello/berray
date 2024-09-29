@@ -7,6 +7,7 @@ import com.berray.components.CoreComponentShortcuts;
 import com.berray.components.core.AnchorType;
 import com.berray.math.Color;
 import com.berray.math.Vec2;
+import com.berray.objects.gui.Slider;
 
 
 public class SliderTest extends BerrayApplication implements CoreComponentShortcuts, CoreAssetShortcuts {

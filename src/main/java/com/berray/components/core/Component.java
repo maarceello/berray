@@ -140,16 +140,16 @@ public class Component {
   /**
    * Registers an action, remembering the action name. Upon deletion the action will be removed.
    */
-  public void registerAction(String name, Consumer<List<Object>> actionMethod) {
-    gameObject.registerAction(name, actionMethod);
+  public <E> void registerAction(String name, Consumer<E> actionMethod, Function<List<Object>, E> actionBeanCreator) {
+    gameObject.registerAction(name, (List<Object> params) -> actionMethod.accept(actionBeanCreator.apply(params)));
     actions.add(name);
   }
 
   /**
    * Registers an action, remembering the action name. Upon deletion the action will be removed.
    */
-  public void registerAction(String name, Function<List<Object>, ?> actionMethod) {
-    gameObject.registerAction(name, actionMethod);
+  public <E> void registerAction(String name, Function<E, ?> actionMethod, Function<List<Object>, E> actionBeanCreator) {
+    gameObject.registerAction(name, (List<Object> params) -> actionMethod.apply(actionBeanCreator.apply(params)));
     actions.add(name);
   }
 

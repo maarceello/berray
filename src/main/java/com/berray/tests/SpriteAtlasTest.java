@@ -5,6 +5,7 @@ import com.berray.GameObject;
 import com.berray.assets.CoreAssetShortcuts;
 import com.berray.assets.SpriteAtlas;
 import com.berray.components.CoreComponentShortcuts;
+import com.berray.components.core.Action;
 import com.berray.components.core.AnchorType;
 import com.berray.components.core.Component;
 import com.berray.event.Event;
@@ -376,7 +377,7 @@ public class SpriteAtlasTest extends BerrayApplication implements CoreComponentS
     @Override
     public void add(GameObject gameObject) {
       super.add(gameObject);
-      registerAction("spin", (Consumer<List<Object>>) (params) -> spinning = true);
+      registerAction("spin", (Action params) -> spinning = true, Action::new);
       on("update", this::update);
     }
 

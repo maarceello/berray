@@ -40,7 +40,7 @@ public class DefaultBuilders {
     };
   }
 
-  public Function<PanelBuilder, GameObject> sliderBuilder(String property, float min, float max) {
+  public Function<PanelBuilder, GameObject> sliderBuilder(String property, float height, float min, float max) {
     return (panelBuilder) -> {
       Color foregroundColor = panelBuilder.getForegroundColor();
       EventListenerCapable dataObject = panelBuilder.getDataObject();
@@ -54,7 +54,7 @@ public class DefaultBuilders {
                   rect(1.0f, 1.0f).fill(false),
                   color(foregroundColor)
               ).handle(
-                  rect(10.0f, 20).fill(true),
+                  rect(height / 2.0f, height).fill(true),
                   color(foregroundColor)
               )
       );
@@ -76,7 +76,7 @@ public class DefaultBuilders {
   }
 
 
-  public Function<PanelBuilder, GameObject> checkboxBuilder(String property) {
+  public Function<PanelBuilder, GameObject> checkboxBuilder(String property, float height) {
     return (PanelBuilder panelBuilder) -> {
       EventListenerCapable dataObject = panelBuilder.getDataObject();
 
@@ -84,12 +84,12 @@ public class DefaultBuilders {
           button("testbutton", true)
               .square()
               .neutral(
-                  rect(20, 20).fill(false),
+                  rect(height, height).fill(false),
                   color(Color.GOLD),
                   anchor(AnchorType.TOP_LEFT)
               )
               .pressed(
-                  rect(20, 20).fill(true),
+                  rect(height, height).fill(true),
                   color(Color.GOLD),
                   anchor(AnchorType.TOP_LEFT)
               ),

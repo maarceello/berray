@@ -2,6 +2,7 @@ package com.berray.components.core;
 
 import com.berray.GameObject;
 import com.berray.event.Event;
+import com.berray.event.UpdateEvent;
 import com.berray.math.Collision;
 import com.berray.math.Matrix4;
 import com.berray.math.Vec2;
@@ -9,10 +10,13 @@ import com.berray.math.Vec3;
 
 import java.util.List;
 
+/**
+ * Adds physics and collision detection to an object.
+ */
 public class BodyComponent extends Component {
   public static final float DEFAULT_JUMP_FORCE = 640f;
   private static final float MAX_VEL = 65536f;
-  // note: static is a keyword in java
+
   /**
    * true when the object cannot move.
    */
@@ -21,6 +25,9 @@ public class BodyComponent extends Component {
    * current jump force
    */
   private float jumpForce = DEFAULT_JUMP_FORCE;
+  /**
+   * mass of the object. determines the pushback force in collisions.
+   */
   private float mass = 1.0f;
   /**
    * other object this object sits on
@@ -34,6 +41,9 @@ public class BodyComponent extends Component {
    * current velocity
    */
   private Vec2 vel = Vec2.origin();
+  /**
+   *
+   */
   private boolean willFall = false;
   private boolean stickToPlatform = true;
   private float gravityScale = 1.0f;
@@ -49,7 +59,8 @@ public class BodyComponent extends Component {
     super.add(gameObject);
     registerGetter("grounded", this::isGrounded);
     registerGetter("static", this::isStatic);
-    registerAction("jump", this::jump);
+    registerGetter("falling", this::isFalling);
+    registerAction("jump", this::jump, JumpAction::new);
 
     if (gameObject.is("area")) {
       on("collideUpdate", this::collideUpdate);
@@ -58,9 +69,70 @@ public class BodyComponent extends Component {
     on("update", this::update);
   }
 
-  public boolean isStatic() {
+  /**
+   * Returns true when the object is standing on another.
+   *
+   * @type property
+   */
+  public boolean isGrounded() {
+    return curPlatform != null;
+  }
+
+  /**
+   * Returns true when the object is static and cannot move.
+   *
+   * @type property
+   */
+  private boolean isStatic() {
     return isStatic;
   }
+
+  /**
+   * Returns true when the object is falling (moving down in direction of gravity).
+   *
+   * @type property
+   */
+  private boolean isFalling() {
+    Vec3 gravityDirection = gameObject.getGame().getGravityDirection();
+    if (gravityDirection == null) {
+      return false;
+    }
+    return this.vel.dot(new Vec2(gravityDirection.getX(), gravityDirection.getY())) > 0;
+  }
+
+  /**
+   * Returns true when the object is jumping (moving up in direction of gravity).
+   *
+   * @type property
+   */
+  private boolean isJumping() {
+    Vec3 gravityDirection = gameObject.getGame().getGravityDirection();
+    if (gravityDirection == null) {
+      return false;
+    }
+    return this.vel.dot(new Vec2(gravityDirection.getX(), gravityDirection.getY())) < 0;
+  }
+
+  /**
+   * Adds a jump force to the object.
+   *
+   * @type action
+   */
+  public void jump(JumpAction params) {
+    Vec3 gravityDirection = gameObject.getGame().getGravityDirection();
+    if (gravityDirection == null) {
+      return;
+    }
+    Float force = params.getForce();
+    if (force == null) {
+      force = jumpForce;
+    }
+    curPlatform = null;
+    lastPlatformPos = null;
+    // jump in the opposite direction as the gravity
+    this.vel = new Vec2(gravityDirection.getX(), gravityDirection.getY()).scale(-force);
+  }
+
 
   public void collideUpdate(Event event) {
     GameObject other = event.getParameter(0);
@@ -108,7 +180,9 @@ public class BodyComponent extends Component {
     other.trigger("physicsResolve", reverseCollision);
   }
 
-  /** Calculate the displacement in the objects local coordinate system. */
+  /**
+   * Calculate the displacement in the objects local coordinate system.
+   */
   private static Vec2 getLocalCoordinateDisplacement(GameObject gameObject1, Vec2 worldDisplacement) {
     Matrix4 inverseTransform = gameObject1.getWorldTransformWithoutAnchor().inverse();
     Vec3 localDisplacement = inverseTransform.multiply(worldDisplacement.getX(), worldDisplacement.getY(), 0);
@@ -116,22 +190,6 @@ public class BodyComponent extends Component {
     Vec3 localRelativeDisplacement = localDisplacement.sub(localZero);
     Vec2 displacement = new Vec2(localRelativeDisplacement.getX(), localRelativeDisplacement.getY());
     return displacement;
-  }
-
-  public boolean isFalling() {
-    Vec3 gravityDirection = gameObject.getGame().getGravityDirection();
-    if (gravityDirection == null) {
-      return false;
-    }
-    return this.vel.dot(new Vec2(gravityDirection.getX(), gravityDirection.getY())) > 0;
-  }
-
-  public boolean isJumping() {
-    Vec3 gravityDirection = gameObject.getGame().getGravityDirection();
-    if (gravityDirection == null) {
-      return false;
-    }
-    return this.vel.dot(new Vec2(gravityDirection.getX(), gravityDirection.getY())) < 0;
   }
 
   private void onPhysicsResolve(Event event) {
@@ -218,26 +276,24 @@ public class BodyComponent extends Component {
     gameObject.doAction("move", this.vel, deltaTime);
   }
 
-  public boolean isGrounded() {
-    return curPlatform != null;
-  }
-
-  public void jump(List<Object> params) {
-    Vec3 gravityDirection = gameObject.getGame().getGravityDirection();
-    if (gravityDirection == null) {
-      return;
-    }
-    Float force = jumpForce;
-    if (!params.isEmpty()) {
-      force = (Float) params.get(0);
-    }
-    curPlatform = null;
-    lastPlatformPos = null;
-    // jump in the opposite direction as the gravity
-    this.vel = new Vec2(gravityDirection.getX(), gravityDirection.getY()).scale(-force);
-  }
-
+  /**
+   * Creates a body component.
+   *
+   * @param isStatic when true the body cannot move and therefore will not move in case of a collision
+   * @type creator
+   */
   public static BodyComponent body(boolean isStatic) {
     return new BodyComponent(isStatic);
+  }
+
+  private static class JumpAction extends Action {
+    private JumpAction(List<Object> params) {
+      super(params);
+    }
+
+    public Float getForce() {
+      return getParameter(0);
+    }
+
   }
 }

@@ -11,21 +11,8 @@ import java.util.*;
 
 /**
  * # AreaComponent
- *
+ * <p>
  * {@link AreaComponent#area()} provides collision detection for the game object.
- *
- * # Properties
- *
- * - worldArea (read only) - returns the current absolute positioning of the collision area
- *
- * # Events
- *
- * | Event         | Direction | Description |
- * |---------------|-----------|---|
- * | collideUpdate | consumed  | triggered by collision detection when this object collides with another. |
- * | update        | consumed  | triggered by main update loop. used to keep track of objects which collides this frame and which doesn't collide anymore |
- * | collide       | triggered | triggered when a collision starts |
- * | collideEnd    | triggered | triggered when a collision ends |
  */
 public class AreaComponent extends Component {
 
@@ -33,9 +20,13 @@ public class AreaComponent extends Component {
    * List of objects this object is already colliding with.
    */
   private Map<Integer, Collision> colliding = new HashMap<>();
-  /** List of objects this object is colliding with in the current frame. */
+  /**
+   * List of objects this object is colliding with in the current frame.
+   */
   private Set<Integer> collidingThisFrame = new HashSet<>();
-  /** List of tags this object should ignore collisions with. */
+  /**
+   * List of tags this object should ignore collisions with.
+   */
   private Set<String> collisionIgnore = new HashSet<>();
 
   private Rect collisionArea;
@@ -52,19 +43,36 @@ public class AreaComponent extends Component {
     on("collideUpdate", this::onCollideUpdate);
     on("update", this::onUpdate);
 
-    registerAction("isColliding", this::isCollidingWith);
+    registerAction("isColliding", this::isCollidingWith, IsCollidingWithAction::new);
     registerGetter("collisionIgnore", this::getCollisionIgnore);
-    registerGetter("collisions", () -> colliding.values());
+    registerGetter("collisions", this::getCollisions);
     registerGetter("localArea", this::getLocalArea);
   }
 
+  /**
+   * Scales the collision area by this factor.
+   *
+   * @type configuration
+   */
   public AreaComponent scale(float scale) {
     this.scale = scale;
     return this;
   }
 
   /**
-   * returns collider area in local coordinates.
+   * Sets the tags which should be ignored in collision detection.
+   *
+   * @type configuration
+   */
+  public AreaComponent ignoreCollisionWith(String... tags) {
+    collisionIgnore.addAll(Arrays.asList(tags));
+    return this;
+  }
+
+  /**
+   * Returns collider area in local coordinates.
+   *
+   * @type property
    */
   public Rect getLocalArea() {
     if (collisionArea != null) {
@@ -74,35 +82,43 @@ public class AreaComponent extends Component {
     return new Rect(0, 0, size.getX() * scale, size.getY() * scale);
   }
 
+  /**
+   * Returns the set of tags which should be ignored when doing collision checks.
+   *
+   * @type property
+   */
   public Set<String> getCollisionIgnore() {
     return collisionIgnore;
   }
 
-  public AreaComponent ignoreCollisionWith(String... tags) {
-    collisionIgnore.addAll(Arrays.asList(tags));
-    return this;
-  }
-
-  /**
-   * Checks if this GameObject is colliding with `other` in this frame.
-   * Params:
-   * - GameObject other
-   */
-  public boolean isCollidingWith(List<Object> params) {
-    GameObject other = (GameObject) params.get(0);
-    return colliding.containsKey(other.getId());
-  }
-
   /**
    * Returns true when this game object is colliding with anything this frame.
+   *
+   * @type property
    */
   public boolean isColliding() {
     return !colliding.isEmpty();
   }
 
+  /**
+   * Returns current collisions.
+   *
+   * @type property
+   */
   public List<Collision> getCollisions() {
     return new ArrayList<>(colliding.values());
   }
+
+  /**
+   * Checks if this GameObject is colliding with `other` in this frame.
+   *
+   * @type action
+   */
+  public boolean isCollidingWith(IsCollidingWithAction params) {
+    GameObject other = params.getOther();
+    return colliding.containsKey(other.getId());
+  }
+
 
   public void onCollideUpdate(Event event) {
     GameObject other = event.getParameter(0);
@@ -136,11 +152,35 @@ public class AreaComponent extends Component {
     collidingThisFrame.clear();
   }
 
+  /**
+   * Creates an area component without a collision shape.
+   *
+   * @type creator
+   */
   public static AreaComponent area() {
     return new AreaComponent(null);
   }
 
+  /**
+   * Creates an area component without a rectangular collision shape.
+   *
+   * @type creator
+   */
   public static AreaComponent area(Rect shape) {
     return new AreaComponent(shape);
+  }
+
+  /**
+   * Parameter class for 'isCollidingWith' action.
+   */
+  private static class IsCollidingWithAction extends Action {
+
+    private IsCollidingWithAction(List<Object> params) {
+      super(params);
+    }
+
+    public GameObject getOther() {
+      return getParameter(0);
+    }
   }
 }

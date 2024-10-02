@@ -72,14 +72,14 @@ public class RowBuilder {
    * add slider
    */
   public RowBuilder slider(String property, float min, float max) {
-    return addCell(componentBuilder.sliderBuilder(property, min, max));
+    return addCell(componentBuilder.sliderBuilder(property, height, min, max));
   }
 
   /**
    * add checkbox
    */
   public RowBuilder checkbox(String property) {
-    return addCell(componentBuilder.checkboxBuilder(property));
+    return addCell(componentBuilder.checkboxBuilder(property, height));
   }
 
   public RowBuilder skip() {

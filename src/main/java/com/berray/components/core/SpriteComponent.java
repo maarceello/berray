@@ -96,14 +96,15 @@ public class SpriteComponent extends Component {
 
   @Override
   public void add(GameObject gameObject) {
+    super.add(gameObject);
     registerBoundProperty("size", this::getSize, this::setSize);
     registerGetter("render", () -> true);
     registerGetter("curAnim", this::getAnim);
     registerBoundProperty("frame", this::getFrameNo, this::setFrameNo);
     registerBoundProperty("flipX", this::isFlipX, this::setFlipX);
     registerBoundProperty("flipY", this::isFlipY, this::setFlipY);
-    registerAction("play", this::play);
-    registerAction("stop", this::stop);
+    registerAction("play", this::play, Action::new);
+    registerAction("stop", this::stop, Action::new);
     on("update", this::update);
     if (anim != null) {
       currentAnimation = initializeAnimation(anim);
@@ -180,20 +181,20 @@ public class SpriteComponent extends Component {
           } else {
             frameNo = currentAnimation.getNumFrames() - 1;
             // stop animation
-            stop();
+            stop(null);
           }
         }
       }
     }
   }
 
-  private void stop() {
+  private void stop(Action action) {
     currentAnimation = null;
     gameObject.trigger("animEnd", anim);
   }
 
-  public void play(List<Object> params) {
-    String animationName = (String) params.get(0);
+  public void play(Action params) {
+    String animationName = params.getParameter(0);
     anim(animationName);
     gameObject.trigger("animStart", anim);
   }

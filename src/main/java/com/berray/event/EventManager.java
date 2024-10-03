@@ -3,6 +3,7 @@ package com.berray.event;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 /**
  * Stores event callbacks and triggers events.
@@ -14,11 +15,11 @@ public class EventManager {
    */
   private Map<String, EventListeners> eventListenersMap = new HashMap<>();
 
-  public void addEventListener(String event, EventListener eventListener) {
+  public <E extends Event> void addEventListener(String event, EventListener<E> eventListener) {
     addEventListener(event, eventListener, null);
   }
 
-  public void addEventListener(String event, EventListener eventListener, Object owner) {
+  public <E extends Event> void addEventListener(String event, EventListener<E> eventListener, Object owner) {
     eventListenersMap.computeIfAbsent(event, e -> new EventListeners()).addEventListener(eventListener, owner);
   }
 
@@ -28,8 +29,9 @@ public class EventManager {
 
   public void trigger(String eventName, List<Object> params) {
     EventListeners listeners = eventListenersMap.get(eventName);
+    Event event = EventTypeFactory.getInstance().createEvent(eventName, params);
     if (listeners != null) {
-      listeners.trigger(new Event(eventName, params));
+      listeners.trigger(event);
     }
   }
 

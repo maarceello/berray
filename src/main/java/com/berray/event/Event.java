@@ -8,7 +8,7 @@ public class Event {
   private final String name;
 
   /** Variable list of event parameters. */
-  private final List<Object> parameters;
+  protected final List<Object> parameters;
 
   public Event(String name, List<Object> parameters) {
     this.name = name;

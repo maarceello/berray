@@ -3,7 +3,7 @@ package com.berray.objects.addon;
 import com.berray.GameObject;
 import com.berray.components.core.AnchorComponent;
 import com.berray.components.core.AnchorType;
-import com.berray.components.core.PosComponent;
+import com.berray.components.core.PosComponent2d;
 import com.berray.math.Vec2;
 import com.berray.objects.core.Label;
 
@@ -21,17 +21,17 @@ public class ObjectDebug extends GameObject {
     addComponents("debug");
     add(
         Label.label(() -> "Id: "+this.getDebuggedObjectId()),
-        PosComponent.pos(new Vec2(0,0)),
+        PosComponent2d.pos(new Vec2(0,0)),
         AnchorComponent.anchor(AnchorType.TOP_LEFT)
     );
     add(
         Label.label(() -> "Pos: "+this.getDebuggedObjectPos()),
-        PosComponent.pos(new Vec2(0,20)),
+        PosComponent2d.pos(new Vec2(0,20)),
         AnchorComponent.anchor(AnchorType.TOP_LEFT)
     );
     add(
         Label.label(() -> "Properties:\n"+this.getDebuggedObjectProperties()),
-        PosComponent.pos(new Vec2(0,40)),
+        PosComponent2d.pos(new Vec2(0,40)),
         AnchorComponent.anchor(AnchorType.TOP_LEFT)
     );
   }

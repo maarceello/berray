@@ -51,6 +51,10 @@ public class MouseComponent extends Component {
   public void add(GameObject gameObject) {
     super.add(gameObject);
 
+    on("sceneGraphAdded", this::processSceneGraphAdded);
+  }
+
+  private void processSceneGraphAdded(Event e) {
     onGame("mouseMove", this::processMouseMove);
     onGame("mousePress", this::processMousePress);
     onGame("mouseRelease", this::processMouseRelease);

@@ -2,13 +2,13 @@ package com.berray;
 
 import com.berray.components.core.AnchorType;
 import com.berray.components.core.Component;
+import com.berray.event.Event;
 import com.berray.event.EventListener;
 import com.berray.event.EventManager;
 import com.berray.math.Matrix4;
 import com.berray.math.Rect;
 import com.berray.math.Vec2;
 import com.berray.math.Vec3;
-
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -29,7 +29,7 @@ public class GameObject {
   /**
    * Components for this game object.
    */
-  private final Map<Class<?>, Component> components;
+  protected final Map<Class<?>, Component> components;
 
   /**
    * registered getter methods from components.
@@ -65,7 +65,7 @@ public class GameObject {
   /**
    * local transformation relative to the parent, without the applied anchor.
    */
-  protected Matrix4 localTransformWithoutAnchor = Matrix4.identity();
+  private Matrix4 localTransformWithoutAnchor = Matrix4.identity();
   /**
    * transformation relative to the world.
    */
@@ -103,6 +103,16 @@ public class GameObject {
 
   public Game getGame() {
     return game;
+  }
+
+  public void setGame(Game game) {
+    this.game = game;
+    // tell each childs the game instance
+    children.forEach(child -> child.setGame(game));
+    if (game != null) {
+      // fire event that the object was added to the scene graoh
+      trigger("sceneGraphAdded", this);
+    }
   }
 
   /**
@@ -166,12 +176,6 @@ public class GameObject {
   }
 
 
-  public void setGame(Game game) {
-    this.game = game;
-    // tell each childs the game instance
-    children.forEach(child -> child.setGame(game));
-  }
-
   public Set<String> getTags() {
     return tags;
   }
@@ -233,6 +237,9 @@ public class GameObject {
         addTag(c.toString());
       } else if (c instanceof Component) {
         Component component = (Component) c;
+        if (this.components.containsKey(component.getClass())) {
+          throw new IllegalArgumentException("Component " + component.getClass() + " is already registered in object with tags " + tags);
+        }
         component.setId(nextComponentId.incrementAndGet());
         this.components.put(component.getClass(), component);
         this.tags.add(component.getTag());
@@ -259,6 +266,7 @@ public class GameObject {
   }
 
   public void draw() {
+    // don't draw paused objects
     if (paused) {
       return;
     }
@@ -283,9 +291,37 @@ public class GameObject {
     setterMethods.put(name, setter);
   }
 
+  /**
+   * Registers a property setter which triggers a <code>propertyChange</code> event when the property is changed.
+   * The property name is remembered. Upon deletion the properties will be removed.
+   * <p>
+   * Note: to compare the old and the new value the getter is needed too.
+   */
+  public <E> void registerBoundPropertySetter(String name, Supplier<E> getter, Consumer<E> setter) {
+    registerPropertySetter(name, (E newValue) ->
+        setter.accept(firePropertyChange(name, getter.get(), newValue))
+    );
+  }
+
   public <E> void registerProperty(String name, Supplier<E> getter, Consumer<E> setter) {
+    if (getterMethods.containsKey(name)) {
+      throw new IllegalStateException("property getter " + name + " already registered with " + getterMethods.get(name));
+    }
     getterMethods.put(name, getter);
+    if (setterMethods.containsKey(name)) {
+      throw new IllegalStateException("property setter " + name + " already registered with " + setterMethods.get(name));
+    }
     setterMethods.put(name, setter);
+  }
+
+  /**
+   * Registers a property which triggers a <code>propertyChange</code> event when the property is changed.
+   * The property name is remembered. Upon deletion the properties will be removed.
+   */
+  public <E> void registerBoundProperty(String name, Supplier<E> getter, Consumer<E> setter) {
+    registerProperty(name, getter, newValue ->
+        setter.accept(firePropertyChange(name, getter.get(), newValue))
+    );
   }
 
   public void removeProperty(String name) {
@@ -352,6 +388,10 @@ public class GameObject {
     return getOrDefault(property, defaultValue);
   }
 
+  public boolean canWrite(String property) {
+    return setterMethods.containsKey(property);
+  }
+
   /**
    * returns registered component property
    */
@@ -366,7 +406,7 @@ public class GameObject {
   public <E> void set(String property, E value) {
     Consumer<E> setterMethod = (Consumer<E>) setterMethods.get(property);
     if (setterMethod == null) {
-      throw new IllegalStateException("cannot find setter for property " + property + " in gameobject with tags " + tags);
+      throw new IllegalStateException("cannot find setter for property " + property + " in gameobject " + getClass().getSimpleName() + " with tags " + tags);
     }
     setterMethod.accept(value);
   }
@@ -437,14 +477,14 @@ public class GameObject {
   /**
    * add event listener.
    */
-  public void on(String event, EventListener listener) {
+  public <E extends Event> void on(String event, EventListener<E> listener) {
     on(event, listener, null);
   }
 
   /**
    * add event listener.
    */
-  public void on(String event, EventListener listener, Object owner) {
+  public <E extends Event> void on(String event, EventListener<E> listener, Object owner) {
     eventManager.addEventListener(event, listener, owner);
   }
 
@@ -469,10 +509,6 @@ public class GameObject {
 
   public GameObject getRoot() {
     return (parent == null) ? this : parent.getRoot();
-  }
-
-  public void onClick(EventListener eventListener) {
-    this.trigger("click");
   }
 
   /**
@@ -535,14 +571,14 @@ public class GameObject {
     return worldTransformWithoutAnchor;
   }
 
-  private void ensureTransformCalculated() {
+  protected void ensureTransformCalculated() {
     if (transformDirty || (parent != null && parent.isTransformDirty())) {
       setTransformDirty(); // be sure to notify children that the transform is recalculated
-      Vec2 pos = getOrDefault("pos", Vec2.origin());
-      float angle = getOrDefault("angle", 0f);
+      Matrix4 posMatrix = getOrDefault("posTransform", Matrix4.identity());
+      Matrix4 rotationMatrix = getOrDefault("rotationMatrix", Matrix4.identity());
       Vec2 size = getOrDefault("size", Vec2.origin());
       AnchorType anchor = getOrDefault("anchor", AnchorType.CENTER);
-      float scale = getOrDefault("scale", 1.0f);
+      Vec3 scale = getOrDefault("scale", new Vec3(1.0f, 1.0f, 1.0f));
 
       float w2 = size.getX() / 2.0f;
       float h2 = size.getY() / 2.0f;
@@ -551,13 +587,12 @@ public class GameObject {
       float anchorY = h2 + anchor.getY() * h2;
 
       localTransformWithoutAnchor = Matrix4.identity()
-          .multiply(Matrix4.fromTranslate(pos.getX(), pos.getY(), 0))
-          .multiply(Matrix4.fromRotatez((float) Math.toRadians(angle)))
-          .multiply(Matrix4.fromScale(scale, scale, 1.0f));
+          .multiply(posMatrix)
+          .multiply(rotationMatrix)
+          .multiply(Matrix4.fromScale(scale.getX(), scale.getY(), scale.getZ()));
       localTransform = localTransformWithoutAnchor
           .multiply(Matrix4.fromTranslate(-anchorX, -anchorY, 0));
 
-      Matrix4 parentsWorldTransformWithoutAnchor = parent == null ? Matrix4.identity() : parent.getWorldTransformWithoutAnchor();
       Matrix4 parentsWorldTransform = parent == null ? Matrix4.identity() : parent.getWorldTransform();
       this.worldTransformWithoutAnchor = parentsWorldTransform.multiply(localTransformWithoutAnchor);
 
@@ -630,6 +665,12 @@ public class GameObject {
     return parent != null;
   }
 
+  protected boolean containsComponent(List<Object> components, String tag) {
+    return components.stream()
+        .filter(Component.class::isInstance)
+        .anyMatch(c -> ((Component) c).getTag().equals(tag));
+  }
+
 
   private static class ChildIterator implements Iterator<GameObject> {
     private final List<GameObject> children;
@@ -699,16 +740,17 @@ public class GameObject {
       // we don't have more iterators. so we don't have an element to return
       throw new NoSuchElementException();
     }
+
   }
 
 
-  public static GameObject make(Object... components) {
+  public static GameObject makeGameObject(Object... components) {
     GameObject object = new GameObject();
     object.addComponents(components);
     return object;
   }
 
-  public static <E extends GameObject> E make(E gameObject, Object... components) {
+  public static <E extends GameObject> E makeGameObject(E gameObject, Object... components) {
     if (gameObject == null) {
       throw new IllegalArgumentException("gameObject may not be null");
     }

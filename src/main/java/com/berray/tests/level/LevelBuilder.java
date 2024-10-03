@@ -5,7 +5,7 @@ import com.berray.math.Vec2;
 import java.util.*;
 import java.util.function.Consumer;
 
-import static com.berray.components.core.PosComponent.pos;
+import static com.berray.components.core.PosComponent2d.pos;
 
 /**
  * Class responsible for creating level Game Objects.

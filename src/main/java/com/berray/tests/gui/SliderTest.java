@@ -7,6 +7,7 @@ import com.berray.components.CoreComponentShortcuts;
 import com.berray.components.core.AnchorType;
 import com.berray.math.Color;
 import com.berray.math.Vec2;
+import com.berray.objects.gui.Slider;
 
 
 public class SliderTest extends BerrayApplication implements CoreComponentShortcuts, CoreAssetShortcuts {
@@ -21,22 +22,22 @@ public class SliderTest extends BerrayApplication implements CoreComponentShortc
     loadSprite("/ui/slider/rightbar", "resources/kenny-ui-pack/space/bar_square_large_m_gray.png");
     loadSprite("/ui/slider/rightborder", "resources/kenny-ui-pack/space/bar_square_large_r_gray.png");
 
-    GameObject leftBorder = GameObject.make(
+    GameObject leftBorder = GameObject.makeGameObject(
         sprite("/ui/slider/leftborder"),
         pos(0,0),
         anchor(AnchorType.CENTER)
     );
-    GameObject rightBorder = GameObject.make(
+    GameObject rightBorder = GameObject.makeGameObject(
         sprite("/ui/slider/rightborder"),
         pos(0,0),
         anchor(AnchorType.CENTER)
     );
-    GameObject rightBar = GameObject.make(
+    GameObject rightBar = GameObject.makeGameObject(
         sprite("/ui/slider/rightbar"),
         pos(0,0),
         anchor(AnchorType.CENTER)
     );
-    GameObject leftBar = GameObject.make(
+    GameObject leftBar = GameObject.makeGameObject(
         sprite("/ui/slider/leftbar"),
         pos(0,0),
         anchor(AnchorType.CENTER)

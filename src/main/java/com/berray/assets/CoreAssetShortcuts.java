@@ -1,11 +1,17 @@
 package com.berray.assets;
 
+import java.awt.image.BufferedImage;
+
 public interface CoreAssetShortcuts {
   DefaultAssetManager getAssetManager();
 
 
   default void loadSprite(String name, String path) {
     getAssetManager().loadSprite(name, path);
+  }
+
+  default void loadSprite(String name, BufferedImage image) {
+    getAssetManager().loadSprite(name, image);
   }
 
   default  void loadMusic(String name, String path) {

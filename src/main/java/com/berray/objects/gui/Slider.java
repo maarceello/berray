@@ -1,13 +1,14 @@
-package com.berray.tests.gui;
+package com.berray.objects.gui;
 
 import com.berray.GameObject;
 import com.berray.components.CoreComponentShortcuts;
 import com.berray.components.core.AnchorType;
+import com.berray.components.core.Component;
 import com.berray.event.Event;
 import com.berray.math.Color;
 import com.berray.math.Vec2;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
 /** Test for a horizontal slider.
@@ -54,30 +55,65 @@ public class Slider extends GameObject implements CoreComponentShortcuts {
     on("add", this::onAdd);
     on("mouseClick", this::onMouseClick);
     on("dragging", this::onMouseDragging);
-    registerProperty("size", () -> size, newSize -> this.size = newSize);
-    registerProperty("value", () -> value, this::setValue);
+    registerProperty("size", this::getSize, this::setSize);
+    registerProperty("value", this::getValue, this::setValue);
     registerPropertyGetter("render", () -> true);
   }
 
   public Slider leftBorder(GameObject object) {
+    addRequiredComponents(object);
     this.leftBorder = object;
     return this;
   }
 
   public Slider rightBorder(GameObject object) {
+    addRequiredComponents(object);
     this.rightBorder = object;
     return this;
   }
 
   public Slider leftBar(GameObject object) {
+    addRequiredComponents(object);
     this.leftBar = object;
     return this;
   }
 
+  public Slider leftBar(Component ... components) {
+    return leftBar(makeGameObject(components));
+  }
+
   public Slider rightBar(GameObject object) {
+    addRequiredComponents(object);
     this.rightBar = object;
     return this;
   }
+
+  public Slider rightBar(Component ... components) {
+    return rightBar(makeGameObject(components));
+  }
+
+
+  public Slider handle(GameObject object) {
+    addRequiredComponents(object);
+    object.set("anchor", AnchorType.CENTER);
+    this.handle = object;
+    return this;
+  }
+
+  public Slider handle(Component ... components) {
+    return handle(makeGameObject(components));
+  }
+
+
+  private void addRequiredComponents(GameObject object) {
+    if (!object.is("pos")) {
+      object.addComponents(pos(Vec2.origin()));
+    }
+    if (!object.is("anchor")) {
+      object.addComponents(anchor(AnchorType.TOP_LEFT));
+    }
+  }
+
 
   private void onMouseDragging(Event event) {
     Vec2 relativePos = event.getParameter(1);
@@ -89,6 +125,10 @@ public class Slider extends GameObject implements CoreComponentShortcuts {
     Vec2 relativePos = event.getParameter(1);
     float percent = relativePos.getX() / size.getX();
     setValue(min + (max - min) * percent);
+  }
+
+  public float getValue() {
+    return value;
   }
 
   private void setValue(float value) {
@@ -103,6 +143,16 @@ public class Slider extends GameObject implements CoreComponentShortcuts {
 
     updateChildPositions();
   }
+
+  public Vec2 getSize() {
+    return size;
+  }
+
+  public void setSize(Vec2 size) {
+    this.size = size;
+    setTransformDirty();
+  }
+
 
   private void updateChildPositions() {
     if (leftBorder != null) {
@@ -150,12 +200,16 @@ public class Slider extends GameObject implements CoreComponentShortcuts {
       if (rightBar != null) {
         add(rightBar);
       }
-      handle = add(
-          rect(size.getY() * 1.2f, size.getY() * 1.2f),
-          pos(size.getX() * (value / (max - min)),size.getY() / 2.0f),
-          anchor(AnchorType.CENTER),
-          color(Color.WHITE)
-      );
+      if (handle != null) {
+        add(handle);
+      } else {
+        handle = add(
+            rect(size.getY() * 1.2f, size.getY() * 1.2f),
+            pos(size.getX() * (value / (max - min)), size.getY() / 2.0f),
+            anchor(AnchorType.CENTER),
+            color(Color.WHITE)
+        );
+      }
 
       updateChildPositions();
     }
@@ -164,15 +218,24 @@ public class Slider extends GameObject implements CoreComponentShortcuts {
 
   @Override
   public void addComponents(List<Object> components) {
-    // first add our own components
-    super.addComponents(Arrays.asList(
-        area(),
-        mouse(),
-        pos(0, 0))
-    );
+    List<Object> allComponents = new ArrayList<>();
+    List<Object> existingComponents = new ArrayList<>(this.components.values());
+    existingComponents.addAll(components);
+
+    if (!containsComponent(existingComponents, "pos")) {
+      allComponents.add( pos(0,0));
+    }
+    if (!containsComponent(existingComponents, "area")) {
+      allComponents.add(area());
+    }
+    if (!containsComponent(existingComponents, "mouse")) {
+      allComponents.add(mouse());
+    }
+    allComponents.addAll(components);
     // then add the supplied components. these may overwrite our own components.
-    super.addComponents(components);
+    super.addComponents(allComponents);
   }
+
 
 
 }

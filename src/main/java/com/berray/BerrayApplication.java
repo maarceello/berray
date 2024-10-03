@@ -5,6 +5,8 @@ import com.berray.assets.DefaultAssetManager;
 import com.berray.components.core.AnchorType;
 import com.berray.event.Event;
 import com.berray.event.EventListener;
+import com.berray.event.KeyEvent;
+import com.berray.event.UpdateEvent;
 import com.berray.math.Color;
 import com.berray.math.Vec2;
 import com.raylib.Raylib;
@@ -16,7 +18,7 @@ import java.util.function.Consumer;
 import static com.berray.components.core.AnchorComponent.anchor;
 import static com.berray.components.core.DebugComponent.debug;
 import static com.berray.components.core.LayerComponent.layer;
-import static com.berray.components.core.PosComponent.pos;
+import static com.berray.components.core.PosComponent2d.pos;
 import static com.berray.objects.core.Label.label;
 import static com.raylib.Jaylib.*;
 
@@ -35,10 +37,10 @@ public abstract class BerrayApplication {
   protected Timings timings = new Timings();
 
   // KEY_KB_MENU is the last key code with id 348
-  private int[] keysDown = new int[KEY_KB_MENU];
+  private final int[] keysDown = new int[KEY_KB_MENU];
 
-  private Map<String, Consumer<SceneDescription>> scenes = new HashMap<>();
-  private Random random = new Random();
+  private final Map<String, Consumer<SceneDescription>> scenes = new HashMap<>();
+  private final Random random = new Random();
 
 
   public BerrayApplication width(int width) {
@@ -68,7 +70,6 @@ public abstract class BerrayApplication {
     return this;
   }
 
-  // TODO: Accept a Ray Color or an Array [r, g, b, a]
   public BerrayApplication background(Color background) {
     this.background = background;
     return this;
@@ -92,39 +93,39 @@ public abstract class BerrayApplication {
   }
 
 
-  public void on(String event, EventListener listener) {
+  public <E extends Event> void on(String event, EventListener<E> listener) {
     game.on(event, listener);
   }
 
-  public void onUpdate(String tag, EventListener eventListener) {
+  public void onUpdate(String tag, EventListener<UpdateEvent> eventListener) {
     game.onUpdate(tag, eventListener);
   }
 
-  public void onKeyPress(EventListener eventListener) {
+  public void onKeyPress(EventListener<KeyEvent> eventListener) {
     game.on("keyPress", eventListener);
   }
 
-  public void onKeyPress(int key, EventListener eventListener) {
-    game.on("keyPress", event -> {
-      int pressedKey = event.getParameter(0);
+  public void onKeyPress(int key, EventListener<KeyEvent> eventListener) {
+    game.on("keyPress", (KeyEvent event) -> {
+      int pressedKey = event.getKeyCode();
       if (pressedKey == key) {
         eventListener.onEvent(event);
       }
     });
   }
 
-  public void onKeyDown(int key, EventListener eventListener) {
-    game.on("keyDown", event -> {
-      int pressedKey = event.getParameter(0);
+  public void onKeyDown(int key, EventListener<KeyEvent> eventListener) {
+    game.on("keyDown", (KeyEvent event) -> {
+      int pressedKey = event.getKeyCode();
       if (pressedKey == key) {
         eventListener.onEvent(event);
       }
     });
   }
 
-  public void onKeyRelease(int key, EventListener eventListener) {
-    game.on("keyUp", event -> {
-      int pressedKey = event.getParameter(0);
+  public void onKeyRelease(int key, EventListener<KeyEvent> eventListener) {
+    game.on("keyUp", (KeyEvent event) -> {
+      int pressedKey = event.getKeyCode();
       if (pressedKey == key) {
         eventListener.onEvent(event);
       }
@@ -332,6 +333,11 @@ public abstract class BerrayApplication {
       @Override
       public GameObject add(Object... components) {
         return root.add(components);
+      }
+
+      @Override
+      public <E extends GameObject> E add(E gameObject, Object... components) {
+        return root.add(gameObject, components);
       }
 
       @Override

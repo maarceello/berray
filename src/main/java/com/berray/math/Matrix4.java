@@ -156,15 +156,15 @@ public class Matrix4 {
   }
 
   public Matrix4 rotatex(float angle) {
-    return multiply(Matrix4.fromRotatex(angle));
+    return multiply(Matrix4.fromRotateX(angle));
   }
 
   public Matrix4 rotatey(float angle) {
-    return multiply(Matrix4.fromRotatey(angle));
+    return multiply(Matrix4.fromRotateY(angle));
   }
 
   public Matrix4 rotatez(float angle) {
-    return multiply(Matrix4.fromRotatez(angle));
+    return multiply(Matrix4.fromRotateZ(angle));
   }
 
   public Matrix4 rotateAxis(float angle, Vec3 axis) {
@@ -198,7 +198,7 @@ public class Matrix4 {
     return m;
   }
 
-  public static Matrix4 fromRotatex(float angle) {
+  public static Matrix4 fromRotateX(float angle) {
     Matrix4 m = Matrix4.identity();
     float sin = (float) Math.sin(angle);
     float cos = (float) Math.cos(angle);
@@ -209,7 +209,7 @@ public class Matrix4 {
     return m;
   }
 
-  public static Matrix4 fromRotatey(float angle) {
+  public static Matrix4 fromRotateY(float angle) {
     Matrix4 m = Matrix4.identity();
     float sin = (float) Math.sin(angle);
     float cos = (float) Math.cos(angle);
@@ -220,7 +220,7 @@ public class Matrix4 {
     return m;
   }
 
-  public static Matrix4 fromRotatez(float angle) {
+  public static Matrix4 fromRotateZ(float angle) {
     Matrix4 m = Matrix4.identity();
     float sin = (float) Math.sin(angle);
     float cos = (float) Math.cos(angle);

@@ -23,8 +23,6 @@ public class GUITest extends BerrayApplication implements CoreComponentShortcuts
 
 
 
-    button.onClick(event -> System.out.println("click"));
-
     button.on("click", event -> System.out.println("click two"));
 
   }

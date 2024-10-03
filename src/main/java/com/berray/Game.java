@@ -3,11 +3,12 @@ package com.berray;
 import com.berray.assets.loader.AssetLoaders;
 import com.berray.assets.DefaultAssetManager;
 import com.berray.assets.loader.RaylibAssetLoader;
+import com.berray.event.*;
 import com.berray.event.EventListener;
-import com.berray.event.EventManager;
 import com.berray.math.Collision;
 import com.berray.math.Rect;
 import com.berray.math.Vec2;
+import com.berray.math.Vec3;
 import com.raylib.Raylib;
 
 import java.nio.file.FileSystems;
@@ -20,16 +21,19 @@ public class Game {
   /**
    * Gravity vector.
    */
-  private Vec2 gravity;
+  private Vec3 gravity;
   /**
    * normalized gravity vector.
    */
-  private Vec2 gravityDirection;
-  private final GameObject root;
+  private Vec3 gravityDirection;
+  /** current root object */
+  private GameObject root;
+  /** root object for 2d rendering */
   private List<String> layers = new ArrayList<>();
 
   private EventManager eventManager;
   private DefaultAssetManager assetManager;
+
 
   // Constructor
   public Game() {
@@ -37,6 +41,15 @@ public class Game {
     assetLoaders = new AssetLoaders();
     assetLoaders.addAssetLoader(new RaylibAssetLoader());
     assetManager = new DefaultAssetManager(assetLoaders, FileSystems.getDefault().getPath("."));
+    EventTypeFactory eventTypeFactory = EventTypeFactory.getInstance();
+    eventTypeFactory.registerEventType("propertyChange", PropertyChangeEvent::new);
+    eventTypeFactory.registerEventType("update", UpdateEvent::new);
+    eventTypeFactory.registerEventType("add", AddEvent::new);
+    eventTypeFactory.registerEventType("keyPress", KeyEvent::new);
+    eventTypeFactory.registerEventType("keyDown", KeyEvent::new);
+    eventTypeFactory.registerEventType("keyUp", KeyEvent::new);
+    eventTypeFactory.registerEventType("mouseMove", MouseMoveEvent::new);
+    eventTypeFactory.registerEventType("sceneGraphAdded", SceneGraphAddedEvent::new);
     eventManager = new EventManager();
     init();
   }
@@ -78,15 +91,15 @@ public class Game {
   }
 
   public void setGravity(int gravity) {
-    this.gravity = new Vec2(0, gravity);
+    this.gravity = new Vec3(0, gravity, 0);
     this.gravityDirection = this.gravity.normalize();
   }
 
-  public Vec2 getGravityDirection() {
+  public Vec3 getGravityDirection() {
     return gravityDirection;
   }
 
-  public Vec2 getGravity() {
+  public Vec3 getGravity() {
     return gravity;
   }
 
@@ -281,11 +294,11 @@ public class Game {
     }
   }
 
-  public void on(String event, EventListener listener) {
+  public <E extends Event> void on(String event, EventListener<E> listener) {
     eventManager.addEventListener(event, listener);
   }
 
-  public void on(String event, EventListener listener, Object owner) {
+  public <E extends Event> void on(String event, EventListener<E> listener, Object owner) {
     eventManager.addEventListener(event, listener, owner);
   }
 
@@ -297,11 +310,10 @@ public class Game {
   /**
    * Update all game objects
    */
-  public void onUpdate(String tag, EventListener eventListener) {
-    on("update", event -> {
-      GameObject gameObject = event.getParameter(0);
+  public void onUpdate(String tag, EventListener<UpdateEvent> eventListener) {
+    on("update", (UpdateEvent event) -> {
       // only propagate event when the object has the required tag
-      if (gameObject.is(tag)) {
+      if (event.getGameObject().is(tag)) {
         eventListener.onEvent(event);
       }
     });

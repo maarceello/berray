@@ -9,6 +9,7 @@ public class Color {
   public static final Color BLACK = new Color(0.0f, 0.0f, 0.0f);
   public static final Color GRAY = new Color(0.5f, 0.5f, 0.5f);
   public static final Color RED = new Color(1.0f, 0.0f, 0.0f);
+  public static final Color GREEN = new Color(0.0f, 1.0f, 0.0f);
 
   private float r;
   private float g;
@@ -18,13 +19,18 @@ public class Color {
   private Raylib.Color raylibColor = null;
 
   public Color() {
+    this(0.0f, 0.0f, 0.0f, 1.0f);
   }
 
   public Color(float r, float g, float b) {
+    this(r, g, b, 1.0f);
+  }
+
+  public Color(float r, float g, float b, float a) {
     this.r = r;
     this.g = g;
     this.b = b;
-    this.a = 1.0f;
+    this.a = a;
   }
 
   public float getR() {
@@ -53,7 +59,7 @@ public class Color {
 
   public Raylib.Color toRaylibColor() {
     if (raylibColor == null) {
-      raylibColor =  new Jaylib.Color((int) (r * 255), (int) (g * 255), (int) (b * 255), (int) (a * 255));
+      raylibColor = new Jaylib.Color((int) (r * 255), (int) (g * 255), (int) (b * 255), (int) (a * 255));
     }
     return raylibColor;
   }

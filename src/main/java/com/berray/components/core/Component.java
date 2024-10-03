@@ -3,6 +3,7 @@ package com.berray.components.core;
 import com.berray.Game;
 import com.berray.GameObject;
 import com.berray.assets.AssetManager;
+import com.berray.event.Event;
 import com.berray.event.EventListener;
 
 import java.util.HashSet;
@@ -102,9 +103,7 @@ public class Component {
    * The property name is remembered. Upon deletion the properties will be removed.
    */
   public <E> void registerBoundProperty(String name, Supplier<E> getter, Consumer<E> setter) {
-    gameObject.registerProperty(name, getter, newValue ->
-        setter.accept(gameObject.firePropertyChange(name, getter.get(), newValue))
-    );
+    gameObject.registerBoundProperty(name, getter, setter);
     properties.add(name);
   }
 
@@ -134,25 +133,23 @@ public class Component {
    * Note: to compare the old and the new value the getter is needed too.
    */
   public <E> void registerBoundSetter(String name, Supplier<E> getter, Consumer<E> setter) {
-    gameObject.registerPropertySetter(name, (E newValue) ->
-        setter.accept(gameObject.firePropertyChange(name, getter.get(), newValue))
-    );
+    registerBoundSetter(name, getter, setter);
     properties.add(name);
   }
 
   /**
    * Registers an action, remembering the action name. Upon deletion the action will be removed.
    */
-  public void registerAction(String name, Consumer<List<Object>> actionMethod) {
-    gameObject.registerAction(name, actionMethod);
+  public <E> void registerAction(String name, Consumer<E> actionMethod, Function<List<Object>, E> actionBeanCreator) {
+    gameObject.registerAction(name, (List<Object> params) -> actionMethod.accept(actionBeanCreator.apply(params)));
     actions.add(name);
   }
 
   /**
    * Registers an action, remembering the action name. Upon deletion the action will be removed.
    */
-  public void registerAction(String name, Function<List<Object>, ?> actionMethod) {
-    gameObject.registerAction(name, actionMethod);
+  public <E> void registerAction(String name, Function<E, ?> actionMethod, Function<List<Object>, E> actionBeanCreator) {
+    gameObject.registerAction(name, (List<Object> params) -> actionMethod.apply(actionBeanCreator.apply(params)));
     actions.add(name);
   }
 
@@ -167,14 +164,14 @@ public class Component {
   /**
    * Registers an event listener. Upon deletion the event listener will be removed.
    */
-  public void on(String eventName, EventListener eventListener) {
+  public <E extends Event> void on(String eventName, EventListener<E> eventListener) {
     gameObject.on(eventName, eventListener, this);
   }
 
   /**
    * Registers an event listener on the game obeject. Upon deletion the event listener will be removed.
    */
-  public void onGame(String eventName, EventListener eventListener) {
+  public <E extends Event> void onGame(String eventName, EventListener<E> eventListener) {
     gameObject.getGame().on(eventName, eventListener, this);
   }
 

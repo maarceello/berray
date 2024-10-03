@@ -9,7 +9,7 @@ import com.berray.math.Color;
 import com.berray.math.Rect;
 import com.berray.math.Vec2;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -25,6 +25,8 @@ public class Button extends GameObject implements CoreComponentShortcuts {
    * push button.
    */
   private final boolean toggleButton;
+  /** When true the button is always square (i.e. checkboxes) */
+  private boolean square = false;
 
   /**
    * armed state is when the mouse is down on the button, but not yet released.
@@ -49,8 +51,32 @@ public class Button extends GameObject implements CoreComponentShortcuts {
     on("hoverLeave", this::onHoverLeave);
     on("mousePress", this::onMousePress);
     on("mouseRelease", this::onMouseRelease);
-    registerPropertyGetter("size", () -> getChildren().get(0).get("size"));
+    registerProperty("size", this::getSize, this::setSize);
     registerPropertyGetter("render", () -> true);
+    registerBoundProperty("pressed", this::getPressed, this::setPressed);
+  }
+
+  public Vec2 getSize() {
+    return getChildren().get(0).get("size");
+  }
+
+  public void setSize(Vec2 size) {
+    if (square) {
+      float minDimension = Math.min(size.getX(), size.getY());
+      size = new Vec2(minDimension, minDimension);
+    }
+    if (neutralChild != null) {
+      neutralChild.set("size", size);
+    }
+    if (hoverChild != null) {
+      hoverChild.set("size", size);
+    }
+    if (armedChild != null) {
+      armedChild.set("size", size);
+    }
+    if (pressedChild != null) {
+      pressedChild.set("size", size);
+    }
   }
 
   private void onMouseRelease(Event event) {
@@ -60,7 +86,8 @@ public class Button extends GameObject implements CoreComponentShortcuts {
     boolean stillhovered = boundingBox.contains(absoluteMousePos);
     if (toggleButton) {
       // toggle button
-      pressed = !pressed;
+      setPressed(!pressed);
+      firePropertyChange("pressed", !pressed, pressed);
       if (pressed) {
         replaceChild(0, getPressedGameObject());
         return;
@@ -101,14 +128,28 @@ public class Button extends GameObject implements CoreComponentShortcuts {
 
   @Override
   public void addComponents(List<Object> components) {
-    // first add our own components
-    super.addComponents(Arrays.asList(
-        area(),
-        mouse(),
-        pos(0, 0))
-    );
+    List<Object> allComponents = new ArrayList<>();
+    List<Object> existingComponents = new ArrayList<>(this.components.values());
+    existingComponents.addAll(components);
+    // first, add our own components
+    if (!containsComponent(existingComponents, "pos")) {
+      allComponents.add( pos(0,0));
+    }
+    if (!containsComponent(existingComponents, "area")) {
+      allComponents.add(area());
+    }
+    if (!containsComponent(existingComponents, "mouse")) {
+      allComponents.add(mouse());
+    }
+    allComponents.addAll(components);
     // then add the supplied components. these may overwrite our own components.
-    super.addComponents(components);
+    super.addComponents(allComponents);
+  }
+
+  /** when called the button is always square. */
+  public Button square() {
+    this.square = true;
+    return this;
   }
 
   /**
@@ -117,7 +158,7 @@ public class Button extends GameObject implements CoreComponentShortcuts {
    * @type initialization
    */
   public Button neutral(Object... components) {
-    this.neutralChild = make(components);
+    this.neutralChild = makeGameObject(components);
     return this;
   }
 
@@ -127,7 +168,7 @@ public class Button extends GameObject implements CoreComponentShortcuts {
    * @type initialization
    */
   public Button neutral(GameObject gameObject, Object... components) {
-    this.neutralChild = make(gameObject, components);
+    this.neutralChild = makeGameObject(gameObject, components);
     return this;
   }
 
@@ -137,7 +178,7 @@ public class Button extends GameObject implements CoreComponentShortcuts {
    * @type initialization
    */
   public Button hover(Object... components) {
-    this.hoverChild = make(components);
+    this.hoverChild = makeGameObject(components);
     return this;
   }
 
@@ -147,7 +188,7 @@ public class Button extends GameObject implements CoreComponentShortcuts {
    * @type initialization
    */
   public Button hover(GameObject gameObject, Object... components) {
-    this.hoverChild = make(gameObject, components);
+    this.hoverChild = makeGameObject(gameObject, components);
     return this;
   }
 
@@ -157,7 +198,7 @@ public class Button extends GameObject implements CoreComponentShortcuts {
    * @type initialization
    */
   public Button armed(Object... components) {
-    this.armedChild = make(components);
+    this.armedChild = makeGameObject(components);
     return this;
   }
 
@@ -167,29 +208,27 @@ public class Button extends GameObject implements CoreComponentShortcuts {
    * @type initialization
    */
   public Button armed(GameObject gameObject, Object... components) {
-    this.armedChild = make(gameObject, components);
+    this.armedChild = makeGameObject(gameObject, components);
     return this;
   }
 
   /**
    * Sets the game object (components) which is used when the button is pressed.
-   * TODO: unused at the moment.
    *
    * @type initialization
    */
   public Button pressed(Object... components) {
-    this.pressedChild = make(components);
+    this.pressedChild = makeGameObject(components);
     return this;
   }
 
   /**
    * Sets the game object (components) which is used when the button is pressed.
-   * TODO: unused at the moment.
    *
    * @type initialization
    */
   public Button pressed(GameObject gameObject, Object... components) {
-    this.pressedChild = make(gameObject, components);
+    this.pressedChild = makeGameObject(gameObject, components);
     return this;
   }
 
@@ -208,7 +247,7 @@ public class Button extends GameObject implements CoreComponentShortcuts {
   }
 
   private GameObject makeSlice9Component(String assetName, Vec2 size, int slice9ComponentSize, Vec2 pos, String text, Color color) {
-    GameObject button = make(
+    GameObject button = makeGameObject(
         Slice9Component.slice9(assetName, size, slice9ComponentSize),
         area(),
         pos(pos),
@@ -231,6 +270,14 @@ public class Button extends GameObject implements CoreComponentShortcuts {
 
   protected GameObject getPressedGameObject() {
     return pressedChild != null ? pressedChild : neutralChild;
+  }
+
+  public boolean getPressed() {
+    return pressed;
+  }
+
+  public void setPressed(boolean pressed) {
+    this.pressed = pressed;
   }
 
   /**

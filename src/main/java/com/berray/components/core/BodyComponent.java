@@ -2,7 +2,6 @@ package com.berray.components.core;
 
 import com.berray.GameObject;
 import com.berray.event.Event;
-import com.berray.event.UpdateEvent;
 import com.berray.math.Collision;
 import com.berray.math.Matrix4;
 import com.berray.math.Vec2;
@@ -142,9 +141,9 @@ public class BodyComponent extends Component {
       return;
     }
 
-    gameObject.trigger("beforePhysicsResolve", collision);
+    emitBeforePhysicsResolve(gameObject, collision);
     Collision reverseCollision = collision.reverse();
-    other.trigger("beforePhysicsResolve", reverseCollision);
+    emitBeforePhysicsResolve(other, reverseCollision);
     // user can mark 'resolved' in beforePhysicsResolve to stop a resolution
     if (collision.isResolved() || reverseCollision.isResolved()) {
       return;
@@ -176,8 +175,28 @@ public class BodyComponent extends Component {
 
     collision.setResolved(true);
     reverseCollision.setResolved(true);
-    gameObject.trigger("physicsResolve", collision);
-    other.trigger("physicsResolve", reverseCollision);
+    GameObject gameObject1 = gameObject;
+    emitPhisicsResolveEvent(gameObject1, collision);
+    emitPhisicsResolveEvent(other, reverseCollision);
+  }
+
+  /**
+   * Fired then the collision is resolved. Note: the event is fired for both parties of the collision.
+   *
+   * @type emit-event
+   */
+  private static void emitPhisicsResolveEvent(GameObject target, Collision collision) {
+    target.trigger("physicsResolve", collision);
+  }
+
+  /**
+   * Fired just before the collision is tried to be resolved so interested parties can resolve the collision themselves.
+   * Note: the event is fired for both parties of the collision.
+   *
+   * @type emit-event
+   */
+  private void emitBeforePhysicsResolve(GameObject target, Collision collision) {
+    target.trigger("beforePhysicsResolve", collision);
   }
 
   /**
@@ -204,13 +223,31 @@ public class BodyComponent extends Component {
         if (willFall) {
           willFall = false;
         } else {
-          gameObject.trigger("ground", curPlatform);
+          emitGroundEvent(curPlatform);
         }
       } else if (col.isTop(gravity2d) && this.isJumping()) {
         this.vel = this.vel.reject(gravity2d.normalize());
-        gameObject.trigger("headbutt", col.getOther());
+        emitHeadbuttEvent(col.getOther());
       }
     }
+  }
+
+  /**
+   * Fired when the object is jumping an be just under another object.
+   *
+   * @type emit-event
+   */
+  private void emitHeadbuttEvent(GameObject ceiling) {
+    gameObject.trigger("headbutt", ceiling);
+  }
+
+  /**
+   * Fired when the object is falling and landing just above another object.
+   *
+   * @type emit-event
+   */
+  private void emitGroundEvent(GameObject platform) {
+    gameObject.trigger("ground", platform);
   }
 
   /**
@@ -228,7 +265,7 @@ public class BodyComponent extends Component {
     if (willFall) {
       curPlatform = null;
       lastPlatformPos = null;
-      gameObject.trigger("fallOff");
+      emitFallOffEvent();
       willFall = false;
     }
 
@@ -268,12 +305,30 @@ public class BodyComponent extends Component {
       }
 
       if (prevVel.dot(gravity) < 0 && this.vel.dot(gravity) >= 0) {
-        gameObject.trigger("fall");
+        emitFallEvent();
       }
     }
 
     this.vel = this.vel.scale(1 - this.drag);
     gameObject.doAction("move", this.vel, deltaTime);
+  }
+
+  /**
+   * Fired when the object is falling.
+   *
+   * @type emit-event
+   */
+  private void emitFallEvent() {
+    gameObject.trigger("fall");
+  }
+
+  /**
+   * Fired when the object was standing on a plattform ({@link #emitGroundEvent(GameObject)}) and is falling again.
+   *
+   * @type emit-event
+   */
+  private void emitFallOffEvent() {
+    gameObject.trigger("fallOff");
   }
 
   /**

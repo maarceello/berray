@@ -2,6 +2,7 @@ package com.berray.components.core;
 
 import com.berray.GameObject;
 import com.berray.event.Event;
+import com.berray.event.UpdateEvent;
 import com.berray.math.Collision;
 import com.berray.math.Matrix4;
 import com.berray.math.Vec2;

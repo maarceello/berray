@@ -11,6 +11,6 @@ Order of elements in components are:
 * property getter and setter
 * action methods
 * event handlers
-* event triggers
+* event triggers (emit methods)
 * static object creators
 * private inner classes for action parameters

@@ -142,26 +142,26 @@ public class Game {
    * Draw all game objects
    */
   public void draw() {
-    Map<String, List<GameObject>> sortedLayers = new HashMap<>();
-    // insert empty list for each layer
+    Map<String, List<Runnable>> sortedLayers = new LinkedHashMap<>();
+    // insert empty list for each layer in the correct order
     layers.forEach(layerName -> sortedLayers.put(layerName, new ArrayList<>()));
 
-    // sort game objects which needs to be rendered in the hashmap
-    root.getGameObjectStream()
-            .filter(gameObject -> gameObject.get("render") != null)
-            .forEach(gameObject -> {
-              String layer = gameObject.getOrDefault("layer", DEFAULT_LAYER);
-              List<GameObject> layerList = sortedLayers.get(layer);
-              if (layerList == null) {
-                throw new IllegalStateException("layer " + layer + " not allowed in game object with tags "+gameObject.getTags());
-              }
-              layerList.add(gameObject);
-            });
+    root.visitDrawChildren((String layer, Runnable drawMethod) -> {
+      if (layer == null) {
+        layer = DEFAULT_LAYER;
+      }
+      List<Runnable> layerList = sortedLayers.get(layer);
+      if (layerList == null) {
+        throw new IllegalStateException("layer " + layer + " not allowed in game object with draw method "+drawMethod);
+      }
+      layerList.add(drawMethod);
+    });
 
-    // TODO: give application the possibility to resort render objects before actually rendering?
-    layers.stream().map(sortedLayers::get)
-            .flatMap(Collection::stream)
-                .forEach(GameObject::draw);
+    // call each render method, in the order of the layers
+    sortedLayers.values()
+        .stream()
+        .flatMap(List::stream)
+        .forEach(Runnable::run);
   }
 
   private Vec2 collides(Rect a, Rect b) {

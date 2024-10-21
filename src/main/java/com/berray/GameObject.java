@@ -12,6 +12,7 @@ import com.berray.math.Vec3;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -81,6 +82,8 @@ public class GameObject {
    * Bounding box in world coordinates.
    */
   protected Rect boundingBox;
+  /** Order in which to draw the game objects children. */
+  protected DrawOrder drawOrder = DrawOrder.DEPTH_FIRST;
 
   public GameObject() {
     this.components = new LinkedHashMap<>();
@@ -265,17 +268,44 @@ public class GameObject {
     return parent;
   }
 
-  public void draw() {
-    // don't draw paused objects
+  /** Called by the game to get the code, which will be called to render the object. */
+  public void visitDraw(BiConsumer<String, Runnable> visitor) {
     if (paused) {
       return;
     }
-    ensureTransformCalculated();
-    for (Component c : components.values()) {
-      c.draw();
+
+    if (Boolean.TRUE.equals(get("render", false))) {
+      visitor.accept(get("layer", Game.DEFAULT_LAYER), () -> {
+        ensureTransformCalculated();
+        for (Component c : components.values()) {
+          c.draw();
+        }
+      });
     }
-    for (GameObject child : children) {
-      child.draw();
+  }
+
+  /** Called by the game to get the code, which will be called to render the objects children. */
+  public void visitDrawChildren(BiConsumer<String, Runnable> visitor) {
+    // don't draw children of paused objects
+    if (paused) {
+      return;
+    }
+
+    if (drawOrder == DrawOrder.DEPTH_FIRST) {
+      // depth first: for each child visit the object, followed by its children.
+      for (GameObject child : getChildren()) {
+        child.visitDraw(visitor);
+        child.visitDrawChildren(visitor);
+      }
+    } else {
+      // breath first: for each child draw the object
+      for (GameObject child : getChildren()) {
+        child.visitDraw(visitor);
+      }
+      // then all children are drawn, for each child draw their children
+      for (GameObject child : getChildren()) {
+        child.visitDrawChildren(visitor);
+      }
     }
   }
 

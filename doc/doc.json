@@ -1,0 +1,2132 @@
+[ {
+  "name" : "SpriteAtlasTest.SpinComponent",
+  "classJavaDoc" : "\n   * custom component for this test.\n   ",
+  "extendedClasses" : [ "com.berray.components.core.Component" ],
+  "methods" : [ {
+    "name" : "add",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "public" ],
+    "parameters" : [ {
+      "name" : "params",
+      "type" : "com.berray.components.core.Action"
+    }, {
+      "name" : "gameObject",
+      "type" : "com.berray.GameObject"
+    } ]
+  }, {
+    "name" : "update",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "public" ],
+    "parameters" : [ {
+      "name" : "event",
+      "type" : "com.berray.event.Event"
+    } ]
+  } ]
+}, {
+  "name" : "Slider",
+  "classJavaDoc" : " Test for a horizontal slider.\n *\n * Slider parts:\n * * full edge\n * * full gauge\n * * slider knob\n * * empty gauge\n * * empty edge\n * * maybe more/less buttons\n * * maybe some textual representation of the progress. The text can be\n * ** int the full gauge\n * ** in the empty gauge\n * ** in the knob\n * ** somewhere outside of the slider\n *\n * ",
+  "extendedClasses" : [ "com.berray.GameObject" ],
+  "methods" : [ {
+    "name" : "leftBorder",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "public" ],
+    "parameters" : [ {
+      "name" : "object",
+      "type" : "com.berray.GameObject"
+    } ]
+  }, {
+    "name" : "rightBorder",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "public" ],
+    "parameters" : [ {
+      "name" : "object",
+      "type" : "com.berray.GameObject"
+    } ]
+  }, {
+    "name" : "leftBar",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "public" ],
+    "parameters" : [ {
+      "name" : "object",
+      "type" : "com.berray.GameObject"
+    } ]
+  }, {
+    "name" : "leftBar",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "public" ],
+    "parameters" : [ {
+      "name" : "components",
+      "type" : "com.berray.components.core.Component"
+    } ]
+  }, {
+    "name" : "rightBar",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "public" ],
+    "parameters" : [ {
+      "name" : "object",
+      "type" : "com.berray.GameObject"
+    } ]
+  }, {
+    "name" : "rightBar",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "public" ],
+    "parameters" : [ {
+      "name" : "components",
+      "type" : "com.berray.components.core.Component"
+    } ]
+  }, {
+    "name" : "handle",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "public" ],
+    "parameters" : [ {
+      "name" : "object",
+      "type" : "com.berray.GameObject"
+    } ]
+  }, {
+    "name" : "handle",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "public" ],
+    "parameters" : [ {
+      "name" : "components",
+      "type" : "com.berray.components.core.Component"
+    } ]
+  }, {
+    "name" : "addRequiredComponents",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "private" ],
+    "parameters" : [ {
+      "name" : "object",
+      "type" : "com.berray.GameObject"
+    } ]
+  }, {
+    "name" : "onMouseDragging",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "private" ],
+    "parameters" : [ {
+      "name" : "event",
+      "type" : "com.berray.event.Event"
+    } ]
+  }, {
+    "name" : "onMouseClick",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "private" ],
+    "parameters" : [ {
+      "name" : "event",
+      "type" : "com.berray.event.Event"
+    } ]
+  }, {
+    "name" : "getValue",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "public" ],
+    "parameters" : [ ]
+  }, {
+    "name" : "setValue",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "private" ],
+    "parameters" : [ {
+      "name" : "value",
+      "type" : "java.lang.Float"
+    } ]
+  }, {
+    "name" : "getSize",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "public" ],
+    "parameters" : [ ]
+  }, {
+    "name" : "setSize",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "public" ],
+    "parameters" : [ {
+      "name" : "size",
+      "type" : "com.berray.math.Vec2"
+    } ]
+  }, {
+    "name" : "updateChildPositions",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "private" ],
+    "parameters" : [ ]
+  }, {
+    "name" : "onAdd",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "private" ],
+    "parameters" : [ {
+      "name" : "event",
+      "type" : "com.berray.event.Event"
+    } ]
+  }, {
+    "name" : "addComponents",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "public" ],
+    "parameters" : [ {
+      "name" : "components",
+      "type" : "java.util.List"
+    } ]
+  } ]
+}, {
+  "name" : "CircleComponent",
+  "classJavaDoc" : "\n * Provides a circle shape for rendering.\n ",
+  "extendedClasses" : [ "com.berray.components.core.Component" ],
+  "methods" : [ {
+    "name" : "add",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "public" ],
+    "parameters" : [ {
+      "name" : "gameObject",
+      "type" : "com.berray.GameObject"
+    } ]
+  }, {
+    "name" : "fill",
+    "documentation" : "sets whether the circle should be filled or just an outline.",
+    "type" : "configuration",
+    "modifiers" : [ "public" ],
+    "parameters" : [ {
+      "name" : "fill",
+      "type" : "java.lang.Boolean"
+    } ]
+  }, {
+    "name" : "getRadius",
+    "documentation" : "returns the radius of the circle",
+    "type" : "property",
+    "modifiers" : [ "public" ],
+    "parameters" : [ ]
+  }, {
+    "name" : "setRadius",
+    "documentation" : "sets the radius of the circle",
+    "type" : "property",
+    "modifiers" : [ "public" ],
+    "parameters" : [ {
+      "name" : "radius",
+      "type" : "java.lang.Float"
+    } ]
+  }, {
+    "name" : "getSize",
+    "documentation" : "returns the rectangular size of the circle",
+    "type" : "property",
+    "modifiers" : [ "private" ],
+    "parameters" : [ ]
+  }, {
+    "name" : "getFill",
+    "documentation" : "returns true when the circle should be filled",
+    "type" : "property",
+    "modifiers" : [ "public" ],
+    "parameters" : [ ]
+  }, {
+    "name" : "setFill",
+    "documentation" : "sets whether the circle should be filled or not",
+    "type" : "property",
+    "modifiers" : [ "public" ],
+    "parameters" : [ {
+      "name" : "fill",
+      "type" : "java.lang.Boolean"
+    } ]
+  }, {
+    "name" : "draw",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "public" ],
+    "parameters" : [ ]
+  }, {
+    "name" : "circle",
+    "documentation" : "creates a circle",
+    "type" : "creator",
+    "modifiers" : [ "public", "static" ],
+    "parameters" : [ {
+      "name" : "radius",
+      "type" : "java.lang.Float"
+    } ]
+  } ]
+}, {
+  "name" : "ObjectDebug",
+  "classJavaDoc" : null,
+  "extendedClasses" : [ "com.berray.GameObject" ],
+  "methods" : [ {
+    "name" : "getDebuggedObjectId",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "public" ],
+    "parameters" : [ ]
+  }, {
+    "name" : "getDebuggedObjectPos",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "public" ],
+    "parameters" : [ ]
+  }, {
+    "name" : "getDebuggedObjectProperties",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "public" ],
+    "parameters" : [ ]
+  }, {
+    "name" : "objectDebug",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "public", "static" ],
+    "parameters" : [ {
+      "name" : "object",
+      "type" : "com.berray.GameObject"
+    } ]
+  } ]
+}, {
+  "name" : "Render3dTest.CubeComponent",
+  "classJavaDoc" : null,
+  "extendedClasses" : [ "com.berray.components.core.Component" ],
+  "methods" : [ {
+    "name" : "add",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "public" ],
+    "parameters" : [ {
+      "name" : "gameObject",
+      "type" : "com.berray.GameObject"
+    } ]
+  }, {
+    "name" : "draw",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "public" ],
+    "parameters" : [ ]
+  } ]
+}, {
+  "name" : "RectComponent",
+  "classJavaDoc" : " Rectangular drawn shape. ",
+  "extendedClasses" : [ "com.berray.components.core.Component" ],
+  "methods" : [ {
+    "name" : "add",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "public" ],
+    "parameters" : [ {
+      "name" : "gameObject",
+      "type" : "com.berray.GameObject"
+    } ]
+  }, {
+    "name" : "fill",
+    "documentation" : "sets whether the rectangle should be drawn filled or as a wireframe.",
+    "type" : "configuration",
+    "modifiers" : [ "public" ],
+    "parameters" : [ {
+      "name" : "fill",
+      "type" : "java.lang.Boolean"
+    } ]
+  }, {
+    "name" : "getSize",
+    "documentation" : "Returns the size of the rectangle",
+    "type" : "configuration",
+    "modifiers" : [ "private" ],
+    "parameters" : [ ]
+  }, {
+    "name" : "setSize",
+    "documentation" : "Sets the size of the rectangle. Note that this forces recalculation of the transformation matrix.",
+    "type" : "configuration",
+    "modifiers" : [ "public" ],
+    "parameters" : [ {
+      "name" : "size",
+      "type" : "com.berray.math.Vec2"
+    } ]
+  }, {
+    "name" : "getFill",
+    "documentation" : "Returns whether the rectangle should be filled or not.",
+    "type" : "configuration",
+    "modifiers" : [ "public" ],
+    "parameters" : [ ]
+  }, {
+    "name" : "setFill",
+    "documentation" : "Sets whether the rectangle should be filled or not.",
+    "type" : "configuration",
+    "modifiers" : [ "public" ],
+    "parameters" : [ {
+      "name" : "fill",
+      "type" : "java.lang.Boolean"
+    } ]
+  }, {
+    "name" : "draw",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "public" ],
+    "parameters" : [ ]
+  }, {
+    "name" : "rect",
+    "documentation" : "creates a new rect component",
+    "type" : "creator",
+    "modifiers" : [ "public", "static" ],
+    "parameters" : [ {
+      "name" : "width",
+      "type" : "java.lang.Float"
+    }, {
+      "name" : "height",
+      "type" : "java.lang.Float"
+    } ]
+  } ]
+}, {
+  "name" : "ColorComponent",
+  "classJavaDoc" : "\n * Component to supply color to other drawing components.\n ",
+  "extendedClasses" : [ "com.berray.components.core.Component" ],
+  "methods" : [ {
+    "name" : "add",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "public" ],
+    "parameters" : [ {
+      "name" : "gameObject",
+      "type" : "com.berray.GameObject"
+    } ]
+  }, {
+    "name" : "getColor",
+    "documentation" : "returns the color",
+    "type" : "property",
+    "modifiers" : [ "public" ],
+    "parameters" : [ ]
+  }, {
+    "name" : "setColor",
+    "documentation" : "sets the color",
+    "type" : "property",
+    "modifiers" : [ "private" ],
+    "parameters" : [ {
+      "name" : "color",
+      "type" : "com.berray.math.Color"
+    } ]
+  }, {
+    "name" : "color",
+    "documentation" : "creates a color component from red, green and blue color components",
+    "type" : "creator",
+    "modifiers" : [ "public", "static" ],
+    "parameters" : [ {
+      "name" : "r",
+      "type" : "java.lang.Integer"
+    }, {
+      "name" : "g",
+      "type" : "java.lang.Integer"
+    }, {
+      "name" : "b",
+      "type" : "java.lang.Integer"
+    } ]
+  }, {
+    "name" : "color",
+    "documentation" : "creates a color component from a color",
+    "type" : "creator",
+    "modifiers" : [ "public", "static" ],
+    "parameters" : [ {
+      "name" : "color",
+      "type" : "com.berray.math.Color"
+    } ]
+  } ]
+}, {
+  "name" : "SpriteComponent",
+  "classJavaDoc" : null,
+  "extendedClasses" : [ "com.berray.components.core.Component" ],
+  "methods" : [ {
+    "name" : "draw",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "public" ],
+    "parameters" : [ ]
+  }, {
+    "name" : "add",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "public" ],
+    "parameters" : [ {
+      "name" : "gameObject",
+      "type" : "com.berray.GameObject"
+    } ]
+  }, {
+    "name" : "getFrameNo",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "public" ],
+    "parameters" : [ ]
+  }, {
+    "name" : "setFrameNo",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "public" ],
+    "parameters" : [ {
+      "name" : "frameNo",
+      "type" : "java.lang.Integer"
+    } ]
+  }, {
+    "name" : "frame",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "public" ],
+    "parameters" : [ {
+      "name" : "frame",
+      "type" : "java.lang.Integer"
+    } ]
+  }, {
+    "name" : "getAnim",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "public" ],
+    "parameters" : [ ]
+  }, {
+    "name" : "anim",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "public" ],
+    "parameters" : [ {
+      "name" : "animationName",
+      "type" : "java.lang.String"
+    } ]
+  }, {
+    "name" : "initializeAnimation",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "private" ],
+    "parameters" : [ {
+      "name" : "animationName",
+      "type" : "java.lang.String"
+    } ]
+  }, {
+    "name" : "setFlipX",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "public" ],
+    "parameters" : [ {
+      "name" : "flipX",
+      "type" : "java.lang.Boolean"
+    } ]
+  }, {
+    "name" : "isFlipY",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "public" ],
+    "parameters" : [ ]
+  }, {
+    "name" : "isFlipX",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "public" ],
+    "parameters" : [ ]
+  }, {
+    "name" : "setFlipY",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "public" ],
+    "parameters" : [ {
+      "name" : "flipY",
+      "type" : "java.lang.Boolean"
+    } ]
+  }, {
+    "name" : "update",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "private" ],
+    "parameters" : [ {
+      "name" : "event",
+      "type" : "com.berray.event.Event"
+    } ]
+  }, {
+    "name" : "stop",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "private" ],
+    "parameters" : [ {
+      "name" : "action",
+      "type" : "com.berray.components.core.Action"
+    } ]
+  }, {
+    "name" : "play",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "public" ],
+    "parameters" : [ {
+      "name" : "params",
+      "type" : "com.berray.components.core.Action"
+    } ]
+  }, {
+    "name" : "getSize",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "private" ],
+    "parameters" : [ ]
+  }, {
+    "name" : "setSize",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "public" ],
+    "parameters" : [ {
+      "name" : "size",
+      "type" : "com.berray.math.Vec2"
+    } ]
+  }, {
+    "name" : "sprite",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "public", "static" ],
+    "parameters" : [ {
+      "name" : "name",
+      "type" : "java.lang.String"
+    } ]
+  } ]
+}, {
+  "name" : "Label",
+  "classJavaDoc" : "\n * Simple text based label. The labels content is updated each frame from the supplier.\n * <p>\n * Usage:\n * <p>\n * ```\n * game.addChild(new Label(<pos>, <anchor>, () -> \"text to be displayed\"));\n * ```\n ",
+  "extendedClasses" : [ "com.berray.GameObject" ],
+  "methods" : [ {
+    "name" : "label",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "public", "static" ],
+    "parameters" : [ {
+      "name" : "textSupplier",
+      "type" : "java.util.function.Supplier"
+    } ]
+  } ]
+}, {
+  "name" : "Rotate3dComponent",
+  "classJavaDoc" : "\n * Rotate the game object and all child objects in 3d.\n ",
+  "extendedClasses" : [ "com.berray.components.core.Component" ],
+  "methods" : [ {
+    "name" : "add",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "public" ],
+    "parameters" : [ {
+      "name" : "gameObject",
+      "type" : "com.berray.GameObject"
+    } ]
+  }, {
+    "name" : "getRotateX",
+    "documentation" : "Returns the x angle of the rotation",
+    "type" : "property",
+    "modifiers" : [ "private" ],
+    "parameters" : [ ]
+  }, {
+    "name" : "setRotateX",
+    "documentation" : "Sets the x angle of the rotation",
+    "type" : "property",
+    "modifiers" : [ "private" ],
+    "parameters" : [ {
+      "name" : "rotateX",
+      "type" : "java.lang.Float"
+    } ]
+  }, {
+    "name" : "getRotateY",
+    "documentation" : "Returns the y angle of the rotation",
+    "type" : "property",
+    "modifiers" : [ "private" ],
+    "parameters" : [ ]
+  }, {
+    "name" : "setRotateY",
+    "documentation" : "Sets the y angle of the rotation",
+    "type" : "property",
+    "modifiers" : [ "private" ],
+    "parameters" : [ {
+      "name" : "rotateY",
+      "type" : "java.lang.Float"
+    } ]
+  }, {
+    "name" : "getRotateZ",
+    "documentation" : "Returns the z angle of the rotation",
+    "type" : "property",
+    "modifiers" : [ "private" ],
+    "parameters" : [ ]
+  }, {
+    "name" : "setRotateZ",
+    "documentation" : "Sets the x angle of the rotation",
+    "type" : "property",
+    "modifiers" : [ "private" ],
+    "parameters" : [ {
+      "name" : "rotateZ",
+      "type" : "java.lang.Float"
+    } ]
+  }, {
+    "name" : "getRotationMatrix",
+    "documentation" : "Returns the rotation matrix",
+    "type" : "property",
+    "modifiers" : [ "public" ],
+    "parameters" : [ ]
+  }, {
+    "name" : "clamp",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "private" ],
+    "parameters" : [ {
+      "name" : "angle",
+      "type" : "java.lang.Float"
+    } ]
+  }, {
+    "name" : "rotate",
+    "documentation" : "Create rotation component with no initial rotation.",
+    "type" : "creator",
+    "modifiers" : [ "public", "static" ],
+    "parameters" : [ ]
+  }, {
+    "name" : "rotate",
+    "documentation" : "Create rotation component with initial rotation around the euler angles.",
+    "type" : "creator",
+    "modifiers" : [ "public", "static" ],
+    "parameters" : [ {
+      "name" : "rotateX",
+      "type" : "java.lang.Float"
+    }, {
+      "name" : "rotateY",
+      "type" : "java.lang.Float"
+    }, {
+      "name" : "rotateZ",
+      "type" : "java.lang.Float"
+    } ]
+  }, {
+    "name" : "rotate",
+    "documentation" : "Create rotation component with initial rotation described by the quaternion.",
+    "type" : "creator",
+    "modifiers" : [ "public", "static" ],
+    "parameters" : [ {
+      "name" : "quaternion",
+      "type" : "com.berray.math.Quaternion"
+    } ]
+  } ]
+}, {
+  "name" : "LevelGameObject",
+  "classJavaDoc" : null,
+  "extendedClasses" : [ "com.berray.GameObject" ],
+  "methods" : [ {
+    "name" : "tile2Pos",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "public" ],
+    "parameters" : [ {
+      "name" : "pos",
+      "type" : "com.berray.math.Vec2"
+    } ]
+  }, {
+    "name" : "tile2Pos",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "public" ],
+    "parameters" : [ {
+      "name" : "x",
+      "type" : "java.lang.Integer"
+    }, {
+      "name" : "y",
+      "type" : "java.lang.Integer"
+    } ]
+  } ]
+}, {
+  "name" : "RotateComponent",
+  "classJavaDoc" : "\n * Rotate the game object and all child objects around the z axis.\n ",
+  "extendedClasses" : [ "com.berray.components.core.Component" ],
+  "methods" : [ {
+    "name" : "add",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "public" ],
+    "parameters" : [ {
+      "name" : "gameObject",
+      "type" : "com.berray.GameObject"
+    } ]
+  }, {
+    "name" : "getAngle",
+    "documentation" : "Returns the angle of the rotation",
+    "type" : "property",
+    "modifiers" : [ "public" ],
+    "parameters" : [ ]
+  }, {
+    "name" : "setAngle",
+    "documentation" : "Sets the angle of the rotation",
+    "type" : "property",
+    "modifiers" : [ "public" ],
+    "parameters" : [ {
+      "name" : "angle",
+      "type" : "java.lang.Float"
+    } ]
+  }, {
+    "name" : "getRotationMatrix",
+    "documentation" : "Returns the rotation matrix.",
+    "type" : "property",
+    "modifiers" : [ "private" ],
+    "parameters" : [ ]
+  }, {
+    "name" : "rotate",
+    "documentation" : "Creates a new rotation component with an initial angle.",
+    "type" : null,
+    "modifiers" : [ "public", "static" ],
+    "parameters" : [ {
+      "name" : "angle",
+      "type" : "java.lang.Float"
+    } ]
+  } ]
+}, {
+  "name" : "OrbitComponent",
+  "classJavaDoc" : " changes the position of the game object so it orbits its parent. ",
+  "extendedClasses" : [ "com.berray.components.core.Component" ],
+  "methods" : [ {
+    "name" : "add",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "public" ],
+    "parameters" : [ {
+      "name" : "gameObject",
+      "type" : "com.berray.GameObject"
+    } ]
+  }, {
+    "name" : "update",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "public" ],
+    "parameters" : [ {
+      "name" : "event",
+      "type" : "com.berray.event.Event"
+    } ]
+  }, {
+    "name" : "orbit",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "public", "static" ],
+    "parameters" : [ {
+      "name" : "radius",
+      "type" : "java.lang.Float"
+    }, {
+      "name" : "angleSpeed",
+      "type" : "java.lang.Float"
+    } ]
+  }, {
+    "name" : "orbit",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "public", "static" ],
+    "parameters" : [ {
+      "name" : "radius",
+      "type" : "java.lang.Float"
+    }, {
+      "name" : "angleSpeed",
+      "type" : "java.lang.Float"
+    }, {
+      "name" : "initialAngle",
+      "type" : "java.lang.Float"
+    } ]
+  } ]
+}, {
+  "name" : "PosComponent3d",
+  "classJavaDoc" : null,
+  "extendedClasses" : [ "com.berray.components.core.PosComponent", "com.berray.components.core.Component" ],
+  "methods" : [ {
+    "name" : "move",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "protected" ],
+    "parameters" : [ {
+      "name" : "pos",
+      "type" : "com.berray.math.Vec3"
+    }, {
+      "name" : "amount",
+      "type" : "com.berray.math.Vec3"
+    } ]
+  }, {
+    "name" : "move",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "protected" ],
+    "parameters" : [ {
+      "name" : "pos",
+      "type" : "com.berray.math.Vec3"
+    }, {
+      "name" : "amount",
+      "type" : "com.berray.math.Vec3"
+    }, {
+      "name" : "scale",
+      "type" : "java.lang.Float"
+    } ]
+  }, {
+    "name" : "getTransform",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "protected" ],
+    "parameters" : [ ]
+  }, {
+    "name" : "pos",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "public", "static" ],
+    "parameters" : [ {
+      "name" : "x",
+      "type" : "java.lang.Float"
+    }, {
+      "name" : "y",
+      "type" : "java.lang.Float"
+    }, {
+      "name" : "z",
+      "type" : "java.lang.Float"
+    } ]
+  }, {
+    "name" : "pos",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "public", "static" ],
+    "parameters" : [ {
+      "name" : "pos",
+      "type" : "com.berray.math.Vec3"
+    } ]
+  } ]
+}, {
+  "name" : "TileComponent",
+  "classJavaDoc" : null,
+  "extendedClasses" : [ "com.berray.components.core.Component" ],
+  "methods" : [ {
+    "name" : "obstacle",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "public" ],
+    "parameters" : [ {
+      "name" : "obstacle",
+      "type" : "java.lang.Boolean"
+    } ]
+  }, {
+    "name" : "tile",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "public", "static" ],
+    "parameters" : [ ]
+  } ]
+}, {
+  "name" : "LayerComponent",
+  "classJavaDoc" : "\n * Component to place the object in a specific render layer.\n ",
+  "extendedClasses" : [ "com.berray.components.core.Component" ],
+  "methods" : [ {
+    "name" : "add",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "public" ],
+    "parameters" : [ {
+      "name" : "gameObject",
+      "type" : "com.berray.GameObject"
+    } ]
+  }, {
+    "name" : "getLayer",
+    "documentation" : "returns the layer",
+    "type" : "property",
+    "modifiers" : [ "public" ],
+    "parameters" : [ ]
+  }, {
+    "name" : "layer",
+    "documentation" : "creates a component with a specifoc layer",
+    "type" : "creator",
+    "modifiers" : [ "public", "static" ],
+    "parameters" : [ {
+      "name" : "layer",
+      "type" : "java.lang.String"
+    } ]
+  } ]
+}, {
+  "name" : "Button",
+  "classJavaDoc" : "\n * Button in Gui.\n ",
+  "extendedClasses" : [ "com.berray.GameObject" ],
+  "methods" : [ {
+    "name" : "getSize",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "public" ],
+    "parameters" : [ ]
+  }, {
+    "name" : "setSize",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "public" ],
+    "parameters" : [ {
+      "name" : "size",
+      "type" : "com.berray.math.Vec2"
+    } ]
+  }, {
+    "name" : "onMouseRelease",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "private" ],
+    "parameters" : [ {
+      "name" : "event",
+      "type" : "com.berray.event.Event"
+    } ]
+  }, {
+    "name" : "onMousePress",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "private" ],
+    "parameters" : [ {
+      "name" : "event",
+      "type" : "com.berray.event.Event"
+    } ]
+  }, {
+    "name" : "onHoverLeave",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "private" ],
+    "parameters" : [ {
+      "name" : "event",
+      "type" : "com.berray.event.Event"
+    } ]
+  }, {
+    "name" : "onHoverEnter",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "private" ],
+    "parameters" : [ {
+      "name" : "event",
+      "type" : "com.berray.event.Event"
+    } ]
+  }, {
+    "name" : "onAdd",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "private" ],
+    "parameters" : [ {
+      "name" : "event",
+      "type" : "com.berray.event.Event"
+    } ]
+  }, {
+    "name" : "addComponents",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "public" ],
+    "parameters" : [ {
+      "name" : "components",
+      "type" : "java.util.List"
+    } ]
+  }, {
+    "name" : "square",
+    "documentation" : "when called the button is always square.",
+    "type" : null,
+    "modifiers" : [ "public" ],
+    "parameters" : [ ]
+  }, {
+    "name" : "neutral",
+    "documentation" : "Sets the game object (components) which is used when the button is neither hovered nor armed nor pressed.",
+    "type" : "initialization",
+    "modifiers" : [ "public" ],
+    "parameters" : [ {
+      "name" : "components",
+      "type" : "java.lang.Object"
+    } ]
+  }, {
+    "name" : "neutral",
+    "documentation" : "Sets the game object (components) which is used when the button is neither hovered nor armed nor pressed.",
+    "type" : "initialization",
+    "modifiers" : [ "public" ],
+    "parameters" : [ {
+      "name" : "gameObject",
+      "type" : "com.berray.GameObject"
+    }, {
+      "name" : "components",
+      "type" : "java.lang.Object"
+    } ]
+  }, {
+    "name" : "hover",
+    "documentation" : "Sets the game object (components) which is used when the button is hovered",
+    "type" : "initialization",
+    "modifiers" : [ "public" ],
+    "parameters" : [ {
+      "name" : "components",
+      "type" : "java.lang.Object"
+    } ]
+  }, {
+    "name" : "hover",
+    "documentation" : "Sets the game object (components) which is used when the button is hovered",
+    "type" : "initialization",
+    "modifiers" : [ "public" ],
+    "parameters" : [ {
+      "name" : "gameObject",
+      "type" : "com.berray.GameObject"
+    }, {
+      "name" : "components",
+      "type" : "java.lang.Object"
+    } ]
+  }, {
+    "name" : "armed",
+    "documentation" : "Sets the game object (components) which is used when the button is armed",
+    "type" : "initialization",
+    "modifiers" : [ "public" ],
+    "parameters" : [ {
+      "name" : "components",
+      "type" : "java.lang.Object"
+    } ]
+  }, {
+    "name" : "armed",
+    "documentation" : "Sets the game object (components) which is used when the button is armed",
+    "type" : "initialization",
+    "modifiers" : [ "public" ],
+    "parameters" : [ {
+      "name" : "gameObject",
+      "type" : "com.berray.GameObject"
+    }, {
+      "name" : "components",
+      "type" : "java.lang.Object"
+    } ]
+  }, {
+    "name" : "pressed",
+    "documentation" : "Sets the game object (components) which is used when the button is pressed.",
+    "type" : "initialization",
+    "modifiers" : [ "public" ],
+    "parameters" : [ {
+      "name" : "components",
+      "type" : "java.lang.Object"
+    } ]
+  }, {
+    "name" : "pressed",
+    "documentation" : "Sets the game object (components) which is used when the button is pressed.",
+    "type" : "initialization",
+    "modifiers" : [ "public" ],
+    "parameters" : [ {
+      "name" : "gameObject",
+      "type" : "com.berray.GameObject"
+    }, {
+      "name" : "components",
+      "type" : "java.lang.Object"
+    } ]
+  }, {
+    "name" : "slice9",
+    "documentation" : "Adds .\nTODO: unused at the moment.",
+    "type" : "initialization",
+    "modifiers" : [ "public" ],
+    "parameters" : [ {
+      "name" : "assetName",
+      "type" : "java.lang.String"
+    }, {
+      "name" : "text",
+      "type" : "java.lang.String"
+    }, {
+      "name" : "size",
+      "type" : "com.berray.math.Vec2"
+    }, {
+      "name" : "slice9ComponentSize",
+      "type" : "java.lang.Integer"
+    }, {
+      "name" : "neutralColor",
+      "type" : "com.berray.math.Color"
+    }, {
+      "name" : "hoverColor",
+      "type" : "com.berray.math.Color"
+    } ]
+  }, {
+    "name" : "makeSlice9Component",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "private" ],
+    "parameters" : [ {
+      "name" : "assetName",
+      "type" : "java.lang.String"
+    }, {
+      "name" : "size",
+      "type" : "com.berray.math.Vec2"
+    }, {
+      "name" : "slice9ComponentSize",
+      "type" : "java.lang.Integer"
+    }, {
+      "name" : "pos",
+      "type" : "com.berray.math.Vec2"
+    }, {
+      "name" : "text",
+      "type" : "java.lang.String"
+    }, {
+      "name" : "color",
+      "type" : "com.berray.math.Color"
+    } ]
+  }, {
+    "name" : "getArmedGameObject",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "protected" ],
+    "parameters" : [ ]
+  }, {
+    "name" : "getPressedGameObject",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "protected" ],
+    "parameters" : [ ]
+  }, {
+    "name" : "getPressed",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "public" ],
+    "parameters" : [ ]
+  }, {
+    "name" : "setPressed",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "public" ],
+    "parameters" : [ {
+      "name" : "pressed",
+      "type" : "java.lang.Boolean"
+    } ]
+  }, {
+    "name" : "pushButton",
+    "documentation" : "Creates a new push button. The button can be pressed and is released when the mouse button is released.\nNote that the \"pressed\" component is not used in this button type.",
+    "type" : null,
+    "modifiers" : [ "public", "static" ],
+    "parameters" : [ {
+      "name" : "id",
+      "type" : "java.lang.String"
+    } ]
+  }, {
+    "name" : "toggleButton",
+    "documentation" : "Creates a new toggle button. The button can be pressed and is on the \"pressed\" state. Pressing the button\nagain moves the button in the neutral state again.",
+    "type" : null,
+    "modifiers" : [ "public", "static" ],
+    "parameters" : [ {
+      "name" : "id",
+      "type" : "java.lang.String"
+    } ]
+  }, {
+    "name" : "button",
+    "documentation" : "Creates a new button.",
+    "type" : null,
+    "modifiers" : [ "public", "static" ],
+    "parameters" : [ {
+      "name" : "id",
+      "type" : "java.lang.String"
+    }, {
+      "name" : "toggleButton",
+      "type" : "java.lang.Boolean"
+    } ]
+  } ]
+}, {
+  "name" : "MouseComponent",
+  "classJavaDoc" : "\n * Component to supply hoverEnter and hoverLeave events and drag events.\n * Note: needs \"area\" component so the component can check if the mouse cursor is over this game object\n ",
+  "extendedClasses" : [ "com.berray.components.core.Component" ],
+  "methods" : [ {
+    "name" : "add",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "public" ],
+    "parameters" : [ {
+      "name" : "gameObject",
+      "type" : "com.berray.GameObject"
+    } ]
+  }, {
+    "name" : "processSceneGraphAdded",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "private" ],
+    "parameters" : [ {
+      "name" : "e",
+      "type" : "com.berray.event.Event"
+    } ]
+  }, {
+    "name" : "isHovered",
+    "documentation" : "Returns if the mouse cursor is over the component (hovered).",
+    "type" : "property",
+    "modifiers" : [ "public" ],
+    "parameters" : [ ]
+  }, {
+    "name" : "processMouseRelease",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "private" ],
+    "parameters" : [ {
+      "name" : "event",
+      "type" : "com.berray.event.Event"
+    } ]
+  }, {
+    "name" : "processMousePress",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "private" ],
+    "parameters" : [ {
+      "name" : "event",
+      "type" : "com.berray.event.Event"
+    } ]
+  }, {
+    "name" : "processMouseMove",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "private" ],
+    "parameters" : [ {
+      "name" : "event",
+      "type" : "com.berray.event.Event"
+    } ]
+  }, {
+    "name" : "processUpdateEvent",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "private" ],
+    "parameters" : [ {
+      "name" : "event",
+      "type" : "com.berray.event.Event"
+    } ]
+  }, {
+    "name" : "worldPosToLocalPos",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "private" ],
+    "parameters" : [ {
+      "name" : "mousePos",
+      "type" : "com.berray.math.Vec2"
+    } ]
+  }, {
+    "name" : "emitDragFinishEvent",
+    "documentation" : "Fired when the dragging of the object is finished.",
+    "type" : "emit-event",
+    "modifiers" : [ "private" ],
+    "parameters" : [ {
+      "name" : "mousePos",
+      "type" : "com.berray.math.Vec2"
+    }, {
+      "name" : "localPos",
+      "type" : "com.berray.math.Vec2"
+    } ]
+  }, {
+    "name" : "emitMouseClickEvent",
+    "documentation" : "Fired when the mouse button is pressed and released over the game object.",
+    "type" : "emit-event",
+    "modifiers" : [ "private" ],
+    "parameters" : [ {
+      "name" : "mousePos",
+      "type" : "com.berray.math.Vec2"
+    }, {
+      "name" : "localPos",
+      "type" : "com.berray.math.Vec2"
+    } ]
+  }, {
+    "name" : "emitMouseReleaseEvent",
+    "documentation" : "Fired when the mouse button is released.",
+    "type" : "emit-event",
+    "modifiers" : [ "private" ],
+    "parameters" : [ {
+      "name" : "mousePos",
+      "type" : "com.berray.math.Vec2"
+    }, {
+      "name" : "localPos",
+      "type" : "com.berray.math.Vec2"
+    } ]
+  }, {
+    "name" : "emitMousePressEvent",
+    "documentation" : "Fired when the mouse button is pressed down.",
+    "type" : "emit-event",
+    "modifiers" : [ "private" ],
+    "parameters" : [ {
+      "name" : "mousePos",
+      "type" : "com.berray.math.Vec2"
+    } ]
+  }, {
+    "name" : "emitDraggingEvent",
+    "documentation" : "Fired each frame the mouse is moved and the dragging operation is active.",
+    "type" : "emit-event",
+    "modifiers" : [ "private" ],
+    "parameters" : [ {
+      "name" : "mousePos",
+      "type" : "com.berray.math.Vec2"
+    }, {
+      "name" : "localPos",
+      "type" : "com.berray.math.Vec2"
+    } ]
+  }, {
+    "name" : "emitDragStartEvent",
+    "documentation" : "Fired then the game object dragging is started.",
+    "type" : "emit-event",
+    "modifiers" : [ "private" ],
+    "parameters" : [ {
+      "name" : "mousePos",
+      "type" : "com.berray.math.Vec2"
+    }, {
+      "name" : "localPos",
+      "type" : "com.berray.math.Vec2"
+    } ]
+  }, {
+    "name" : "emitHoverEvent",
+    "documentation" : "Fired then the mouse is hovered over the object. Note that there may also be be a mouse press and/or a dragging operation.",
+    "type" : "emit-event",
+    "modifiers" : [ "private" ],
+    "parameters" : [ {
+      "name" : "mousePos",
+      "type" : "com.berray.math.Vec2"
+    } ]
+  }, {
+    "name" : "emitHoverLeaveEvent",
+    "documentation" : "Fired when the mouse cursor leaves the bounding box of the game object.",
+    "type" : "emit-event",
+    "modifiers" : [ "private" ],
+    "parameters" : [ ]
+  }, {
+    "name" : "emitHoverEnterEvent",
+    "documentation" : "Fired when the mouse cursor enters the bounding box of the game object.",
+    "type" : "emit-event",
+    "modifiers" : [ "private" ],
+    "parameters" : [ ]
+  }, {
+    "name" : "mouse",
+    "documentation" : "creates a new mouse() component.",
+    "type" : null,
+    "modifiers" : [ "public", "static" ],
+    "parameters" : [ ]
+  } ]
+}, {
+  "name" : "PosComponent.MoveAction",
+  "classJavaDoc" : null,
+  "extendedClasses" : [ "com.berray.components.core.Action" ],
+  "methods" : [ {
+    "name" : "getVector",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "public" ],
+    "parameters" : [ ]
+  }, {
+    "name" : "getDeltaTime",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "public" ],
+    "parameters" : [ ]
+  } ]
+}, {
+  "name" : "PosComponent",
+  "classJavaDoc" : "\n * Adds a position vector to the Game Object.\n ",
+  "extendedClasses" : [ "com.berray.components.core.Component" ],
+  "methods" : [ {
+    "name" : "add",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "public" ],
+    "parameters" : [ {
+      "name" : "gameObject",
+      "type" : "com.berray.GameObject"
+    } ]
+  }, {
+    "name" : "getTransform",
+    "documentation" : "Returns the transformation matrix.",
+    "type" : "property",
+    "modifiers" : [ "protected", "abstract" ],
+    "parameters" : [ ]
+  }, {
+    "name" : "getPos",
+    "documentation" : "Returns the current position.",
+    "type" : "property",
+    "modifiers" : [ "public" ],
+    "parameters" : [ ]
+  }, {
+    "name" : "setPos",
+    "documentation" : "Sets the current position. Note that this will force recalculation of the transformation matrix.",
+    "type" : "property",
+    "modifiers" : [ "public" ],
+    "parameters" : [ {
+      "name" : "pos",
+      "type" : "unknown: TypeVariable {JPTypeParameter(E, bounds=[])}"
+    } ]
+  }, {
+    "name" : "moveAction",
+    "documentation" : "Moves the position by a delta, respecting the frame time. So the delta is interpreted\nas movement per second.",
+    "type" : "action",
+    "modifiers" : [ "public" ],
+    "parameters" : [ {
+      "name" : "params",
+      "type" : "com.berray.components.core.PosComponent.MoveAction"
+    } ]
+  }, {
+    "name" : "moveByAction",
+    "documentation" : "Moves the position by a delta. This action does ignore the frame time.",
+    "type" : "action",
+    "modifiers" : [ "public" ],
+    "parameters" : [ {
+      "name" : "params",
+      "type" : "com.berray.components.core.PosComponent.MoveAction"
+    } ]
+  }, {
+    "name" : "move",
+    "documentation" : "Moves the vector <code>pos</code> by amount <code>amount</code>",
+    "type" : null,
+    "modifiers" : [ "protected", "abstract" ],
+    "parameters" : [ {
+      "name" : "pos",
+      "type" : "unknown: TypeVariable {JPTypeParameter(E, bounds=[])}"
+    }, {
+      "name" : "amount",
+      "type" : "unknown: TypeVariable {JPTypeParameter(E, bounds=[])}"
+    } ]
+  }, {
+    "name" : "move",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "protected", "abstract" ],
+    "parameters" : [ {
+      "name" : "pos",
+      "type" : "unknown: TypeVariable {JPTypeParameter(E, bounds=[])}"
+    }, {
+      "name" : "amount",
+      "type" : "unknown: TypeVariable {JPTypeParameter(E, bounds=[])}"
+    }, {
+      "name" : "scale",
+      "type" : "java.lang.Float"
+    } ]
+  } ]
+}, {
+  "name" : "Slice9Component",
+  "classJavaDoc" : null,
+  "extendedClasses" : [ "com.berray.components.core.Component" ],
+  "methods" : [ {
+    "name" : "add",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "public" ],
+    "parameters" : [ {
+      "name" : "gameObject",
+      "type" : "com.berray.GameObject"
+    } ]
+  }, {
+    "name" : "getSize",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "public" ],
+    "parameters" : [ ]
+  }, {
+    "name" : "setSize",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "public" ],
+    "parameters" : [ {
+      "name" : "size",
+      "type" : "com.berray.math.Vec2"
+    } ]
+  }, {
+    "name" : "draw",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "public" ],
+    "parameters" : [ ]
+  }, {
+    "name" : "slice9",
+    "documentation" : "Creates a new slice9 sprite",
+    "type" : null,
+    "modifiers" : [ "public", "static" ],
+    "parameters" : [ {
+      "name" : "textureName",
+      "type" : "java.lang.String"
+    }, {
+      "name" : "size",
+      "type" : "com.berray.math.Vec2"
+    }, {
+      "name" : "sizes",
+      "type" : "java.lang.Integer"
+    } ]
+  } ]
+}, {
+  "name" : "PosComponent2d",
+  "classJavaDoc" : null,
+  "extendedClasses" : [ "com.berray.components.core.PosComponent", "com.berray.components.core.Component" ],
+  "methods" : [ {
+    "name" : "move",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "protected" ],
+    "parameters" : [ {
+      "name" : "pos",
+      "type" : "com.berray.math.Vec2"
+    }, {
+      "name" : "amount",
+      "type" : "com.berray.math.Vec2"
+    } ]
+  }, {
+    "name" : "move",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "protected" ],
+    "parameters" : [ {
+      "name" : "pos",
+      "type" : "com.berray.math.Vec2"
+    }, {
+      "name" : "amount",
+      "type" : "com.berray.math.Vec2"
+    }, {
+      "name" : "scale",
+      "type" : "java.lang.Float"
+    } ]
+  }, {
+    "name" : "getTransform",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "protected" ],
+    "parameters" : [ ]
+  }, {
+    "name" : "pos",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "public", "static" ],
+    "parameters" : [ {
+      "name" : "x",
+      "type" : "java.lang.Float"
+    }, {
+      "name" : "y",
+      "type" : "java.lang.Float"
+    } ]
+  }, {
+    "name" : "pos",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "public", "static" ],
+    "parameters" : [ {
+      "name" : "pos",
+      "type" : "com.berray.math.Vec2"
+    } ]
+  } ]
+}, {
+  "name" : "AreaComponent.IsCollidingWithAction",
+  "classJavaDoc" : "\n   * Parameter class for 'isCollidingWith' action.\n   ",
+  "extendedClasses" : [ "com.berray.components.core.Action" ],
+  "methods" : [ {
+    "name" : "getOther",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "public" ],
+    "parameters" : [ ]
+  } ]
+}, {
+  "name" : "AreaComponent",
+  "classJavaDoc" : "\n * # AreaComponent\n * <p>\n * {@link AreaComponent#area()} provides collision detection for the game object.\n ",
+  "extendedClasses" : [ "com.berray.components.core.Component" ],
+  "methods" : [ {
+    "name" : "add",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "public" ],
+    "parameters" : [ {
+      "name" : "gameObject",
+      "type" : "com.berray.GameObject"
+    } ]
+  }, {
+    "name" : "scale",
+    "documentation" : "Scales the collision area by this factor.",
+    "type" : "configuration",
+    "modifiers" : [ "public" ],
+    "parameters" : [ {
+      "name" : "scale",
+      "type" : "java.lang.Float"
+    } ]
+  }, {
+    "name" : "ignoreCollisionWith",
+    "documentation" : "Sets the tags which should be ignored in collision detection.",
+    "type" : "configuration",
+    "modifiers" : [ "public" ],
+    "parameters" : [ {
+      "name" : "tags",
+      "type" : "java.lang.String"
+    } ]
+  }, {
+    "name" : "getLocalArea",
+    "documentation" : "Returns collider area in local coordinates.",
+    "type" : "property",
+    "modifiers" : [ "public" ],
+    "parameters" : [ ]
+  }, {
+    "name" : "getCollisionIgnore",
+    "documentation" : "Returns the set of tags which should be ignored when doing collision checks.",
+    "type" : "property",
+    "modifiers" : [ "public" ],
+    "parameters" : [ ]
+  }, {
+    "name" : "isColliding",
+    "documentation" : "Returns true when this game object is colliding with anything this frame.",
+    "type" : "property",
+    "modifiers" : [ "public" ],
+    "parameters" : [ ]
+  }, {
+    "name" : "getCollisions",
+    "documentation" : "Returns current collisions.",
+    "type" : "property",
+    "modifiers" : [ "public" ],
+    "parameters" : [ ]
+  }, {
+    "name" : "isCollidingWith",
+    "documentation" : "Checks if this GameObject is colliding with `other` in this frame.",
+    "type" : "action",
+    "modifiers" : [ "public" ],
+    "parameters" : [ {
+      "name" : "params",
+      "type" : "com.berray.components.core.AreaComponent.IsCollidingWithAction"
+    } ]
+  }, {
+    "name" : "onCollideUpdate",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "public" ],
+    "parameters" : [ {
+      "name" : "event",
+      "type" : "com.berray.event.Event"
+    } ]
+  }, {
+    "name" : "emitCollideEvent",
+    "documentation" : "Fired each frame for each collision of this object.",
+    "type" : "emit-event",
+    "modifiers" : [ "private" ],
+    "parameters" : [ {
+      "name" : "other",
+      "type" : "com.berray.GameObject"
+    }, {
+      "name" : "collision",
+      "type" : "com.berray.math.Collision"
+    } ]
+  }, {
+    "name" : "emitCollideEndEvent",
+    "documentation" : "Fired when a collection ended this frame.",
+    "type" : "emit-event",
+    "modifiers" : [ "private" ],
+    "parameters" : [ {
+      "name" : "id",
+      "type" : "java.lang.Integer"
+    } ]
+  }, {
+    "name" : "onUpdate",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "public" ],
+    "parameters" : [ {
+      "name" : "event",
+      "type" : "com.berray.event.Event"
+    } ]
+  }, {
+    "name" : "area",
+    "documentation" : "Creates an area component without a collision shape.",
+    "type" : "creator",
+    "modifiers" : [ "public", "static" ],
+    "parameters" : [ ]
+  }, {
+    "name" : "area",
+    "documentation" : "Creates an area component without a rectangular collision shape.",
+    "type" : "creator",
+    "modifiers" : [ "public", "static" ],
+    "parameters" : [ {
+      "name" : "shape",
+      "type" : "com.berray.math.Rect"
+    } ]
+  } ]
+}, {
+  "name" : "CameraComponent",
+  "classJavaDoc" : null,
+  "extendedClasses" : [ "com.berray.components.core.Component" ],
+  "methods" : [ {
+    "name" : "add",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "public" ],
+    "parameters" : [ {
+      "name" : "gameObject",
+      "type" : "com.berray.GameObject"
+    } ]
+  }, {
+    "name" : "getCamera",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "public" ],
+    "parameters" : [ ]
+  }, {
+    "name" : "setCamera",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "public" ],
+    "parameters" : [ {
+      "name" : "camera",
+      "type" : "com.raylib.Raylib.Camera3D"
+    } ]
+  }, {
+    "name" : "camera",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "public", "static" ],
+    "parameters" : [ {
+      "name" : "camera",
+      "type" : "com.raylib.Raylib.Camera3D"
+    } ]
+  } ]
+}, {
+  "name" : "DebugComponent",
+  "classJavaDoc" : null,
+  "extendedClasses" : [ "com.berray.components.core.Component" ],
+  "methods" : [ {
+    "name" : "draw",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "public" ],
+    "parameters" : [ ]
+  }, {
+    "name" : "drawPoint",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "private", "static" ],
+    "parameters" : [ {
+      "name" : "pos",
+      "type" : "com.berray.math.Vec3"
+    }, {
+      "name" : "color",
+      "type" : "com.raylib.Raylib.Color"
+    } ]
+  }, {
+    "name" : "drawLine",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "private" ],
+    "parameters" : [ {
+      "name" : "p1",
+      "type" : "com.berray.math.Vec3"
+    }, {
+      "name" : "p2",
+      "type" : "com.berray.math.Vec3"
+    }, {
+      "name" : "color",
+      "type" : "com.raylib.Raylib.Color"
+    } ]
+  }, {
+    "name" : "debug",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "public", "static" ],
+    "parameters" : [ ]
+  } ]
+}, {
+  "name" : "Root3D",
+  "classJavaDoc" : null,
+  "extendedClasses" : [ "com.berray.GameObject" ],
+  "methods" : [ {
+    "name" : "visitDrawChildren",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "public" ],
+    "parameters" : [ {
+      "name" : "visitor",
+      "type" : "java.util.function.BiConsumer"
+    } ]
+  }, {
+    "name" : "ensureTransformCalculated",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "protected" ],
+    "parameters" : [ ]
+  } ]
+}, {
+  "name" : "TextComponent",
+  "classJavaDoc" : "\n * Component which displays some fixed text.\n ",
+  "extendedClasses" : [ "com.berray.components.core.Component" ],
+  "methods" : [ {
+    "name" : "add",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "public" ],
+    "parameters" : [ {
+      "name" : "gameObject",
+      "type" : "com.berray.GameObject"
+    } ]
+  }, {
+    "name" : "setText",
+    "documentation" : "Sets the text which should be drawn. Note that this may change the size of the object\nand therefore force recalculation of the transformation matrix.",
+    "type" : "property",
+    "modifiers" : [ "public" ],
+    "parameters" : [ {
+      "name" : "text",
+      "type" : "java.lang.String"
+    } ]
+  }, {
+    "name" : "getText",
+    "documentation" : "Returns the text which should be drawn.",
+    "type" : "property",
+    "modifiers" : [ "public" ],
+    "parameters" : [ ]
+  }, {
+    "name" : "getFontHeight",
+    "documentation" : "Returns the font height.",
+    "type" : "property",
+    "modifiers" : [ "public" ],
+    "parameters" : [ ]
+  }, {
+    "name" : "setFontHeight",
+    "documentation" : "Sets the font height. Note that this may change the size of the object\nand therefore force recalculation of the transformation matrix.",
+    "type" : "property",
+    "modifiers" : [ "public" ],
+    "parameters" : [ {
+      "name" : "fontHeight",
+      "type" : "java.lang.Integer"
+    } ]
+  }, {
+    "name" : "getSize",
+    "documentation" : "Returns the size of the component.",
+    "type" : "property",
+    "modifiers" : [ "private" ],
+    "parameters" : [ ]
+  }, {
+    "name" : "updateSize",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "private" ],
+    "parameters" : [ ]
+  }, {
+    "name" : "draw",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "public" ],
+    "parameters" : [ ]
+  }, {
+    "name" : "text",
+    "documentation" : "Creates a text component with fixed initial text.",
+    "type" : null,
+    "modifiers" : [ "public", "static" ],
+    "parameters" : [ {
+      "name" : "text",
+      "type" : "java.lang.String"
+    } ]
+  } ]
+}, {
+  "name" : "AnchorComponent",
+  "classJavaDoc" : "\n * {@link AnchorComponent#anchor(AnchorType)} provides an anchor point for rendering shapes.\n ",
+  "extendedClasses" : [ "com.berray.components.core.Component" ],
+  "methods" : [ {
+    "name" : "add",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "public" ],
+    "parameters" : [ {
+      "name" : "gameObject",
+      "type" : "com.berray.GameObject"
+    } ]
+  }, {
+    "name" : "getAnchor",
+    "documentation" : "Returns the current anchor type.",
+    "type" : "property",
+    "modifiers" : [ "public" ],
+    "parameters" : [ ]
+  }, {
+    "name" : "setAnchor",
+    "documentation" : "Sets the current anchor type.",
+    "type" : "property",
+    "modifiers" : [ "public" ],
+    "parameters" : [ {
+      "name" : "anchorType",
+      "type" : "com.berray.components.core.AnchorType"
+    } ]
+  }, {
+    "name" : "anchor",
+    "documentation" : "Creates a new anchor component.",
+    "type" : "creator",
+    "modifiers" : [ "public", "static" ],
+    "parameters" : [ {
+      "name" : "anchorType",
+      "type" : "com.berray.components.core.AnchorType"
+    } ]
+  } ]
+}, {
+  "name" : "BodyComponent.JumpAction",
+  "classJavaDoc" : null,
+  "extendedClasses" : [ "com.berray.components.core.Action" ],
+  "methods" : [ {
+    "name" : "getForce",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "public" ],
+    "parameters" : [ ]
+  } ]
+}, {
+  "name" : "BodyComponent",
+  "classJavaDoc" : "\n * Adds physics and collision detection to an object.\n ",
+  "extendedClasses" : [ "com.berray.components.core.Component" ],
+  "methods" : [ {
+    "name" : "add",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "public" ],
+    "parameters" : [ {
+      "name" : "gameObject",
+      "type" : "com.berray.GameObject"
+    } ]
+  }, {
+    "name" : "isGrounded",
+    "documentation" : "Returns true when the object is standing on another.",
+    "type" : "property",
+    "modifiers" : [ "public" ],
+    "parameters" : [ ]
+  }, {
+    "name" : "isStatic",
+    "documentation" : "Returns true when the object is static and cannot move.",
+    "type" : "property",
+    "modifiers" : [ "private" ],
+    "parameters" : [ ]
+  }, {
+    "name" : "isFalling",
+    "documentation" : "Returns true when the object is falling (moving down in direction of gravity).",
+    "type" : "property",
+    "modifiers" : [ "private" ],
+    "parameters" : [ ]
+  }, {
+    "name" : "isJumping",
+    "documentation" : "Returns true when the object is jumping (moving up in direction of gravity).",
+    "type" : "property",
+    "modifiers" : [ "private" ],
+    "parameters" : [ ]
+  }, {
+    "name" : "jump",
+    "documentation" : "Adds a jump force to the object.",
+    "type" : "action",
+    "modifiers" : [ "public" ],
+    "parameters" : [ {
+      "name" : "params",
+      "type" : "com.berray.components.core.BodyComponent.JumpAction"
+    } ]
+  }, {
+    "name" : "collideUpdate",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "public" ],
+    "parameters" : [ {
+      "name" : "event",
+      "type" : "com.berray.event.Event"
+    } ]
+  }, {
+    "name" : "emitPhisicsResolveEvent",
+    "documentation" : "Fired then the collision is resolved. Note: the event is fired for both parties of the collision.",
+    "type" : "emit-event",
+    "modifiers" : [ "private", "static" ],
+    "parameters" : [ {
+      "name" : "target",
+      "type" : "com.berray.GameObject"
+    }, {
+      "name" : "collision",
+      "type" : "com.berray.math.Collision"
+    } ]
+  }, {
+    "name" : "emitBeforePhysicsResolve",
+    "documentation" : "Fired just before the collision is tried to be resolved so interested parties can resolve the collision themselves.\nNote: the event is fired for both parties of the collision.",
+    "type" : "emit-event",
+    "modifiers" : [ "private" ],
+    "parameters" : [ {
+      "name" : "target",
+      "type" : "com.berray.GameObject"
+    }, {
+      "name" : "collision",
+      "type" : "com.berray.math.Collision"
+    } ]
+  }, {
+    "name" : "getLocalCoordinateDisplacement",
+    "documentation" : "Calculate the displacement in the objects local coordinate system.",
+    "type" : null,
+    "modifiers" : [ "private", "static" ],
+    "parameters" : [ {
+      "name" : "gameObject1",
+      "type" : "com.berray.GameObject"
+    }, {
+      "name" : "worldDisplacement",
+      "type" : "com.berray.math.Vec2"
+    } ]
+  }, {
+    "name" : "onPhysicsResolve",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "private" ],
+    "parameters" : [ {
+      "name" : "event",
+      "type" : "com.berray.event.Event"
+    } ]
+  }, {
+    "name" : "emitHeadbuttEvent",
+    "documentation" : "Fired when the object is jumping an be just under another object.",
+    "type" : "emit-event",
+    "modifiers" : [ "private" ],
+    "parameters" : [ {
+      "name" : "ceiling",
+      "type" : "com.berray.GameObject"
+    } ]
+  }, {
+    "name" : "emitGroundEvent",
+    "documentation" : "Fired when the object is falling and landing just above another object.",
+    "type" : "emit-event",
+    "modifiers" : [ "private" ],
+    "parameters" : [ {
+      "name" : "platform",
+      "type" : "com.berray.GameObject"
+    } ]
+  }, {
+    "name" : "update",
+    "documentation" : "Params:\n<p>\n- float deltaTime",
+    "type" : null,
+    "modifiers" : [ "public" ],
+    "parameters" : [ {
+      "name" : "event",
+      "type" : "com.berray.event.Event"
+    } ]
+  }, {
+    "name" : "emitFallEvent",
+    "documentation" : "Fired when the object is falling.",
+    "type" : "emit-event",
+    "modifiers" : [ "private" ],
+    "parameters" : [ ]
+  }, {
+    "name" : "emitFallOffEvent",
+    "documentation" : "Fired when the object was standing on a plattform ({@link #emitGroundEvent(GameObject)}) and is falling again.",
+    "type" : "emit-event",
+    "modifiers" : [ "private" ],
+    "parameters" : [ ]
+  }, {
+    "name" : "body",
+    "documentation" : "Creates a body component.",
+    "type" : "creator",
+    "modifiers" : [ "public", "static" ],
+    "parameters" : [ {
+      "name" : "isStatic",
+      "type" : "java.lang.Boolean"
+    } ]
+  } ]
+}, {
+  "name" : "ScaleComponent",
+  "classJavaDoc" : "\n * Scales the game object and all children by a factor. Note that in 2d stack the\n * z factor must be 1.0\n ",
+  "extendedClasses" : [ "com.berray.components.core.Component" ],
+  "methods" : [ {
+    "name" : "add",
+    "documentation" : null,
+    "type" : null,
+    "modifiers" : [ "public" ],
+    "parameters" : [ {
+      "name" : "gameObject",
+      "type" : "com.berray.GameObject"
+    } ]
+  }, {
+    "name" : "getScale",
+    "documentation" : "Returns the scale factors for each axis.",
+    "type" : "property",
+    "modifiers" : [ "public" ],
+    "parameters" : [ ]
+  }, {
+    "name" : "setScale",
+    "documentation" : "Sets the scale factors for each axis.",
+    "type" : "property",
+    "modifiers" : [ "public" ],
+    "parameters" : [ {
+      "name" : "scale",
+      "type" : "com.berray.math.Vec3"
+    } ]
+  }, {
+    "name" : "scale",
+    "documentation" : "Creates a scale component with equal scale factor in x and y axis and a scale of 1.0 in z axis.",
+    "type" : "creator",
+    "modifiers" : [ "public", "static" ],
+    "parameters" : [ {
+      "name" : "scale",
+      "type" : "java.lang.Float"
+    } ]
+  }, {
+    "name" : "scale",
+    "documentation" : "Creates a scale component with initial factors in each axis.",
+    "type" : "creator",
+    "modifiers" : [ "public", "static" ],
+    "parameters" : [ {
+      "name" : "scaleX",
+      "type" : "java.lang.Float"
+    }, {
+      "name" : "scaleY",
+      "type" : "java.lang.Float"
+    }, {
+      "name" : "scaleZ",
+      "type" : "java.lang.Float"
+    } ]
+  } ]
+} ]

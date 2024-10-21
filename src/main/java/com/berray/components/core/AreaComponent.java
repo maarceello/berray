@@ -125,7 +125,7 @@ public class AreaComponent extends Component {
     Collision collision = event.getParameter(1);
 
     if (!colliding.containsKey(other.getId())) {
-      gameObject.trigger("collide", other, collision);
+      emitCollideEvent(other, collision);
     }
     if (collision == null) {
       return;
@@ -136,6 +136,24 @@ public class AreaComponent extends Component {
     collidingThisFrame.add(other.getId());
   }
 
+  /**
+   * Fired each frame for each collision of this object.
+   *
+   * @type emit-event
+   */
+  private void emitCollideEvent(GameObject other, Collision collision) {
+    gameObject.trigger("collide", other, collision);
+  }
+
+  /**
+   * Fired when a collection ended this frame.
+   *
+   * @type emit-event
+   */
+  private void emitCollideEndEvent(Integer id) {
+    gameObject.trigger("collideEnd", colliding.get(id));
+  }
+
   public void onUpdate(Event event) {
     // check each object which is in the collision set.
     Iterator<Integer> iterator = colliding.keySet().iterator();
@@ -144,7 +162,7 @@ public class AreaComponent extends Component {
       // does this object collided this frame also?
       if (!collidingThisFrame.contains(id)) {
         // if not, remove it from the set and send the "collideEnd" Event
-        gameObject.trigger("collideEnd", colliding.get(id));
+        emitCollideEndEvent(id);
         iterator.remove();
       }
     }

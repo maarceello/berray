@@ -19,10 +19,21 @@ public class LayerComponent extends Component {
     registerGetter("layer", this::getLayer);
   }
 
+  /**
+   * returns the layer
+   *
+   * @type property
+   */
   public String getLayer() {
     return layer;
   }
 
+  /**
+   * creates a component with a specifoc layer
+   *
+   * @param layer the layer where the object should be placed
+   * @type creator
+   */
   public static LayerComponent layer(String layer) {
     return new LayerComponent(layer);
   }

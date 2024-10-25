@@ -1,10 +1,15 @@
 package com.berray.components.core;
 
 import com.berray.GameObject;
+import com.berray.event.CoreEvents;
 import com.berray.event.Event;
+import com.berray.event.MouseEvent;
+import com.berray.event.UpdateEvent;
 import com.berray.math.Matrix4;
 import com.berray.math.Vec2;
 import com.berray.math.Vec3;
+
+import static com.berray.event.CoreEvents.SCENE_GRAPH_ADDED;
 
 /**
  * Component to supply hoverEnter and hoverLeave events and drag events.
@@ -15,6 +20,10 @@ public class MouseComponent extends Component {
   private boolean hoveredLastFrame = false;
   private boolean pressed = false;
   private boolean dragging = false;
+  /**
+   * Position, where the mouse button was initially pressed down.
+   */
+  private Vec2 mousePressedPosition;
 
   public MouseComponent() {
     super("mouse", "area");
@@ -24,14 +33,14 @@ public class MouseComponent extends Component {
   public void add(GameObject gameObject) {
     super.add(gameObject);
 
-    on("sceneGraphAdded", this::processSceneGraphAdded);
+    on(SCENE_GRAPH_ADDED, this::processSceneGraphAdded);
   }
 
   private void processSceneGraphAdded(Event e) {
-    onGame("mouseMove", this::processMouseMove);
-    onGame("mousePress", this::processMousePress);
-    onGame("mouseRelease", this::processMouseRelease);
-    on("update", this::processUpdateEvent);
+    onGame(CoreEvents.MOUSE_MOVE, this::processMouseMove);
+    onGame(CoreEvents.MOUSE_PRESS, this::processMousePress);
+    onGame(CoreEvents.MOUSE_RELEASE, this::processMouseRelease);
+    on(CoreEvents.UPDATE, this::processUpdateEvent);
     registerGetter("hovered", this::isHovered);
   }
 
@@ -44,11 +53,11 @@ public class MouseComponent extends Component {
     return hoveredThisFrame;
   }
 
-  private void processMouseRelease(Event event) {
+  private void processMouseRelease(MouseEvent event) {
     // if the mouse is released and it was pressed above this object,
     // always send the release event.
     if (pressed) {
-      Vec2 mousePos = event.getParameter(0);
+      Vec2 mousePos = event.getWindowPos();
 
       Vec2 localPos = worldPosToLocalPos(mousePos);
       emitMouseReleaseEvent(mousePos, localPos);
@@ -63,20 +72,21 @@ public class MouseComponent extends Component {
         emitDragFinishEvent(mousePos, localPos);
         dragging = false;
       }
+      mousePressedPosition = null;
     }
   }
 
-  private void processMousePress(Event event) {
-    Vec2 mousePos = event.getParameter(0);
+  private void processMousePress(MouseEvent event) {
+    Vec2 mousePos = event.getWindowPos();
     if (gameObject.getBoundingBox().contains(mousePos)) {
       emitMousePressEvent(mousePos);
       this.pressed = true;
+      this.mousePressedPosition = mousePos;
     }
-
   }
 
-  private void processMouseMove(Event event) {
-    Vec2 mousePos = event.getParameter(0);
+  private void processMouseMove(MouseEvent event) {
+    Vec2 mousePos = event.getWindowPos();
     if (gameObject.getBoundingBox().contains(mousePos)) {
       hoveredThisFrame = true;
       emitHoverEvent(mousePos);
@@ -84,17 +94,20 @@ public class MouseComponent extends Component {
 
     if (pressed) {
       // moving the mouse while pressing the buttons means dragging the mouse
-
-      Vec2 localPos = worldPosToLocalPos(mousePos);
-      if (!dragging) {
-        emitDragStartEvent(mousePos, localPos);
-        dragging = true;
+      Vec2 delta = mousePressedPosition.sub(mousePos);
+      // dragging only starts then the mouse actually moves while the button is pressed
+      if (delta.lengthSquared() > 0.0f) {
+        Vec2 localPos = worldPosToLocalPos(mousePos);
+        if (!dragging) {
+          emitDragStartEvent(mousePos, localPos);
+          dragging = true;
+        }
+        emitDraggingEvent(mousePos, localPos);
       }
-      emitDraggingEvent(mousePos, localPos);
     }
   }
 
-  private void processUpdateEvent(Event event) {
+  private void processUpdateEvent(UpdateEvent event) {
     if (!hoveredLastFrame && hoveredThisFrame) {
       emitHoverEnterEvent();
     }
@@ -113,14 +126,6 @@ public class MouseComponent extends Component {
     return new Vec2(localVec3.getX(), localVec3.getY());
   }
 
-  /**
-   * Fired when the dragging of the object is finished.
-   *
-   * @type emit-event
-   */
-  private void emitDragFinishEvent(Vec2 mousePos, Vec2 localPos) {
-    gameObject.trigger("dragFinish", gameObject, localPos, mousePos);
-  }
 
   /**
    * Fired when the mouse button is pressed and released over the game object.
@@ -128,7 +133,7 @@ public class MouseComponent extends Component {
    * @type emit-event
    */
   private void emitMouseClickEvent(Vec2 mousePos, Vec2 localPos) {
-    gameObject.trigger("mouseClick", gameObject, localPos, mousePos);
+    gameObject.trigger(CoreEvents.MOUSE_CLICK, gameObject, localPos, mousePos);
   }
 
   /**
@@ -137,7 +142,7 @@ public class MouseComponent extends Component {
    * @type emit-event
    */
   private void emitMouseReleaseEvent(Vec2 mousePos, Vec2 localPos) {
-    gameObject.trigger("mouseRelease", gameObject, localPos, mousePos);
+    gameObject.trigger(CoreEvents.MOUSE_RELEASE, gameObject, localPos, mousePos);
   }
 
   /**
@@ -146,7 +151,17 @@ public class MouseComponent extends Component {
    * @type emit-event
    */
   private void emitMousePressEvent(Vec2 mousePos) {
-    gameObject.trigger("mousePress", gameObject, worldPosToLocalPos(mousePos), mousePos);
+    gameObject.trigger(CoreEvents.MOUSE_PRESS, gameObject, worldPosToLocalPos(mousePos), mousePos);
+  }
+
+
+  /**
+   * Fired then the game object dragging is started.
+   *
+   * @type emit-event
+   */
+  private void emitDragStartEvent(Vec2 mousePos, Vec2 localPos) {
+    gameObject.trigger(CoreEvents.DRAG_START, gameObject, localPos, mousePos);
   }
 
   /**
@@ -155,16 +170,16 @@ public class MouseComponent extends Component {
    * @type emit-event
    */
   private void emitDraggingEvent(Vec2 mousePos, Vec2 localPos) {
-    gameObject.trigger("dragging", gameObject, localPos, mousePos);
+    gameObject.trigger(CoreEvents.DRAGGING, gameObject, localPos, mousePos);
   }
 
   /**
-   * Fired then the game object dragging is started.
+   * Fired when the dragging of the object is finished.
    *
    * @type emit-event
    */
-  private void emitDragStartEvent(Vec2 mousePos, Vec2 localPos) {
-    gameObject.trigger("dragStart", gameObject, localPos, mousePos);
+  private void emitDragFinishEvent(Vec2 mousePos, Vec2 localPos) {
+    gameObject.trigger(CoreEvents.DRAG_FINISH, gameObject, localPos, mousePos);
   }
 
   /**
@@ -173,17 +188,7 @@ public class MouseComponent extends Component {
    * @type emit-event
    */
   private void emitHoverEvent(Vec2 mousePos) {
-    gameObject.trigger("hover", gameObject, worldPosToLocalPos(mousePos), mousePos);
-  }
-
-
-  /**
-   * Fired when the mouse cursor leaves the bounding box of the game object.
-   *
-   * @type emit-event
-   */
-  private void emitHoverLeaveEvent() {
-    gameObject.trigger("hoverLeave", gameObject);
+    gameObject.trigger(CoreEvents.HOVER, gameObject, worldPosToLocalPos(mousePos), mousePos);
   }
 
   /**
@@ -192,9 +197,17 @@ public class MouseComponent extends Component {
    * @type emit-event
    */
   private void emitHoverEnterEvent() {
-    gameObject.trigger("hoverEnter", gameObject);
+    gameObject.trigger(CoreEvents.HOVER_ENTER, gameObject);
   }
 
+  /**
+   * Fired when the mouse cursor leaves the bounding box of the game object.
+   *
+   * @type emit-event
+   */
+  private void emitHoverLeaveEvent() {
+    gameObject.trigger(CoreEvents.HOVER_LEAVE, gameObject);
+  }
 
   /**
    * creates a new mouse() component.

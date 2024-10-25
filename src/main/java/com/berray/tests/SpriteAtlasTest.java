@@ -8,21 +8,18 @@ import com.berray.components.CoreComponentShortcuts;
 import com.berray.components.core.Action;
 import com.berray.components.core.AnchorType;
 import com.berray.components.core.Component;
-import com.berray.event.Event;
+import com.berray.event.UpdateEvent;
 import com.berray.math.Collision;
 import com.berray.math.Color;
 import com.berray.math.Rect;
 import com.berray.math.Vec2;
 import com.berray.tests.level.LevelBuilder;
 import com.berray.tests.level.LevelGameObject;
-import com.raylib.Jaylib;
 import com.raylib.Raylib;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
-import java.util.function.Consumer;
 
 import static com.berray.assets.Animation.anim;
 import static com.berray.assets.SpriteSheet.spriteSheet;
@@ -381,8 +378,8 @@ public class SpriteAtlasTest extends BerrayApplication implements CoreComponentS
       on("update", this::update);
     }
 
-    public void update(Event event) {
-      float deltaTime = event.getParameter(0);
+    public void update(UpdateEvent event) {
+      float deltaTime = event.getFrametime();
       if (spinning) {
         float angle = gameObject.get("angle");
         angle += 1200 * deltaTime;

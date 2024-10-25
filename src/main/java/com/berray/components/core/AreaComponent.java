@@ -1,12 +1,17 @@
 package com.berray.components.core;
 
 import com.berray.GameObject;
-import com.berray.event.Event;
+import com.berray.event.CoreEvents;
+import com.berray.event.PhysicsCollideUpdateEvent;
+import com.berray.event.UpdateEvent;
 import com.berray.math.Collision;
 import com.berray.math.Rect;
 import com.berray.math.Vec2;
 
 import java.util.*;
+
+import static com.berray.event.CoreEvents.PHYSICS_COLLIDE_UPDATE;
+import static com.berray.event.CoreEvents.UPDATE;
 
 
 /**
@@ -40,8 +45,8 @@ public class AreaComponent extends Component {
   @Override
   public void add(GameObject gameObject) {
     super.add(gameObject);
-    on("collideUpdate", this::onCollideUpdate);
-    on("update", this::onUpdate);
+    on(PHYSICS_COLLIDE_UPDATE, this::onCollideUpdate);
+    on(UPDATE, this::onUpdate);
 
     registerAction("isColliding", this::isCollidingWith, IsCollidingWithAction::new);
     registerGetter("collisionIgnore", this::getCollisionIgnore);
@@ -120,9 +125,9 @@ public class AreaComponent extends Component {
   }
 
 
-  public void onCollideUpdate(Event event) {
-    GameObject other = event.getParameter(0);
-    Collision collision = event.getParameter(1);
+  public void onCollideUpdate(PhysicsCollideUpdateEvent event) {
+    GameObject other = event.getCollisionPartner();
+    Collision collision = event.getCollision();
 
     if (!colliding.containsKey(other.getId())) {
       emitCollideEvent(other, collision);
@@ -142,7 +147,7 @@ public class AreaComponent extends Component {
    * @type emit-event
    */
   private void emitCollideEvent(GameObject other, Collision collision) {
-    gameObject.trigger("collide", other, collision);
+    gameObject.trigger(CoreEvents.PHYSICS_COLLIDE, gameObject, collision, other);
   }
 
   /**
@@ -151,10 +156,10 @@ public class AreaComponent extends Component {
    * @type emit-event
    */
   private void emitCollideEndEvent(Integer id) {
-    gameObject.trigger("collideEnd", colliding.get(id));
+    gameObject.trigger(CoreEvents.PHYSICS_COLLIDE_END, gameObject, colliding.get(id));
   }
 
-  public void onUpdate(Event event) {
+  public void onUpdate(UpdateEvent event) {
     // check each object which is in the collision set.
     Iterator<Integer> iterator = colliding.keySet().iterator();
     while (iterator.hasNext()) {

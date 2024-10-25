@@ -4,7 +4,9 @@ import com.berray.GameObject;
 import com.berray.components.CoreComponentShortcuts;
 import com.berray.components.core.AnchorType;
 import com.berray.components.core.Component;
-import com.berray.event.Event;
+import com.berray.event.AddEvent;
+import com.berray.event.CoreEvents;
+import com.berray.event.MouseEvent;
 import com.berray.math.Color;
 import com.berray.math.Vec2;
 
@@ -52,9 +54,9 @@ public class Slider extends GameObject implements CoreComponentShortcuts {
     this.min = min;
     this.max = max;
     this.value = value;
-    on("add", this::onAdd);
-    on("mouseClick", this::onMouseClick);
-    on("dragging", this::onMouseDragging);
+    on(CoreEvents.ADD, this::onAdd);
+    on(CoreEvents.MOUSE_CLICK, this::onMouseClick);
+    on(CoreEvents.DRAGGING, this::onMouseDragging);
     registerProperty("size", this::getSize, this::setSize);
     registerProperty("value", this::getValue, this::setValue);
     registerPropertyGetter("render", () -> true);
@@ -115,14 +117,14 @@ public class Slider extends GameObject implements CoreComponentShortcuts {
   }
 
 
-  private void onMouseDragging(Event event) {
-    Vec2 relativePos = event.getParameter(1);
+  private void onMouseDragging(MouseEvent event) {
+    Vec2 relativePos = event.getGameObjectPos();
     float percent = relativePos.getX() / size.getX();
     setValue(min + (max - min) * percent);
   }
 
-  private void onMouseClick(Event event) {
-    Vec2 relativePos = event.getParameter(1);
+  private void onMouseClick(MouseEvent event) {
+    Vec2 relativePos = event.getGameObjectPos();
     float percent = relativePos.getX() / size.getX();
     setValue(min + (max - min) * percent);
   }
@@ -180,8 +182,8 @@ public class Slider extends GameObject implements CoreComponentShortcuts {
     }
   }
 
-  private void onAdd(Event event) {
-    GameObject parent = event.getParameter(0);
+  private void onAdd(AddEvent event) {
+    GameObject parent = event.getSource();
     // ignore add event when we're the one the child is added to
     if (parent != this) {
       leftInset = 0;

@@ -5,6 +5,7 @@ import com.berray.GameObject;
 import com.berray.components.CoreComponentShortcuts;
 import com.berray.components.core.Component;
 import com.berray.components.core.Rotate3dComponent;
+import com.berray.event.UpdateEvent;
 import com.berray.math.Color;
 import com.berray.math.Vec3;
 import com.berray.objects.CameraComponent;
@@ -35,9 +36,9 @@ public class Render3dTest extends BerrayApplication implements CoreComponentShor
         new CubeComponent()
     );
 
-    onUpdate("root3d", event -> {
-      GameObject gameObject = event.getParameter(0);
-      float deltaTime = event.getParameter(1);
+    onUpdate("root3d", (UpdateEvent event) -> {
+      GameObject gameObject = event.getSource();
+      float deltaTime = event.getFrametime();
       float angle = gameObject.get("angleY");
       angle += 40 * deltaTime;
       gameObject.set("angleY", angle);

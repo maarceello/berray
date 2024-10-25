@@ -5,6 +5,9 @@ import com.berray.GameObject;
 import com.berray.assets.CoreAssetShortcuts;
 import com.berray.components.CoreComponentShortcuts;
 import com.berray.components.core.AnchorType;
+import com.berray.event.AnimationEvent;
+import com.berray.event.KeyEvent;
+import com.berray.event.PhysicsEvent;
 import com.berray.math.Color;
 import com.berray.math.Vec2;
 import com.berray.objects.core.Label;
@@ -13,6 +16,8 @@ import com.raylib.Raylib;
 
 import static com.berray.assets.Animation.anim;
 import static com.berray.assets.SpriteSheet.spriteSheet;
+import static com.berray.event.CoreEvents.ANIMATION_END;
+import static com.berray.event.CoreEvents.PHYSICS_GROUND;
 
 public class SpriteTest extends BerrayApplication implements CoreComponentShortcuts, CoreAssetShortcuts {
   @Override
@@ -61,7 +66,7 @@ public class SpriteTest extends BerrayApplication implements CoreComponentShortc
 
 
 // Switch to "idle" or "run" animation when player hits ground
-    player.on("ground", (event) -> {
+    player.on(PHYSICS_GROUND, (PhysicsEvent event) -> {
       if (!Raylib.IsKeyDown(Raylib.KEY_LEFT) && !Raylib.IsKeyDown(Raylib.KEY_RIGHT)) {
         player.doAction("play", "idle");
       } else {
@@ -69,21 +74,21 @@ public class SpriteTest extends BerrayApplication implements CoreComponentShortc
       }
     });
 
-    player.on("animEnd", event -> {
-      String anim = event.getParameter(0);
+    player.on(ANIMATION_END, (AnimationEvent event) -> {
+      String anim = event.getAnimation();
       if (anim.equals("idle")) {
         // You can also register an event that runs when certain anim ends
       }
     });
 
-    onKeyPress(Jaylib.KEY_SPACE, (event) -> {
+    onKeyPress(Jaylib.KEY_SPACE, (KeyEvent event) -> {
       if (player.getOrDefault("grounded", false)) {
         player.doAction("jump", JUMP_FORCE);
         player.doAction("play", "jump");
       }
     });
 
-    onKeyDown(Raylib.KEY_LEFT, (event) -> {
+    onKeyDown(Raylib.KEY_LEFT, (KeyEvent event) -> {
       player.doAction("move", new Vec2(-SPEED, 0), frameTime());
       player.set("flipX", true);
       // .play() will reset to the first frame of the anim, so we want to make sure it only runs when the current animation is not "run"
@@ -92,7 +97,7 @@ public class SpriteTest extends BerrayApplication implements CoreComponentShortc
       }
     });
 
-    onKeyDown(Raylib.KEY_RIGHT, (event) -> {
+    onKeyDown(Raylib.KEY_RIGHT, (KeyEvent event) -> {
       player.doAction("move", new Vec2(SPEED, 0), frameTime());
       player.set("flipX", false);
       if (player.getOrDefault("grounded", false) && !"run".equals(player.get("curAnim")  )) {
@@ -100,8 +105,8 @@ public class SpriteTest extends BerrayApplication implements CoreComponentShortc
       }
     });
 
-    on("keyUp", (event) -> {
-      int key = event.getParameter(0);
+    on("keyUp", (KeyEvent event) -> {
+      int key = event.getKeyCode();
       if (key == Raylib.KEY_LEFT || key == Raylib.KEY_RIGHT) {
         // Only reset to "idle" if player is not holding any of these keys
         if (player.getOrDefault("grounded", false)) {

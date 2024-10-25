@@ -4,9 +4,11 @@ import com.berray.BerrayApplication;
 import com.berray.GameObject;
 import com.berray.components.CoreComponentShortcuts;
 import com.berray.components.core.AnchorType;
+import com.berray.event.UpdateEvent;
 import com.berray.math.Color;
 import com.berray.math.Vec2;
-import com.raylib.Jaylib;
+
+import static com.berray.event.CoreEvents.UPDATE;
 
 public class MouseCalculationTest extends BerrayApplication implements CoreComponentShortcuts {
 
@@ -56,8 +58,8 @@ public class MouseCalculationTest extends BerrayApplication implements CoreCompo
       }
     }
 
-    root.on("update", event -> {
-      float deltaTime = event.getParameter(0);
+    root.on(UPDATE, (UpdateEvent event) -> {
+      float deltaTime = event.getFrametime();
       angle += deltaTime * 30f;
       root.set("angle", angle);
     });

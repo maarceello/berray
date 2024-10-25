@@ -4,9 +4,11 @@ import com.berray.BerrayApplication;
 import com.berray.GameObject;
 import com.berray.components.CoreComponentShortcuts;
 import com.berray.components.core.AnchorType;
+import com.berray.event.CoreEvents;
+import com.berray.event.MouseEvent;
+import com.berray.event.PropertyChangeEvent;
 import com.berray.math.Color;
 import com.berray.math.Vec2;
-import com.raylib.Jaylib;
 
 public class DatabindingTest extends BerrayApplication implements CoreComponentShortcuts {
     @Override
@@ -24,13 +26,13 @@ public class DatabindingTest extends BerrayApplication implements CoreComponentS
                 text("foobar")
         );
 
-        on("mousePress", event -> {
-            Vec2 pos = event.getParameter(0);
+        on(CoreEvents.MOUSE_PRESS, (MouseEvent event) -> {
+            Vec2 pos = event.getWindowPos();
             testobject.set("pos", pos);
         });
 
-        testobject.on("propertyChange", event -> {
-            text.set("text", event.getParameter(0)+": "+event.getParameter(1));
+        testobject.on(CoreEvents.PROPERTY_CHANGED, (PropertyChangeEvent event) -> {
+            text.set("text", event.getPropertyName()+": "+event.getNewValue());
         });
 
     }

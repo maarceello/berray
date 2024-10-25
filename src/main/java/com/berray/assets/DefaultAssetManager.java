@@ -8,7 +8,7 @@ import com.raylib.Raylib;
 import javax.imageio.ImageIO;
 import javax.imageio.stream.ImageInputStream;
 import javax.imageio.stream.MemoryCacheImageInputStream;
-import java.awt.image.BufferedImage;
+import java.awt.image.RenderedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -130,7 +130,7 @@ public class DefaultAssetManager extends BaseAssetManager {
     assets.put(name, asset);
   }
 
-  public void loadSprite(String name, BufferedImage bufferedImage) {
+  public void loadSprite(String name, RenderedImage bufferedImage) {
     try {
       ByteArrayOutputStream output = new ByteArrayOutputStream();
       ImageIO.write(bufferedImage, "png", output);

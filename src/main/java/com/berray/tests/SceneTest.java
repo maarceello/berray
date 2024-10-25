@@ -5,11 +5,12 @@ import com.berray.GameObject;
 import com.berray.assets.CoreAssetShortcuts;
 import com.berray.components.CoreComponentShortcuts;
 import com.berray.components.core.AnchorType;
+import com.berray.event.CoreEvents;
+import com.berray.event.PhysicsCollideEvent;
 import com.berray.math.Color;
 import com.berray.math.Vec2;
 import com.berray.tests.level.LevelBuilder;
 import com.berray.tests.level.LevelGameObject;
-import com.raylib.Jaylib;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -107,8 +108,8 @@ public class SceneTest extends BerrayApplication implements CoreComponentShortcu
         go("lose");
       });
 
-      player.onCollide("coin", event -> {
-        GameObject coin = event.getParameter(0);
+      player.onCollide("coin", (PhysicsCollideEvent event) -> {
+        GameObject coin = event.getCollisionPartner();
         destroy(coin);
         play("score");
         score.getAndIncrement();
@@ -116,7 +117,7 @@ public class SceneTest extends BerrayApplication implements CoreComponentShortcu
       });
 
       // Fall death
-      player.on("update", event -> {
+      player.on(CoreEvents.UPDATE, event -> {
         if (player.get("pos", Vec2.origin()).getY() >= 480) {
           go("lose");
         }

@@ -2,9 +2,8 @@ package com.berray;
 
 import com.berray.components.core.AnchorType;
 import com.berray.components.core.Component;
-import com.berray.event.Event;
+import com.berray.event.*;
 import com.berray.event.EventListener;
-import com.berray.event.EventManager;
 import com.berray.math.Matrix4;
 import com.berray.math.Rect;
 import com.berray.math.Vec2;
@@ -18,6 +17,9 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
+
+import static com.berray.event.CoreEvents.PHYSICS_COLLIDE;
+import static com.berray.event.CoreEvents.SCENE_GRAPH_ADDED;
 
 public class GameObject {
   private static final AtomicInteger nextComponentId = new AtomicInteger(0);
@@ -114,7 +116,7 @@ public class GameObject {
     children.forEach(child -> child.setGame(game));
     if (game != null) {
       // fire event that the object was added to the scene graoh
-      trigger("sceneGraphAdded", this);
+      trigger(SCENE_GRAPH_ADDED, this);
     }
   }
 
@@ -194,8 +196,8 @@ public class GameObject {
     other.setGame(this.game);
     // force recalculation of bounding rectangle
     transformDirty = true;
-    trigger("add", this, other);
-    other.trigger("add", this, other);
+    trigger(CoreEvents.ADD, this, other);
+    other.trigger(CoreEvents.ADD, this, other);
     return other;
   }
 
@@ -205,8 +207,8 @@ public class GameObject {
     child.setGame(this.game);
     // force recalculation of bounding rectangle
     transformDirty = true;
-    trigger("add", this, child);
-    child.trigger("add", this, child);
+    trigger(CoreEvents.ADD, this, child);
+    child.trigger(CoreEvents.ADD, this, child);
     return child;
   }
 
@@ -218,9 +220,9 @@ public class GameObject {
     }
     // first update all children, then the object itself (depth first traversal)
     this.children.forEach(child -> child.update(frameTime));
-    this.trigger("update", frameTime);
+    this.trigger(CoreEvents.UPDATE, this, frameTime);
     // trigger game also, so tag based listeners get notified
-    this.game.trigger("update", this, frameTime);
+    this.game.trigger(CoreEvents.UPDATE, this, frameTime);
   }
 
   public List<GameObject> getChildren() {
@@ -365,7 +367,7 @@ public class GameObject {
    */
   public <E> E firePropertyChange(String propertyName, E oldValue, E newValue) {
     if (!Objects.equals(oldValue, newValue)) {
-      trigger("propertyChange", propertyName, oldValue, newValue);
+      trigger(CoreEvents.PROPERTY_CHANGED, this, propertyName, oldValue, newValue);
     }
 
     return newValue;
@@ -406,6 +408,7 @@ public class GameObject {
   /**
    * returns registered component property
    */
+  @SuppressWarnings("unchecked")
   public <E> E get(String property) {
     Supplier<?> getterMethod = getterMethods.get(property);
     return getterMethod == null ? null : (E) getterMethod.get();
@@ -433,6 +436,7 @@ public class GameObject {
   /**
    * sets registered component property
    */
+  @SuppressWarnings("unchecked")
   public <E> void set(String property, E value) {
     Consumer<E> setterMethod = (Consumer<E>) setterMethods.get(property);
     if (setterMethod == null) {
@@ -451,6 +455,7 @@ public class GameObject {
   /**
    * calls a registered action, returning the result
    */
+  @SuppressWarnings("unchecked")
   public <E> E doAction(String methodName, Object... value) {
     Function<List<Object>, E> actionMethod = (Function<List<Object>, E>) actionMethods.get(methodName);
     if (actionMethod == null) {
@@ -492,10 +497,12 @@ public class GameObject {
     properties.put(property, value);
   }
 
+  @SuppressWarnings("unchecked")
   public <E> E getProperty(String property) {
     return (E) properties.get(property);
   }
 
+  @SuppressWarnings("unchecked")
   public <E extends Component> E getComponent(Class<E> type) {
     return (E) components.get(type);
   }
@@ -544,9 +551,9 @@ public class GameObject {
   /**
    * Update all game objects
    */
-  public void onCollide(String tag, EventListener eventListener) {
-    on("collide", event -> {
-      GameObject gameObject = event.getParameter(0);
+  public <E extends PhysicsCollideEvent> void onCollide(String tag, EventListener<E> eventListener) {
+    on(PHYSICS_COLLIDE, (E event) -> {
+      GameObject gameObject = event.getCollisionPartner();
       // only propagate event when the object has the required tag
       if (gameObject.is(tag)) {
         eventListener.onEvent(event);

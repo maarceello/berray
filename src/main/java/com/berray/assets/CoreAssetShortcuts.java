@@ -1,6 +1,6 @@
 package com.berray.assets;
 
-import java.awt.image.BufferedImage;
+import java.awt.image.RenderedImage;
 
 public interface CoreAssetShortcuts {
   DefaultAssetManager getAssetManager();
@@ -10,7 +10,7 @@ public interface CoreAssetShortcuts {
     getAssetManager().loadSprite(name, path);
   }
 
-  default void loadSprite(String name, BufferedImage image) {
+  default void loadSprite(String name, RenderedImage image) {
     getAssetManager().loadSprite(name, image);
   }
 

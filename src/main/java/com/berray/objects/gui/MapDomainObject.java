@@ -1,5 +1,6 @@
 package com.berray.objects.gui;
 
+import com.berray.event.CoreEvents;
 import com.berray.event.EventListener;
 import com.berray.event.EventManager;
 import com.berray.event.PropertyChangeEvent;
@@ -12,12 +13,12 @@ public class MapDomainObject implements EventListenerCapable {
   private EventManager eventManager = new EventManager();
   @Override
   public void onPropertyChange(EventListener<? extends PropertyChangeEvent> listener) {
-    eventManager.addEventListener("propertyChange", listener);
+    eventManager.addEventListener(CoreEvents.PROPERTY_CHANGED, listener);
   }
 
   @Override
   public void onPropertyChange(EventListener<? extends PropertyChangeEvent> listener, Object owner) {
-    eventManager.addEventListener("propertyChange", listener, owner);
+    eventManager.addEventListener(CoreEvents.PROPERTY_CHANGED, listener, owner);
   }
 
   @Override
@@ -48,6 +49,6 @@ public class MapDomainObject implements EventListenerCapable {
       return;
     }
     properties.put(name, value);
-    eventManager.trigger("propertyChange", Arrays.asList(name, old, value));
+    eventManager.trigger(CoreEvents.PROPERTY_CHANGED, Arrays.asList(null, name, old, value));
   }
 }

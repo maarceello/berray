@@ -35,6 +35,13 @@ Events can have parameters, there are event type specific. You can see them in t
 
 # Events
 
+Notes about event parameters:
+
+The first event parameter is always the game object which fired the event. This may be null when the event is global, 
+such as `keyPress` or `mouseMove`. 
+Games should always use the most specific Event Object. This way changes in the parameters are automatically picked up 
+and no migration effort is necessary.
+
 ## Game
 
 ### keyDown, keyUp, keyPress

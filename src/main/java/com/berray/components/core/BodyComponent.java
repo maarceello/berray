@@ -1,13 +1,15 @@
 package com.berray.components.core;
 
 import com.berray.GameObject;
-import com.berray.event.Event;
+import com.berray.event.*;
 import com.berray.math.Collision;
 import com.berray.math.Matrix4;
 import com.berray.math.Vec2;
 import com.berray.math.Vec3;
 
 import java.util.List;
+
+import static com.berray.event.CoreEvents.*;
 
 /**
  * Adds physics and collision detection to an object.
@@ -62,10 +64,10 @@ public class BodyComponent extends Component {
     registerAction("jump", this::jump, JumpAction::new);
 
     if (gameObject.is("area")) {
-      on("collideUpdate", this::collideUpdate);
-      on("physicsResolve", this::onPhysicsResolve);
+      on(PHYSICS_COLLIDE_UPDATE, this::collideUpdate);
+      on(PHYSICS_RESOLVE, this::onPhysicsResolve);
     }
-    on("update", this::update);
+    on(UPDATE, this::update);
   }
 
   /**
@@ -133,9 +135,9 @@ public class BodyComponent extends Component {
   }
 
 
-  public void collideUpdate(Event event) {
-    GameObject other = event.getParameter(0);
-    Collision collision = event.getParameter(1);
+  public void collideUpdate(PhysicsCollideUpdateEvent event) {
+    GameObject other = event.getCollisionPartner();
+    Collision collision = event.getCollision();
 
     if (collision == null || collision.isResolved() || !other.is("body")) {
       return;
@@ -176,28 +178,10 @@ public class BodyComponent extends Component {
     collision.setResolved(true);
     reverseCollision.setResolved(true);
     GameObject gameObject1 = gameObject;
-    emitPhisicsResolveEvent(gameObject1, collision);
-    emitPhisicsResolveEvent(other, reverseCollision);
+    emitPhysicsResolveEvent(gameObject1, collision);
+    emitPhysicsResolveEvent(other, reverseCollision);
   }
 
-  /**
-   * Fired then the collision is resolved. Note: the event is fired for both parties of the collision.
-   *
-   * @type emit-event
-   */
-  private static void emitPhisicsResolveEvent(GameObject target, Collision collision) {
-    target.trigger("physicsResolve", collision);
-  }
-
-  /**
-   * Fired just before the collision is tried to be resolved so interested parties can resolve the collision themselves.
-   * Note: the event is fired for both parties of the collision.
-   *
-   * @type emit-event
-   */
-  private void emitBeforePhysicsResolve(GameObject target, Collision collision) {
-    target.trigger("beforePhysicsResolve", collision);
-  }
 
   /**
    * Calculate the displacement in the objects local coordinate system.
@@ -211,8 +195,8 @@ public class BodyComponent extends Component {
     return displacement;
   }
 
-  private void onPhysicsResolve(Event event) {
-    Collision col = event.getParameter(0);
+  private void onPhysicsResolve(PhysicsResolveEvent event) {
+    Collision col = event.getCollision();
     Vec3 gravity = gameObject.getGame().getGravity();
     if (gravity != null) {
       Vec2 gravity2d = new Vec2(gravity.getX(), gravity.getY());
@@ -233,30 +217,12 @@ public class BodyComponent extends Component {
   }
 
   /**
-   * Fired when the object is jumping an be just under another object.
-   *
-   * @type emit-event
-   */
-  private void emitHeadbuttEvent(GameObject ceiling) {
-    gameObject.trigger("headbutt", ceiling);
-  }
-
-  /**
-   * Fired when the object is falling and landing just above another object.
-   *
-   * @type emit-event
-   */
-  private void emitGroundEvent(GameObject platform) {
-    gameObject.trigger("ground", platform);
-  }
-
-  /**
    * Params:
    * <p>
    * - float deltaTime
    */
-  public void update(Event event) {
-    float deltaTime = event.getParameter(0);
+  public void update(UpdateEvent event) {
+    float deltaTime = event.getFrametime();
     Vec3 gravityDirection = gameObject.getGame().getGravityDirection();
     if (gravityDirection == null || isStatic) {
       return;
@@ -314,12 +280,49 @@ public class BodyComponent extends Component {
   }
 
   /**
+   * Fired when the collision is resolved. Note: the event is fired for both parties of the collision.
+   *
+   * @type emit-event
+   */
+  private void emitPhysicsResolveEvent(GameObject target, Collision collision) {
+    target.trigger(PHYSICS_RESOLVE, this, collision);
+  }
+
+  /**
+   * Fired just before the collision is tried to be resolved so interested parties can resolve the collision themselves.
+   * Note: the event is fired for both parties of the collision.
+   *
+   * @type emit-event
+   */
+  private void emitBeforePhysicsResolve(GameObject target, Collision collision) {
+    target.trigger(PHYSICS_BEFORE_RESOLVE, target, collision, this);
+  }
+
+  /**
+   * Fired when the object is jumping and is just under another object.
+   *
+   * @type emit-event
+   */
+  private void emitHeadbuttEvent(GameObject ceiling) {
+    gameObject.trigger(PHYSICS_HEADBUTT, this, ceiling);
+  }
+
+  /**
+   * Fired when the object is falling and landing just above another object.
+   *
+   * @type emit-event
+   */
+  private void emitGroundEvent(GameObject platform) {
+    gameObject.trigger(PHYSICS_GROUND, this, platform);
+  }
+
+  /**
    * Fired when the object is falling.
    *
    * @type emit-event
    */
   private void emitFallEvent() {
-    gameObject.trigger("fall");
+    gameObject.trigger(PHYSICS_FALL, this);
   }
 
   /**
@@ -328,8 +331,9 @@ public class BodyComponent extends Component {
    * @type emit-event
    */
   private void emitFallOffEvent() {
-    gameObject.trigger("fallOff");
+    gameObject.trigger(PHYSICS_FALL_OFF, this);
   }
+
 
   /**
    * Creates a body component.

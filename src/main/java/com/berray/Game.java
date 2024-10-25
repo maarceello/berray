@@ -15,6 +15,8 @@ import java.nio.file.FileSystems;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.berray.event.CoreEvents.PHYSICS_COLLIDE_UPDATE;
+
 public class Game {
   public static final String DEFAULT_LAYER = "default";
   private final AssetLoaders assetLoaders;
@@ -42,14 +44,33 @@ public class Game {
     assetLoaders.addAssetLoader(new RaylibAssetLoader());
     assetManager = new DefaultAssetManager(assetLoaders, FileSystems.getDefault().getPath("."));
     EventTypeFactory eventTypeFactory = EventTypeFactory.getInstance();
-    eventTypeFactory.registerEventType("propertyChange", PropertyChangeEvent::new);
-    eventTypeFactory.registerEventType("update", UpdateEvent::new);
-    eventTypeFactory.registerEventType("add", AddEvent::new);
-    eventTypeFactory.registerEventType("keyPress", KeyEvent::new);
-    eventTypeFactory.registerEventType("keyDown", KeyEvent::new);
-    eventTypeFactory.registerEventType("keyUp", KeyEvent::new);
-    eventTypeFactory.registerEventType("mouseMove", MouseMoveEvent::new);
-    eventTypeFactory.registerEventType("sceneGraphAdded", SceneGraphAddedEvent::new);
+    eventTypeFactory.registerEventType(PropertyChangeEvent.EVENT_NAME, PropertyChangeEvent::new);
+    eventTypeFactory.registerEventType(UpdateEvent.EVENT_NAME, UpdateEvent::new);
+    eventTypeFactory.registerEventType(AddEvent.EVENT_NAME, AddEvent::new);
+    eventTypeFactory.registerEventType(KeyEvent.EVENT_NAME_KEY_PRESS, KeyEvent::new);
+    eventTypeFactory.registerEventType(KeyEvent.EVENT_NAME_KEY_DOWN, KeyEvent::new);
+    eventTypeFactory.registerEventType(KeyEvent.EVENT_NAME_KEY_UP, KeyEvent::new);
+    eventTypeFactory.registerEventType(MouseEvent.EVENT_NAME_MOUSE_MOVE, MouseEvent::new);
+    eventTypeFactory.registerEventType(MouseEvent.EVENT_NAME_MOUSE_PRESS, MouseEvent::new);
+    eventTypeFactory.registerEventType(MouseEvent.EVENT_NAME_MOUSE_RELEASE, MouseEvent::new);
+    eventTypeFactory.registerEventType(MouseEvent.EVENT_NAME_MOUSE_CLICK, MouseEvent::new);
+    eventTypeFactory.registerEventType(MouseEvent.EVENT_NAME_DRAG_START, MouseEvent::new);
+    eventTypeFactory.registerEventType(MouseEvent.EVENT_NAME_DRAGGING, MouseEvent::new);
+    eventTypeFactory.registerEventType(MouseEvent.EVENT_NAME_DRAG_FINISH, MouseEvent::new);
+    eventTypeFactory.registerEventType(MouseEvent.EVENT_NAME_HOVER, MouseEvent::new);
+    eventTypeFactory.registerEventType(MouseEvent.EVENT_NAME_HOVER_LEAVE, MouseEvent::new);
+    eventTypeFactory.registerEventType(MouseEvent.EVENT_NAME_HOVER_ENTER, MouseEvent::new);
+    eventTypeFactory.registerEventType(AnimationEvent.EVENT_NAME_ANIMATION_END, AnimationEvent::new);
+    eventTypeFactory.registerEventType(AnimationEvent.EVENT_NAME_ANIMATION_START, AnimationEvent::new);
+    eventTypeFactory.registerEventType(SceneGraphAddedEvent.EVENT_NAME, SceneGraphAddedEvent::new);
+    eventTypeFactory.registerEventType(PhysicsBeforeResolveEvent.EVENT_NAME, PhysicsBeforeResolveEvent::new);
+    eventTypeFactory.registerEventType(PhysicsCollideEvent.EVENT_NAME, PhysicsCollideEvent::new);
+    eventTypeFactory.registerEventType(PhysicsCollideUpdateEvent.EVENT_NAME, PhysicsCollideUpdateEvent::new);
+    eventTypeFactory.registerEventType(PhysicsResolveEvent.EVENT_NAME, PhysicsResolveEvent::new);
+    eventTypeFactory.registerEventType( PhysicsEvent.EVENT_NAME_GROUND,  PhysicsEvent::new);
+    eventTypeFactory.registerEventType( PhysicsEvent.EVENT_NAME_HEADBUTT,  PhysicsEvent::new);
+    eventTypeFactory.registerEventType( PhysicsEvent.EVENT_NAME_FALL,  PhysicsEvent::new);
+    eventTypeFactory.registerEventType( PhysicsEvent.EVENT_NAME_FALL_OFF,  PhysicsEvent::new);
     eventManager = new EventManager();
     init();
   }
@@ -64,9 +85,9 @@ public class Game {
 
   public void init() {
     // forward game objects adds to game event manager
-    root.on("add", event -> eventManager.trigger(event.getName(), event.getParameters()));
+    root.on(CoreEvents.ADD, event -> eventManager.trigger(event.getName(), event.getParameters()));
     // forward update events down the object tree
-    on("update", event -> root.trigger(event.getName(), event.getParameters()));
+    on(CoreEvents.UPDATE, event -> root.trigger(event.getName(), event.getParameters()));
     layers.add(DEFAULT_LAYER);
   }
 
@@ -110,7 +131,7 @@ public class Game {
   public <E extends GameObject> E add(E gameObject, Object... components) {
     E newGameObject = root.add(gameObject, components);
     // forward add events from the new game object to game event manager
-    newGameObject.on("add", event -> eventManager.trigger(event.getName(), event.getParameters()));
+    newGameObject.on(CoreEvents.ADD, event -> eventManager.trigger(event.getName(), event.getParameters()));
     return newGameObject;
   }
   /**
@@ -119,7 +140,7 @@ public class Game {
   public GameObject add(Object... components) {
     GameObject newGameObject = root.add(components);
     // forward add events from the new game object to game event manager
-    newGameObject.on("add", event -> eventManager.trigger(event.getName(), event.getParameters()));
+    newGameObject.on(CoreEvents.ADD, event -> eventManager.trigger(event.getName(), event.getParameters()));
     return newGameObject;
   }
 
@@ -285,11 +306,11 @@ public class Game {
       Vec2 res = collides(thisBoundingBox, other.getBoundingBox());
       if (res != null) {
         Collision col1 = new Collision(obj, other, res);
-        obj.trigger("collideUpdate", other, col1);
+        obj.trigger(PHYSICS_COLLIDE_UPDATE, obj, col1, other);
         Collision col2 = col1.reverse();
         // resolution only has to happen only once
         col2.setResolved(col1.isResolved());
-        other.trigger("collideUpdate", obj, col2);
+        other.trigger(PHYSICS_COLLIDE_UPDATE, other, col2, obj);
       }
     }
   }
@@ -311,9 +332,9 @@ public class Game {
    * Update all game objects
    */
   public void onUpdate(String tag, EventListener<UpdateEvent> eventListener) {
-    on("update", (UpdateEvent event) -> {
+    on(CoreEvents.UPDATE, (UpdateEvent event) -> {
       // only propagate event when the object has the required tag
-      if (event.getGameObject().is(tag)) {
+      if (event.getSource().is(tag)) {
         eventListener.onEvent(event);
       }
     });

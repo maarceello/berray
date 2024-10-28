@@ -70,6 +70,10 @@ public class Rect {
     return points;
   }
 
+  public Rect moveBy(Vec2 delta) {
+    return new Rect(x+delta.getX(), y+delta.getY(), width, height);
+  }
+
   public Raylib.Rectangle toRectangle() {
     return new Jaylib.Rectangle(x, y, width, height);
   }

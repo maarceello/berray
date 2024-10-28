@@ -1,6 +1,7 @@
 package com.berray.components.core;
 
 import com.berray.GameObject;
+import com.berray.math.Vec2;
 import com.berray.math.Vec3;
 
 /**
@@ -26,7 +27,7 @@ public class ScaleComponent extends Component {
    *
    * @type property
    */
-  public Vec3 getScale() {
+  public Object getScale() {
     return scale;
   }
 
@@ -35,8 +36,20 @@ public class ScaleComponent extends Component {
    *
    * @type property
    */
-  public void setScale(Vec3 scale) {
-    this.scale = scale;
+  public void setScale(Object scale) {
+    if (scale == null) {
+      this.scale = new Vec3(1.0f, 1.0f, 1.0f);
+    } else if (scale instanceof Vec3) {
+      this.scale = (Vec3) scale;
+    } else if (scale instanceof Vec2) {
+      Vec2 vec2 = (Vec2) scale;
+      this.scale = new Vec3(vec2.getX(), vec2.getY(), 1.0f);
+    } else if (scale instanceof Float) {
+      this.scale = new Vec3((Float) scale, (Float) scale, (Float) scale);
+    } else {
+      throw new IllegalArgumentException("Unknown Scale type: "+scale.getClass().getSimpleName()+". Supported are Float, Vec2 and Vec3");
+    }
+    gameObject.setTransformDirty();
   }
 
   /**

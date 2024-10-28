@@ -1,10 +1,7 @@
 package com.berray.components.core;
 
 import com.berray.GameObject;
-import com.berray.event.CoreEvents;
-import com.berray.event.Event;
-import com.berray.event.MouseEvent;
-import com.berray.event.UpdateEvent;
+import com.berray.event.*;
 import com.berray.math.Matrix4;
 import com.berray.math.Vec2;
 import com.berray.math.Vec3;
@@ -40,8 +37,16 @@ public class MouseComponent extends Component {
     onGame(CoreEvents.MOUSE_MOVE, this::processMouseMove);
     onGame(CoreEvents.MOUSE_PRESS, this::processMousePress);
     onGame(CoreEvents.MOUSE_RELEASE, this::processMouseRelease);
+    onGame(CoreEvents.MOUSE_WHEEL_MOVE, this::processMouseWheel);
     on(CoreEvents.UPDATE, this::processUpdateEvent);
     registerGetter("hovered", this::isHovered);
+  }
+
+  private void processMouseWheel(MouseWheelEvent event) {
+    Vec2 mousePos = event.getWindowPos();
+    if (gameObject.getBoundingBox().contains(mousePos)) {
+      emitMouseWheelEvent(mousePos, worldPosToLocalPos(mousePos), event.getWheelDelta());
+    }
   }
 
   /**
@@ -126,6 +131,15 @@ public class MouseComponent extends Component {
     return new Vec2(localVec3.getX(), localVec3.getY());
   }
 
+  /**
+   * Fired when the mouse wheel was moved while the mouse cursor is over the game object.
+   *
+   * @type emit-event
+   */
+  private void emitMouseWheelEvent(Vec2 mousePos, Vec2 localPos, float wheelDelta) {
+    gameObject.trigger(CoreEvents.MOUSE_WHEEL_MOVE, gameObject, mousePos, localPos, wheelDelta);
+  }
+
 
   /**
    * Fired when the mouse button is pressed and released over the game object.
@@ -133,7 +147,7 @@ public class MouseComponent extends Component {
    * @type emit-event
    */
   private void emitMouseClickEvent(Vec2 mousePos, Vec2 localPos) {
-    gameObject.trigger(CoreEvents.MOUSE_CLICK, gameObject, localPos, mousePos);
+    gameObject.trigger(CoreEvents.MOUSE_CLICK, gameObject, mousePos, localPos);
   }
 
   /**
@@ -142,7 +156,7 @@ public class MouseComponent extends Component {
    * @type emit-event
    */
   private void emitMouseReleaseEvent(Vec2 mousePos, Vec2 localPos) {
-    gameObject.trigger(CoreEvents.MOUSE_RELEASE, gameObject, localPos, mousePos);
+    gameObject.trigger(CoreEvents.MOUSE_RELEASE, gameObject, mousePos, localPos);
   }
 
   /**
@@ -151,7 +165,7 @@ public class MouseComponent extends Component {
    * @type emit-event
    */
   private void emitMousePressEvent(Vec2 mousePos) {
-    gameObject.trigger(CoreEvents.MOUSE_PRESS, gameObject, worldPosToLocalPos(mousePos), mousePos);
+    gameObject.trigger(CoreEvents.MOUSE_PRESS, gameObject, mousePos, worldPosToLocalPos(mousePos));
   }
 
 
@@ -161,7 +175,7 @@ public class MouseComponent extends Component {
    * @type emit-event
    */
   private void emitDragStartEvent(Vec2 mousePos, Vec2 localPos) {
-    gameObject.trigger(CoreEvents.DRAG_START, gameObject, localPos, mousePos);
+    gameObject.trigger(CoreEvents.DRAG_START, gameObject, mousePos, localPos);
   }
 
   /**
@@ -170,7 +184,7 @@ public class MouseComponent extends Component {
    * @type emit-event
    */
   private void emitDraggingEvent(Vec2 mousePos, Vec2 localPos) {
-    gameObject.trigger(CoreEvents.DRAGGING, gameObject, localPos, mousePos);
+    gameObject.trigger(CoreEvents.DRAGGING, gameObject, mousePos, localPos);
   }
 
   /**
@@ -179,7 +193,7 @@ public class MouseComponent extends Component {
    * @type emit-event
    */
   private void emitDragFinishEvent(Vec2 mousePos, Vec2 localPos) {
-    gameObject.trigger(CoreEvents.DRAG_FINISH, gameObject, localPos, mousePos);
+    gameObject.trigger(CoreEvents.DRAG_FINISH, gameObject, mousePos, localPos);
   }
 
   /**
@@ -188,7 +202,7 @@ public class MouseComponent extends Component {
    * @type emit-event
    */
   private void emitHoverEvent(Vec2 mousePos) {
-    gameObject.trigger(CoreEvents.HOVER, gameObject, worldPosToLocalPos(mousePos), mousePos);
+    gameObject.trigger(CoreEvents.HOVER, gameObject, mousePos, worldPosToLocalPos(mousePos));
   }
 
   /**

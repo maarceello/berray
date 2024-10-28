@@ -270,11 +270,15 @@ public abstract class BerrayApplication {
 
     game.trigger(CoreEvents.MOUSE_MOVE, null, currentMousePos);
 
-    if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+    if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT) || IsMouseButtonPressed(MOUSE_BUTTON_RIGHT)  || IsMouseButtonPressed(MOUSE_BUTTON_MIDDLE)) {
       game.trigger(CoreEvents.MOUSE_PRESS, null, currentMousePos);
     }
-    if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
+    if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT) || IsMouseButtonReleased(MOUSE_BUTTON_RIGHT)  || IsMouseButtonReleased(MOUSE_BUTTON_MIDDLE)) {
       game.trigger(CoreEvents.MOUSE_RELEASE, null, currentMousePos);
+    }
+    float mouseWheeelMove = Raylib.GetMouseWheelMove();
+    if (mouseWheeelMove != 0.0f) {
+      game.trigger(CoreEvents.MOUSE_WHEEL_MOVE, null, currentMousePos, null, mouseWheeelMove);
     }
 
     for (int i = 0; i < keysDown.length; i++) {

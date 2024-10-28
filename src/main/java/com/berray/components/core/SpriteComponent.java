@@ -203,6 +203,9 @@ public class SpriteComponent extends Component {
     if (size != null) {
       return size;
     }
+    if (gameObject == null || gameObject.getGame() == null) {
+      return Vec2.origin();
+    }
     Asset asset = getAssetManager().getAsset(textureName);
     if (asset.getType() == AssetType.SPRITE) {
       Raylib.Texture texture = asset.getAsset();

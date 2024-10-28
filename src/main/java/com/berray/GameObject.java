@@ -646,6 +646,12 @@ public class GameObject {
 
 
   protected Rect calculateBoundingBox(Matrix4 worldTransformWithoutAnchor, Vec2 size, AnchorType anchor) {
+    // when the game object supplies its own bounding box, there is no need for a `size` property
+    Rect customBoundingBox = get("boundingBox");
+    if (customBoundingBox != null) {
+      return customBoundingBox;
+    }
+
     if (size.getX() < 0 || size.getY() < 0) {
       // a game object without dimensions cannot collide with anything
       return null;

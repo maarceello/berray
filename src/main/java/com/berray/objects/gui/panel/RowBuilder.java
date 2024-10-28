@@ -3,6 +3,7 @@ package com.berray.objects.gui.panel;
 import com.berray.GameObject;
 import com.berray.components.core.AnchorComponent;
 import com.berray.components.core.AnchorType;
+import com.berray.components.core.Component;
 import com.berray.math.Color;
 import com.berray.math.Vec2;
 
@@ -82,6 +83,11 @@ public class RowBuilder {
     return addCell(componentBuilder.checkboxBuilder(property, height));
   }
 
+  public RowBuilder add(Component ... components) {
+    return addCell(panelBuilder -> GameObject.makeGameObject(components));
+  }
+
+
   public RowBuilder skip() {
     return addCell(((panelBuilder) -> null));
   }
@@ -133,13 +139,13 @@ public class RowBuilder {
         }
 
         if (gameObject.canWrite("size")) {
-          gameObject.set("size", new Vec2(cellWidth, 20));
+          gameObject.set("size", new Vec2(cellWidth, height));
         }
 
         if (cellDefinition.getBackgroundColor() != null) {
           GameObject frame = GameObject.makeGameObject(
               pos(new Vec2(columnPos, 0)),
-              rect(cellWidth, 20).fill(true),
+              rect(cellWidth, height).fill(true),
               color(cellDefinition.getBackgroundColor()),
               anchor(AnchorType.TOP_LEFT)
           );

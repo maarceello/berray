@@ -61,6 +61,14 @@ public class Rect {
     this.height = height;
   }
 
+  public Vec2 getPos() {
+    return new Vec2(x, y);
+  }
+
+  public Vec2 getSize() {
+    return new Vec2(width, height);
+  }
+
   public List<Vec2> getPoints() {
     List<Vec2> points = new ArrayList<>();
     points.add(new Vec2(x, y));
@@ -71,7 +79,7 @@ public class Rect {
   }
 
   public Rect moveBy(Vec2 delta) {
-    return new Rect(x+delta.getX(), y+delta.getY(), width, height);
+    return new Rect(x + delta.getX(), y + delta.getY(), width, height);
   }
 
   public Raylib.Rectangle toRectangle() {
@@ -80,7 +88,7 @@ public class Rect {
 
   @Override
   public String toString() {
-    return String.format("(%.3f, %.3f - %.3f, %.3f)", x,y, width, height);
+    return String.format("(%.3f, %.3f - %.3f, %.3f)", x, y, width, height);
   }
 
   public boolean contains(Vec2 point) {

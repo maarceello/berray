@@ -4,6 +4,8 @@ import com.berray.GameObject;
 import com.berray.components.core.AnchorType;
 import com.berray.components.core.AreaComponent;
 import com.berray.components.core.ColorComponent;
+import com.berray.event.CoreEvents;
+import com.berray.event.MouseEvent;
 import com.berray.math.Color;
 import com.berray.math.Vec2;
 import com.berray.objects.gui.EventListenerCapable;
@@ -15,6 +17,8 @@ import java.util.Collections;
 import java.util.List;
 
 import static com.berray.components.core.AnchorComponent.anchor;
+import static com.berray.components.core.AreaComponent.area;
+import static com.berray.components.core.MouseComponent.mouse;
 import static com.berray.components.core.PosComponent2d.pos;
 import static com.berray.components.core.RectComponent.rect;
 import static com.berray.components.core.TextComponent.*;
@@ -37,7 +41,10 @@ public class PanelBuilder implements GameObjectBuilder {
   private Color backgroundColor;
   private Color foregroundColor;
 
-  private String title;
+  /** Title for the panel. default: <code>null</code> for no title. */
+  private String title = null;
+  /** true when the panel can be dragged by the titlebar, false when it should be static. */
+  private boolean moveable = false;
 
   public PanelBuilder() {
     this.columnWidths = Collections.emptyList();
@@ -45,6 +52,11 @@ public class PanelBuilder implements GameObjectBuilder {
 
   public PanelBuilder title(String title) {
     this.title = title;
+    return this;
+  }
+
+  public PanelBuilder movable(boolean moveable) {
+    this.moveable = moveable;
     return this;
   }
 
@@ -103,7 +115,20 @@ public class PanelBuilder implements GameObjectBuilder {
     if (title != null) {
       GameObject titleRow = createTitleRow(totalWidth);
       panel.add(titleRow);
-      rowPos += titleRow.<Vec2>get("size").getY();
+      rowPos += titleRow.<Vec2>get("size").getY() + 1;
+
+      if (moveable) {
+        titleRow.addComponents(
+            mouse(),
+            area()
+        );
+
+        PanelDragManager dragManager = new PanelDragManager(panel);
+        titleRow.on(CoreEvents.DRAG_START, dragManager::dragStart);
+        titleRow.on(CoreEvents.DRAGGING, dragManager::dragUpdate);
+        titleRow.on(CoreEvents.DRAG_FINISH, dragManager::dragFinish);
+      }
+
     }
 
     for (int row = 0; row < rows.size(); row++) {
@@ -117,14 +142,14 @@ public class PanelBuilder implements GameObjectBuilder {
 
     if (backgroundColor != null) {
       panel.addComponents(
-          rect(totalWidth, rowPos),
+          rect(totalWidth, rowPos + frameSize*2),
           ColorComponent.color(backgroundColor)
       );
     }
 
     if (frameColor != null) {
       panel.add(
-          rect(totalWidth - frameSize, rowPos - frameSize).fill(false),
+          rect(totalWidth - frameSize, rowPos+frameSize).fill(false),
           pos(frameSize / 2, frameSize / 2),
           ColorComponent.color(frameColor),
           anchor(AnchorType.TOP_LEFT)
@@ -136,25 +161,27 @@ public class PanelBuilder implements GameObjectBuilder {
   }
 
   private GameObject createTitleRow(float width) {
-    GameObject titleRow = GameObject.makeGameObject(
+
+    GameObject background = GameObject.makeGameObject(
+        pos(frameSize, frameSize),
+        ColorComponent.color(foregroundColor),
+        anchor(AnchorType.TOP_LEFT)
+    );
+
+    GameObject titleText = background.add(
         text(title),
-        pos(new Vec2(frameSize, 0 + frameSize)),
-        anchor(AnchorType.TOP_LEFT),
+        pos(width / 2 - frameSize, 0),
+        anchor(AnchorType.TOP),
         ColorComponent.color(backgroundColor == null ? foregroundColor : backgroundColor)
     );
 
-    if (backgroundColor != null) {
-      GameObject background = GameObject.makeGameObject(
-          rect(width - frameSize, titleRow.<Integer>get("fontHeight") - frameSize).fill(false),
-          pos(frameSize / 2, frameSize / 2),
-          ColorComponent.color(backgroundColor),
-          anchor(AnchorType.TOP_LEFT)
+    if (backgroundColor != null ) {
+      background.addComponents(
+          rect(width - frameSize*2, titleText.<Integer>get("fontHeight")).fill(true)
       );
-      background.add(titleRow);
-      titleRow = background;
     }
 
-    return titleRow;
+    return background;
   }
 
   public static PanelBuilder makePanel() {

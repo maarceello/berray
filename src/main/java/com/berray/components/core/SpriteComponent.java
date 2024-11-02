@@ -47,51 +47,45 @@ public class SpriteComponent extends Component {
 
   @Override
   public void draw() {
-    rlPushMatrix();
-    {
-      rlMultMatrixf(gameObject.getWorldTransform().toFloatTransposed());
-
-      Asset asset = getAssetManager().getAsset(textureName);
-      if (asset.getType() == AssetType.SPRITE) {
-        if (size == null) {
-          DrawTexture(asset.getAsset(), 0, 0, WHITE);
-        } else {
-          Texture texture = asset.getAsset();
-          Raylib.Rectangle rectangle = new Jaylib.Rectangle(0, 0, texture.width(), texture.height());
-          DrawTexturePro(asset.getAsset(), rectangle, new Jaylib.Rectangle(0, 0, size.getX(), size.getY()), Vec2.origin().toVector2(), 0, WHITE);
-        }
-      } else if (asset.getType() == AssetType.SPRITE_SHEET) {
-        SpriteSheet spriteSheet = asset.getAsset();
-
-        Rect frameRect;
-        if (anim != null && spriteSheet.hasAnimations()) {
-          // we have an animation, then get the frame no relative to the animation
-          Animation animation = spriteSheet.getAnimation(anim);
-          frameRect = animation.getFrame(frameNo);
-        } else {
-          // sprite sheet doesn't have animations. Then get the frame relative to the sheet.
-          frameRect = spriteSheet.getFrame(frameNo);
-        }
-        Rectangle rectangle = frameRect.toRectangle();
-        if (flipX) {
-          rectangle.width(-frameRect.getWidth());
-        }
-        if (flipY) {
-          rectangle.height(-frameRect.getHeight());
-        }
-        // DrawTextureRec(@ByVal @Cast("Texture2D*") Texture texture, @ByVal Rectangle source, @ByVal Vector2 _position, @ByVal Color tint);            // Draw a part of a texture defined by a rectangle
-        // DrawTexturePro(@ByVal @Cast("Texture2D*") Texture texture, @ByVal Rectangle source, @ByVal Rectangle dest, @ByVal Vector2 origin, float rotation, @ByVal Color tint); // Draw a part of a texture defined by a rectangle with 'pro' parameters
-
-        if (size == null) {
-          DrawTextureRec(spriteSheet.getTexture(), rectangle, Vec2.origin().toVector2(), WHITE);
-        } else {
-          DrawTexturePro(spriteSheet.getTexture(), rectangle, new Jaylib.Rectangle(0, 0, size.getX(), size.getY()), Vec2.origin().toVector2(), 0, WHITE);
-        }
+    Asset asset = getAssetManager().getAsset(textureName);
+    if (asset.getType() == AssetType.SPRITE) {
+      if (size == null) {
+        DrawTexture(asset.getAsset(), 0, 0, WHITE);
       } else {
-        throw new IllegalStateException("Illegal asset type for " + textureName + ": " + asset.getType());
+        Texture texture = asset.getAsset();
+        Raylib.Rectangle rectangle = new Jaylib.Rectangle(0, 0, texture.width(), texture.height());
+        DrawTexturePro(asset.getAsset(), rectangle, new Jaylib.Rectangle(0, 0, size.getX(), size.getY()), Vec2.origin().toVector2(), 0, WHITE);
       }
+    } else if (asset.getType() == AssetType.SPRITE_SHEET) {
+      SpriteSheet spriteSheet = asset.getAsset();
+
+      Rect frameRect;
+      if (anim != null && spriteSheet.hasAnimations()) {
+        // we have an animation, then get the frame no relative to the animation
+        Animation animation = spriteSheet.getAnimation(anim);
+        frameRect = animation.getFrame(frameNo);
+      } else {
+        // sprite sheet doesn't have animations. Then get the frame relative to the sheet.
+        frameRect = spriteSheet.getFrame(frameNo);
+      }
+      Rectangle rectangle = frameRect.toRectangle();
+      if (flipX) {
+        rectangle.width(-frameRect.getWidth());
+      }
+      if (flipY) {
+        rectangle.height(-frameRect.getHeight());
+      }
+      // DrawTextureRec(@ByVal @Cast("Texture2D*") Texture texture, @ByVal Rectangle source, @ByVal Vector2 _position, @ByVal Color tint);            // Draw a part of a texture defined by a rectangle
+      // DrawTexturePro(@ByVal @Cast("Texture2D*") Texture texture, @ByVal Rectangle source, @ByVal Rectangle dest, @ByVal Vector2 origin, float rotation, @ByVal Color tint); // Draw a part of a texture defined by a rectangle with 'pro' parameters
+
+      if (size == null) {
+        DrawTextureRec(spriteSheet.getTexture(), rectangle, Vec2.origin().toVector2(), WHITE);
+      } else {
+        DrawTexturePro(spriteSheet.getTexture(), rectangle, new Jaylib.Rectangle(0, 0, size.getX(), size.getY()), Vec2.origin().toVector2(), 0, WHITE);
+      }
+    } else {
+      throw new IllegalStateException("Illegal asset type for " + textureName + ": " + asset.getType());
     }
-    rlPopMatrix();
   }
 
   @Override

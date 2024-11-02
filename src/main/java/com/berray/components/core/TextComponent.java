@@ -4,7 +4,8 @@ import com.berray.GameObject;
 import com.berray.math.Color;
 import com.berray.math.Vec2;
 
-import static com.raylib.Jaylib.*;
+import static com.raylib.Jaylib.DrawText;
+import static com.raylib.Jaylib.MeasureText;
 
 /**
  * Component which displays some fixed text.
@@ -89,16 +90,13 @@ public class TextComponent extends Component {
 
   @Override
   public void draw() {
-    rlPushMatrix();
-    {
-      Color color = gameObject.getOrDefault("color", Color.BLACK);
-      rlMultMatrixf(gameObject.getWorldTransform().toFloatTransposed());
-      DrawText(text, 0, 0, fontHeight, color.toRaylibColor());
-    }
-    rlPopMatrix();
+    Color color = gameObject.getOrDefault("color", Color.BLACK);
+    DrawText(text, 0, 0, fontHeight, color.toRaylibColor());
   }
 
-  /** Creates a text component with fixed initial text. */
+  /**
+   * Creates a text component with fixed initial text.
+   */
   public static TextComponent text(String text) {
     return new TextComponent(text);
   }

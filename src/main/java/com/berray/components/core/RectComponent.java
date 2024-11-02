@@ -7,7 +7,9 @@ import com.raylib.Jaylib;
 
 import static com.raylib.Jaylib.*;
 
-/** Rectangular drawn shape. */
+/**
+ * Rectangular drawn shape.
+ */
 public class RectComponent extends Component {
   private Vec2 size;
   private boolean fill = true;
@@ -105,17 +107,12 @@ public class RectComponent extends Component {
 
   @Override
   public void draw() {
-    rlPushMatrix();
-    {
-      Color color = gameObject.getOrDefault("color", Color.WHITE);
-      rlMultMatrixf(gameObject.getWorldTransform().toFloatTransposed());
-      if (fill) {
-        DrawRectangle(0, 0, (int) size.getX(), (int) size.getY(), color.toRaylibColor());
-      } else {
-        DrawRectangleLinesEx(new Jaylib.Rectangle(0, 0, (int) size.getX(), (int) size.getY()),lineThickness, color.toRaylibColor());
-      }
+    Color color = gameObject.getOrDefault("color", Color.WHITE);
+    if (fill) {
+      DrawRectangle(0, 0, (int) size.getX(), (int) size.getY(), color.toRaylibColor());
+    } else {
+      DrawRectangleLinesEx(new Jaylib.Rectangle(0, 0, (int) size.getX(), (int) size.getY()), lineThickness, color.toRaylibColor());
     }
-    rlPopMatrix();
   }
 
   /**

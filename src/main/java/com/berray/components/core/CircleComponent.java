@@ -4,7 +4,8 @@ import com.berray.GameObject;
 import com.berray.math.Color;
 import com.berray.math.Vec2;
 
-import static com.raylib.Raylib.*;
+import static com.raylib.Raylib.DrawCircle;
+import static com.raylib.Raylib.DrawCircleLines;
 
 /**
  * Provides a circle shape for rendering.
@@ -86,17 +87,12 @@ public class CircleComponent extends Component {
 
   @Override
   public void draw() {
-    rlPushMatrix();
-    {
-      Color color = gameObject.getOrDefault("color", Color.WHITE);
-      rlMultMatrixf(gameObject.getWorldTransform().toFloatTransposed());
-      if (fill) {
-        DrawCircle((int) radius, (int) radius, radius, color.toRaylibColor());
-      } else {
-        DrawCircleLines((int) radius, (int) radius, radius, color.toRaylibColor());
-      }
+    Color color = gameObject.getOrDefault("color", Color.WHITE);
+    if (fill) {
+      DrawCircle((int) radius, (int) radius, radius, color.toRaylibColor());
+    } else {
+      DrawCircleLines((int) radius, (int) radius, radius, color.toRaylibColor());
     }
-    rlPopMatrix();
   }
 
   /**

@@ -15,8 +15,7 @@ public class Root3D extends GameObject {
 
   @Override
   public void visitDrawChildren(BiConsumer<String, Runnable> visitor) {
-    Camera3D camera = get("camera");
-    visitor.accept(get("layer", Game.DEFAULT_LAYER), () -> BeginMode3D(camera));
+    visitor.accept(get("layer", Game.DEFAULT_LAYER), () -> BeginMode3D(get("camera")));
     super.visitDrawChildren(visitor);
     visitor.accept(get("layer", Game.DEFAULT_LAYER), Raylib::EndMode3D);
   }

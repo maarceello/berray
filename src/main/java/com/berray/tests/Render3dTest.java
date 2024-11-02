@@ -70,7 +70,7 @@ public class Render3dTest extends BerrayApplication implements CoreComponentShor
     new Render3dTest().runGame();
   }
 
-  private static class CubeComponent extends Component {
+  public static class CubeComponent extends Component {
     public CubeComponent() {
       super("cube");
     }
@@ -83,12 +83,7 @@ public class Render3dTest extends BerrayApplication implements CoreComponentShor
 
     @Override
     public void draw() {
-      rlPushMatrix();
-      {
-          rlMultMatrixf(gameObject.getWorldTransform().toFloatTransposed());
-          Raylib.DrawCubeWires(new Vector3(), 1.0f,1.0f,1.0f, Jaylib.WHITE);
-      }
-      rlPopMatrix();
+      Raylib.DrawCubeWires(new Vector3(), 1.0f,1.0f,1.0f, Jaylib.WHITE);
     }
   }
 }

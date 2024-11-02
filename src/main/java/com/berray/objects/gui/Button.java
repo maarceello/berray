@@ -4,7 +4,10 @@ import com.berray.GameObject;
 import com.berray.components.CoreComponentShortcuts;
 import com.berray.components.addon.Slice9Component;
 import com.berray.components.core.AnchorType;
+import com.berray.event.AddEvent;
+import com.berray.event.CoreEvents;
 import com.berray.event.Event;
+import com.berray.event.MouseEvent;
 import com.berray.math.Color;
 import com.berray.math.Rect;
 import com.berray.math.Vec2;
@@ -46,11 +49,11 @@ public class Button extends GameObject implements CoreComponentShortcuts {
   public Button(String id, boolean toggleButton) {
     this.id = id;
     this.toggleButton = toggleButton;
-    on("add", this::onAdd);
-    on("hoverEnter", this::onHoverEnter);
-    on("hoverLeave", this::onHoverLeave);
-    on("mousePress", this::onMousePress);
-    on("mouseRelease", this::onMouseRelease);
+    on(CoreEvents.ADD, this::onAdd);
+    on(CoreEvents.HOVER_ENTER, this::onHoverEnter);
+    on(CoreEvents.HOVER_LEAVE, this::onHoverLeave);
+    on(CoreEvents.MOUSE_PRESS, this::onMousePress);
+    on(CoreEvents.MOUSE_RELEASE, this::onMouseRelease);
     registerProperty("size", this::getSize, this::setSize);
     registerPropertyGetter("render", () -> true);
     registerBoundProperty("pressed", this::getPressed, this::setPressed);
@@ -79,11 +82,12 @@ public class Button extends GameObject implements CoreComponentShortcuts {
     }
   }
 
-  private void onMouseRelease(Event event) {
-    Vec2 absoluteMousePos = event.getParameter(2);
+  private void onMouseRelease(MouseEvent event) {
+    Vec2 absoluteMousePos = event.getWindowPos();
     Rect boundingBox = getBoundingBox();
     armed = false;
     boolean stillhovered = boundingBox.contains(absoluteMousePos);
+    emitClickEvent(pressed);
     if (toggleButton) {
       // toggle button
       setPressed(!pressed);
@@ -93,14 +97,24 @@ public class Button extends GameObject implements CoreComponentShortcuts {
         return;
       }
     }
+
     // push button or the toggle button is released
     replaceChild(0, stillhovered && hoverChild != null ? hoverChild : neutralChild);
   }
 
+  /**
+   * Fired when the button was clicked,
+   * @type emit-event
+   * */
+  private void emitClickEvent(boolean pressed) {
+    trigger("click", this, pressed);
+  }
 
-  private void onMousePress(Event event) {
+
+  private void onMousePress(MouseEvent event) {
     replaceChild(0, getArmedGameObject());
     armed = true;
+    event.setProcessed();
   }
 
   private void onHoverLeave(Event event) {
@@ -117,8 +131,8 @@ public class Button extends GameObject implements CoreComponentShortcuts {
     }
   }
 
-  private void onAdd(Event event) {
-    GameObject parent = event.getParameter(0);
+  private void onAdd(AddEvent event) {
+    GameObject parent = event.getSource();
     // ignore add event when we're the one the child is added to
     if (parent != this) {
       addChild(neutralChild);

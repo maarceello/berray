@@ -5,6 +5,8 @@ import com.berray.GameObject;
 import com.berray.assets.CoreAssetShortcuts;
 import com.berray.components.CoreComponentShortcuts;
 import com.berray.components.core.AnchorType;
+import com.berray.event.CoreEvents;
+import com.berray.event.PropertyChangeEvent;
 import com.berray.math.Color;
 import com.berray.math.Vec2;
 import com.berray.objects.gui.Slider;
@@ -60,9 +62,9 @@ public class SliderTest extends BerrayApplication implements CoreComponentShortc
         color(Color.WHITE)
     );
 
-    slider.on("propertyChange", event -> {
-      if (event.getParameter(0).equals("value")) {
-        text.set("text", String.format("Value: %.2f", event.<Float>getParameter(2)));
+    slider.on(CoreEvents.PROPERTY_CHANGED, (PropertyChangeEvent event) -> {
+      if (event.getPropertyName().equals("value")) {
+        text.set("text", String.format("Value: %.2f", event.<Float>getNewValue()));
       }
     });
 

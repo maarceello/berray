@@ -2,6 +2,7 @@ package com.berray.objects.gui.panel;
 
 import com.berray.GameObject;
 import com.berray.components.core.AnchorType;
+import com.berray.event.CoreEvents;
 import com.berray.event.PropertyChangeEvent;
 import com.berray.math.Color;
 import com.berray.math.Vec2;
@@ -65,7 +66,7 @@ public class DefaultBuilders {
           }
         });
 
-        slider.on("propertyChange", (PropertyChangeEvent event) -> {
+        slider.on(CoreEvents.PROPERTY_CHANGED, (PropertyChangeEvent event) -> {
           if (event.getPropertyName().equals("value")) {
             dataObject.setProperty(property, event.getNewValue());
           }
@@ -103,7 +104,7 @@ public class DefaultBuilders {
               }
             }
         );
-        button.on("propertyChange", (PropertyChangeEvent event) ->
+        button.on(CoreEvents.PROPERTY_CHANGED, (PropertyChangeEvent event) ->
         {
           if (event.getPropertyName().equals("pressed")) {
             dataObject.setProperty(property, event.getNewValue());

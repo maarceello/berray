@@ -5,9 +5,11 @@ import com.berray.GameObject;
 import com.berray.assets.CoreAssetShortcuts;
 import com.berray.components.CoreComponentShortcuts;
 import com.berray.components.core.AnchorType;
+import com.berray.event.CoreEvents;
+import com.berray.event.MouseEvent;
+import com.berray.event.UpdateEvent;
 import com.berray.math.Color;
 import com.berray.math.Vec2;
-import com.raylib.Jaylib;
 import com.raylib.Raylib;
 
 import static com.berray.components.addon.OrbitComponent.orbit;
@@ -45,9 +47,9 @@ public class RotateTest extends BerrayApplication implements CoreComponentShortc
       );
     }
 
-    onUpdate("berry", (event) -> {
-      GameObject berry = event.getParameter(0);
-      float frameTime = event.getParameter(1);
+    onUpdate("berry", (UpdateEvent event) -> {
+      GameObject berry = event.getSource();
+      float frameTime = event.getFrametime();
       Float angle = berry.get("angle");
       angle += frameTime * 45f;
       berry.set("angle", angle);
@@ -65,16 +67,16 @@ public class RotateTest extends BerrayApplication implements CoreComponentShortc
       );
     }
 
-    onUpdate("orbiting", (event) -> {
-      GameObject berry = event.getParameter(0);
-      float frameTime = event.getParameter(1);
+    onUpdate("orbiting", (UpdateEvent event) -> {
+      GameObject berry = event.getSource();
+      float frameTime = event.getFrametime();
       Float angle = berry.get("angle");
       angle += frameTime * 75;
       berry.set("angle", angle);
     });
 
-    on("mousePress", (event) -> {
-      Vec2 pos = event.getParameter(0);
+    on(CoreEvents.MOUSE_PRESS, (MouseEvent event) -> {
+      Vec2 pos = event.getWindowPos();
       mainNode.set("pos", pos);
     });
 

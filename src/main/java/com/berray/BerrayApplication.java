@@ -3,10 +3,8 @@ package com.berray;
 
 import com.berray.assets.DefaultAssetManager;
 import com.berray.components.core.AnchorType;
-import com.berray.event.Event;
+import com.berray.event.*;
 import com.berray.event.EventListener;
-import com.berray.event.KeyEvent;
-import com.berray.event.UpdateEvent;
 import com.berray.math.Color;
 import com.berray.math.Vec2;
 import com.raylib.Raylib;
@@ -102,11 +100,11 @@ public abstract class BerrayApplication {
   }
 
   public void onKeyPress(EventListener<KeyEvent> eventListener) {
-    game.on("keyPress", eventListener);
+    game.on(CoreEvents.KEY_PRESS, eventListener);
   }
 
   public void onKeyPress(int key, EventListener<KeyEvent> eventListener) {
-    game.on("keyPress", (KeyEvent event) -> {
+    game.on(CoreEvents.KEY_PRESS, (KeyEvent event) -> {
       int pressedKey = event.getKeyCode();
       if (pressedKey == key) {
         eventListener.onEvent(event);
@@ -115,7 +113,7 @@ public abstract class BerrayApplication {
   }
 
   public void onKeyDown(int key, EventListener<KeyEvent> eventListener) {
-    game.on("keyDown", (KeyEvent event) -> {
+    game.on(CoreEvents.KEY_DOWN, (KeyEvent event) -> {
       int pressedKey = event.getKeyCode();
       if (pressedKey == key) {
         eventListener.onEvent(event);
@@ -124,7 +122,7 @@ public abstract class BerrayApplication {
   }
 
   public void onKeyRelease(int key, EventListener<KeyEvent> eventListener) {
-    game.on("keyUp", (KeyEvent event) -> {
+    game.on(CoreEvents.KEY_UP, (KeyEvent event) -> {
       int pressedKey = event.getKeyCode();
       if (pressedKey == key) {
         eventListener.onEvent(event);
@@ -158,7 +156,7 @@ public abstract class BerrayApplication {
     }
 
     this.game = new Game();
-    game.on("add", this::addDebugInfos);
+    game.on(CoreEvents.ADD, this::onAddDebugInfos);
 
     game();
     if (debug) {
@@ -240,11 +238,11 @@ public abstract class BerrayApplication {
   /**
    * Event callback which adds debug Infos to game objects.
    */
-  private void addDebugInfos(Event event) {
+  private void onAddDebugInfos(AddEvent event) {
     if (!debug) {
       return;
     }
-    GameObject gameObject = event.getParameter(1);
+    GameObject gameObject = event.getChild();
     addDebugInfos(gameObject);
   }
 
@@ -270,13 +268,17 @@ public abstract class BerrayApplication {
     Vector2 mousePosRaylib = GetMousePosition();
     Vec2 currentMousePos = new Vec2(mousePosRaylib.x(), mousePosRaylib.y());
 
-    game.trigger("mouseMove", currentMousePos);
+    game.trigger(CoreEvents.MOUSE_MOVE, null, currentMousePos);
 
-    if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-      game.trigger("mousePress", currentMousePos);
+    if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT) || IsMouseButtonPressed(MOUSE_BUTTON_RIGHT)  || IsMouseButtonPressed(MOUSE_BUTTON_MIDDLE)) {
+      game.trigger(CoreEvents.MOUSE_PRESS, null, currentMousePos);
     }
-    if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
-      game.trigger("mouseRelease", currentMousePos);
+    if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT) || IsMouseButtonReleased(MOUSE_BUTTON_RIGHT)  || IsMouseButtonReleased(MOUSE_BUTTON_MIDDLE)) {
+      game.trigger(CoreEvents.MOUSE_RELEASE, null, currentMousePos);
+    }
+    float mouseWheeelMove = Raylib.GetMouseWheelMove();
+    if (mouseWheeelMove != 0.0f) {
+      game.trigger(CoreEvents.MOUSE_WHEEL_MOVE, null, currentMousePos, null, mouseWheeelMove);
     }
 
     for (int i = 0; i < keysDown.length; i++) {
@@ -285,16 +287,16 @@ public abstract class BerrayApplication {
       if (IsKeyDown(i)) {
         if (frame == 0) {
           // key is pressed this frame
-          trigger("keyPress", i);
+          trigger(CoreEvents.KEY_PRESS, null, i);
         }
         // key is still pressed (or pressed the first time)
-        trigger("keyDown", i);
+        trigger(CoreEvents.KEY_DOWN, null, i);
         keysDown[i] = frameNo;
       } else {
         // Key not down, but was down the previous frame? Then it was released this frame.
         if (frame != 0) {
           keysDown[i] = 0;
-          trigger("keyUp", i);
+          trigger(CoreEvents.KEY_UP, null, i);
         }
       }
     }

@@ -35,6 +35,13 @@ Events can have parameters, there are event type specific. You can see them in t
 
 # Events
 
+Notes about event parameters:
+
+The first event parameter is always the game object which fired the event. This may be null when the event is global, 
+such as `keyPress` or `mouseMove`. 
+Games should always use the most specific Event Object. This way changes in the parameters are automatically picked up 
+and no migration effort is necessary.
+
 ## Game
 
 ### keyDown, keyUp, keyPress
@@ -104,6 +111,23 @@ once, regardless how many subscriber processes the event.
 ```
   gameObject.trigger("eventName", () -> expensiveCalculation());
 ```
+
+# Collision Detection
+
+For performance reasons the collision detection calculation as well as bounding boxes is only done for objects with 
+the `area` component. Note that advanced mouse stuff (`MouseCompopnent`) is based on bounding boxes and therefore also 
+need the `area` component. 
+
+The collision detection is based on a bounding box. To calculate the bounding box, the game object needs to have at 
+least a `size` property. Most drawing components do provide this property. The bounding box will be calculated as the 
+rectangle `(0, 0) - (size.width, size.height)`.
+Components may additionally supply a custom bounding box with the `localArea` Property. Then this area is used as a bounding box.
+Note that `size` and `localArea` are in object space and will be transformed by the game object to world space automatically.
+
+If a game object (or component) needs to set a custom collision detection in global space (i.e. for mouse processing)
+the bounding box can be supplied as a `boundingBox` property. The bounding box will be calculated during transformation 
+matrix processing and cached until the transformation matrix needs to be recalculated. To update changes in the 
+`boundingBox` property the transformation matrix needs to be invalidated (`GameObject#setTransformDirty()`). 
 
 
 # 3D Stack

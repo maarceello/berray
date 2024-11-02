@@ -1,10 +1,10 @@
 package com.berray.event;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class EventListeners {
-  private final List<EventListenerWrapper> eventListener = new ArrayList<>();
+  private final List<EventListenerWrapper> eventListener = new CopyOnWriteArrayList<>();
 
   public void addEventListener(EventListener<?> eventListener, Object owner) {
     this.eventListener.add(new EventListenerWrapper(eventListener, owner));

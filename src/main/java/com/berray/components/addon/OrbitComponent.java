@@ -2,8 +2,10 @@ package com.berray.components.addon;
 
 import com.berray.GameObject;
 import com.berray.components.core.Component;
-import com.berray.event.Event;
+import com.berray.event.UpdateEvent;
 import com.berray.math.Vec2;
+
+import static com.berray.event.CoreEvents.UPDATE;
 
 /** changes the position of the game object so it orbits its parent. */
 public class OrbitComponent extends Component {
@@ -21,11 +23,11 @@ public class OrbitComponent extends Component {
 
   @Override
   public void add(GameObject gameObject) {
-    gameObject.on("update", this::update);
+    gameObject.on(UPDATE, this::update);
   }
 
-  public void update(Event event) {
-    float deltaTime = event.getParameter(0);
+  public void update(UpdateEvent event) {
+    float deltaTime = event.getFrametime();
     this.currentAngle += ((deltaTime * angleSpeed) + 360) % 360;
     float x = (float) (radius * Math.sin(Math.toRadians(currentAngle)));
     float y = (float) (radius * Math.cos(Math.toRadians(currentAngle)));

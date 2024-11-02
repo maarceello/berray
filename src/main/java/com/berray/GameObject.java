@@ -2,9 +2,8 @@ package com.berray;
 
 import com.berray.components.core.AnchorType;
 import com.berray.components.core.Component;
-import com.berray.event.Event;
 import com.berray.event.EventListener;
-import com.berray.event.EventManager;
+import com.berray.event.*;
 import com.berray.math.Matrix4;
 import com.berray.math.Rect;
 import com.berray.math.Vec2;
@@ -16,8 +15,12 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
+
+import static com.berray.event.CoreEvents.PHYSICS_COLLIDE;
+import static com.berray.event.CoreEvents.SCENE_GRAPH_ADDED;
 
 public class GameObject {
   private static final AtomicInteger nextComponentId = new AtomicInteger(0);
@@ -82,7 +85,9 @@ public class GameObject {
    * Bounding box in world coordinates.
    */
   protected Rect boundingBox;
-  /** Order in which to draw the game objects children. */
+  /**
+   * Order in which to draw the game objects children.
+   */
   protected DrawOrder drawOrder = DrawOrder.DEPTH_FIRST;
 
   public GameObject() {
@@ -114,7 +119,7 @@ public class GameObject {
     children.forEach(child -> child.setGame(game));
     if (game != null) {
       // fire event that the object was added to the scene graoh
-      trigger("sceneGraphAdded", this);
+      trigger(SCENE_GRAPH_ADDED, this);
     }
   }
 
@@ -165,6 +170,22 @@ public class GameObject {
     children.remove(gameObject);
     gameObject.parent = null;
     gameObject.game = null;
+    // trigger event that the object was removed from the scene graph
+    gameObject.emitSceneGraphRemovedEvent(this);
+  }
+
+  /**
+   * Fired when the game object or ist subtree was removed from the scene graph
+   *
+   * @param removePoint game object from which the subtree was removed
+   * @type emit-event
+   */
+  protected void emitSceneGraphRemovedEvent(GameObject removePoint) {
+    trigger(CoreEvents.SCENE_GRAPH_REMOVED, removePoint);
+    // also notify children that the subtree was removed
+    for (GameObject child : children) {
+      child.emitSceneGraphRemovedEvent(removePoint);
+    }
   }
 
   public void destroy() {
@@ -190,12 +211,14 @@ public class GameObject {
     GameObject previous = children.set(index, other);
     previous.parent = null;
     previous.game = null;
+    previous.emitSceneGraphRemovedEvent(this);
+
     other.parent = this;
     other.setGame(this.game);
     // force recalculation of bounding rectangle
     transformDirty = true;
-    trigger("add", this, other);
-    other.trigger("add", this, other);
+    trigger(CoreEvents.ADD, this, other);
+    other.trigger(CoreEvents.ADD, this, other);
     return other;
   }
 
@@ -205,8 +228,8 @@ public class GameObject {
     child.setGame(this.game);
     // force recalculation of bounding rectangle
     transformDirty = true;
-    trigger("add", this, child);
-    child.trigger("add", this, child);
+    trigger(CoreEvents.ADD, this, child);
+    child.trigger(CoreEvents.ADD, this, child);
     return child;
   }
 
@@ -218,14 +241,24 @@ public class GameObject {
     }
     // first update all children, then the object itself (depth first traversal)
     this.children.forEach(child -> child.update(frameTime));
-    this.trigger("update", frameTime);
+    this.trigger(CoreEvents.UPDATE, this, frameTime);
     // trigger game also, so tag based listeners get notified
-    this.game.trigger("update", this, frameTime);
+    this.game.trigger(CoreEvents.UPDATE, this, frameTime);
   }
 
   public List<GameObject> getChildren() {
     return children;
   }
+
+  /**
+   * Returns children with the specified tag. This method checks only the direct children of the game object.
+   *
+   * @see #getTagStream(String)
+   */
+  public List<GameObject> getChildren(String tag) {
+    return children.stream().filter(child -> child.is(tag)).collect(Collectors.toList());
+  }
+
 
   public void addComponents(Object... components) {
     addComponents(Arrays.asList(components));
@@ -268,7 +301,9 @@ public class GameObject {
     return parent;
   }
 
-  /** Called by the game to get the code, which will be called to render the object. */
+  /**
+   * Called by the game to get the code, which will be called to render the object.
+   */
   public void visitDraw(BiConsumer<String, Runnable> visitor) {
     if (paused) {
       return;
@@ -284,7 +319,9 @@ public class GameObject {
     }
   }
 
-  /** Called by the game to get the code, which will be called to render the objects children. */
+  /**
+   * Called by the game to get the code, which will be called to render the objects children.
+   */
   public void visitDrawChildren(BiConsumer<String, Runnable> visitor) {
     // don't draw children of paused objects
     if (paused) {
@@ -365,7 +402,7 @@ public class GameObject {
    */
   public <E> E firePropertyChange(String propertyName, E oldValue, E newValue) {
     if (!Objects.equals(oldValue, newValue)) {
-      trigger("propertyChange", propertyName, oldValue, newValue);
+      trigger(CoreEvents.PROPERTY_CHANGED, this, propertyName, oldValue, newValue);
     }
 
     return newValue;
@@ -406,6 +443,7 @@ public class GameObject {
   /**
    * returns registered component property
    */
+  @SuppressWarnings("unchecked")
   public <E> E get(String property) {
     Supplier<?> getterMethod = getterMethods.get(property);
     return getterMethod == null ? null : (E) getterMethod.get();
@@ -433,6 +471,7 @@ public class GameObject {
   /**
    * sets registered component property
    */
+  @SuppressWarnings("unchecked")
   public <E> void set(String property, E value) {
     Consumer<E> setterMethod = (Consumer<E>) setterMethods.get(property);
     if (setterMethod == null) {
@@ -451,6 +490,7 @@ public class GameObject {
   /**
    * calls a registered action, returning the result
    */
+  @SuppressWarnings("unchecked")
   public <E> E doAction(String methodName, Object... value) {
     Function<List<Object>, E> actionMethod = (Function<List<Object>, E>) actionMethods.get(methodName);
     if (actionMethod == null) {
@@ -492,10 +532,12 @@ public class GameObject {
     properties.put(property, value);
   }
 
+  @SuppressWarnings("unchecked")
   public <E> E getProperty(String property) {
     return (E) properties.get(property);
   }
 
+  @SuppressWarnings("unchecked")
   public <E extends Component> E getComponent(Class<E> type) {
     return (E) components.get(type);
   }
@@ -537,6 +579,10 @@ public class GameObject {
     eventManager.trigger(eventName, Arrays.asList(params));
   }
 
+  public void trigger(Event event) {
+    eventManager.trigger(event);
+  }
+
   public GameObject getRoot() {
     return (parent == null) ? this : parent.getRoot();
   }
@@ -544,9 +590,9 @@ public class GameObject {
   /**
    * Update all game objects
    */
-  public void onCollide(String tag, EventListener eventListener) {
-    on("collide", event -> {
-      GameObject gameObject = event.getParameter(0);
+  public <E extends PhysicsCollideEvent> void onCollide(String tag, EventListener<E> eventListener) {
+    on(PHYSICS_COLLIDE, (E event) -> {
+      GameObject gameObject = event.getCollisionPartner();
       // only propagate event when the object has the required tag
       if (gameObject.is(tag)) {
         eventListener.onEvent(event);
@@ -639,6 +685,12 @@ public class GameObject {
 
 
   protected Rect calculateBoundingBox(Matrix4 worldTransformWithoutAnchor, Vec2 size, AnchorType anchor) {
+    // when the game object supplies its own bounding box, there is no need for a `size` property
+    Rect customBoundingBox = get("boundingBox");
+    if (customBoundingBox != null) {
+      return customBoundingBox;
+    }
+
     if (size.getX() < 0 || size.getY() < 0) {
       // a game object without dimensions cannot collide with anything
       return null;
@@ -678,12 +730,12 @@ public class GameObject {
 
     // find combined bounding box of this game object and all of its children
     for (GameObject child : children) {
-      Rect boundingBox = child.getBoundingBox();
-      if (boundingBox != null) {
-        x1 = Math.min(x1, boundingBox.getX());
-        y1 = Math.min(y1, boundingBox.getY());
-        x2 = Math.max(x2, boundingBox.getX() + boundingBox.getWidth());
-        y2 = Math.max(y2, boundingBox.getY() + boundingBox.getHeight());
+      Rect childBoundingBox = child.getBoundingBox();
+      if (childBoundingBox != null) {
+        x1 = Math.min(x1, childBoundingBox.getX());
+        y1 = Math.min(y1, childBoundingBox.getY());
+        x2 = Math.max(x2, childBoundingBox.getX() + childBoundingBox.getWidth());
+        y2 = Math.max(y2, childBoundingBox.getY() + childBoundingBox.getHeight());
       }
     }
 

@@ -5,14 +5,14 @@ import com.berray.assets.Animation;
 import com.berray.assets.Asset;
 import com.berray.assets.AssetType;
 import com.berray.assets.SpriteSheet;
-import com.berray.event.Event;
+import com.berray.event.UpdateEvent;
 import com.berray.math.Rect;
 import com.berray.math.Vec2;
 import com.raylib.Jaylib;
 import com.raylib.Raylib;
 
-import java.util.List;
-
+import static com.berray.event.CoreEvents.ANIMATION_END;
+import static com.berray.event.CoreEvents.ANIMATION_START;
 import static com.raylib.Jaylib.WHITE;
 import static com.raylib.Raylib.*;
 
@@ -164,8 +164,8 @@ public class SpriteComponent extends Component {
     this.flipY = flipY;
   }
 
-  private void update(Event event) {
-    float deltaTime = event.getParameter(0);
+  private void update(UpdateEvent event) {
+    float deltaTime = event.getFrametime();
     if (currentAnimation != null) {
       frameDuration += deltaTime;
       float frameTime = 1.0f / currentAnimation.getSpeed();
@@ -190,18 +190,21 @@ public class SpriteComponent extends Component {
 
   private void stop(Action action) {
     currentAnimation = null;
-    gameObject.trigger("animEnd", anim);
+    gameObject.trigger(ANIMATION_END, gameObject, anim);
   }
 
   public void play(Action params) {
     String animationName = params.getParameter(0);
     anim(animationName);
-    gameObject.trigger("animStart", anim);
+    gameObject.trigger(ANIMATION_START, gameObject, anim);
   }
 
   private Vec2 getSize() {
     if (size != null) {
       return size;
+    }
+    if (gameObject == null || gameObject.getGame() == null) {
+      return Vec2.origin();
     }
     Asset asset = getAssetManager().getAsset(textureName);
     if (asset.getType() == AssetType.SPRITE) {

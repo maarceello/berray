@@ -5,6 +5,9 @@ import com.berray.GameObject;
 import com.berray.assets.CoreAssetShortcuts;
 import com.berray.components.CoreComponentShortcuts;
 import com.berray.components.core.AnchorType;
+import com.berray.event.CoreEvents;
+import com.berray.event.MouseEvent;
+import com.berray.event.UpdateEvent;
 import com.berray.math.Color;
 import com.berray.math.Vec2;
 import com.raylib.Jaylib;
@@ -80,18 +83,18 @@ public class ShapeTest  extends BerrayApplication implements CoreComponentShortc
         area()
     );
 
-    on("mousePress", (event) -> {
-      Vec2 pos = event.getParameter(0);
+    on(CoreEvents.MOUSE_PRESS, (MouseEvent event) -> {
+      Vec2 pos = event.getWindowPos();
       berry.set("pos", pos);
     });
 
-    game.onUpdate("sprite", event -> {
-      GameObject gameObject = event.getParameter(0);
+    game.onUpdate("sprite", (UpdateEvent event) -> {
+      GameObject gameObject = event.getSource();
       Vec2 pos = gameObject.get("pos");
       int mouseY = Jaylib.GetMouseY();
       if (pos != null) {
         // Note: this updates the pos inside the component
-        gameObject.set("pos", new Vec2(pos.getX(), GetMouseY()));
+        gameObject.set("pos", new Vec2(pos.getX(), mouseY));
       }
     });
   }

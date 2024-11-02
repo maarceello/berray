@@ -5,12 +5,13 @@ import com.berray.GameObject;
 import com.berray.assets.CoreAssetShortcuts;
 import com.berray.components.CoreComponentShortcuts;
 import com.berray.components.core.AnchorType;
+import com.berray.event.PhysicsCollideEvent;
 import com.berray.math.Color;
 import com.berray.math.Vec2;
 import com.berray.tests.level.LevelBuilder;
 import com.berray.tests.level.LevelGameObject;
-import com.raylib.Jaylib;
 
+import static com.berray.event.CoreEvents.UPDATE;
 import static com.berray.objects.addon.ObjectDebug.objectDebug;
 import static com.berray.objects.core.Label.label;
 import static com.raylib.Raylib.*;
@@ -112,7 +113,7 @@ public class AddLevelTest extends BerrayApplication implements CoreComponentShor
     });
 
     // back to start when the player falls off screen
-    player.on("update", (event) -> {
+    player.on(UPDATE, (event) -> {
       Vec2 pos = player.get("pos");
       if (pos.getY() > width()) {
         player.set("pos", level.tile2Pos(0, 0));
@@ -120,8 +121,8 @@ public class AddLevelTest extends BerrayApplication implements CoreComponentShor
     });
 
     // Eat the coin!
-    player.onCollide("coin", (event) -> {
-      GameObject coin = event.getParameter(0);
+    player.onCollide("coin", (PhysicsCollideEvent event) -> {
+      GameObject coin = event.getCollisionPartner();
       destroy(coin);
       play("score");
       score++;

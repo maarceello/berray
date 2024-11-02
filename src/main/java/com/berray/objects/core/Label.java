@@ -1,6 +1,7 @@
 package com.berray.objects.core;
 
 import com.berray.GameObject;
+import com.berray.event.CoreEvents;
 
 import java.util.function.Supplier;
 
@@ -21,7 +22,7 @@ public class Label extends GameObject {
         text(textSupplier.get())
     );
 
-    on("update", event -> {
+    on(CoreEvents.UPDATE, event -> {
       set("text", textSupplier.get());
     });
   }

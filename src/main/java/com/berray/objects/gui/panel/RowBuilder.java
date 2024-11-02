@@ -87,6 +87,9 @@ public class RowBuilder {
     return addCell(panelBuilder -> GameObject.makeGameObject(components));
   }
 
+  public RowBuilder add(GameObject gameObject) {
+    return addCell(panelBuilder -> gameObject);
+  }
 
   public RowBuilder skip() {
     return addCell(((panelBuilder) -> null));

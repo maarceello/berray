@@ -26,6 +26,7 @@ public class RectComponent extends Component {
     super.add(gameObject);
     registerBoundProperty("size", this::getSize, this::setSize);
     registerBoundProperty("fill", this::getFill, this::setFill);
+    registerBoundProperty("lineThickness", this::getLineThickness, this::setLineThickness);
     registerGetter("render", () -> true);
   }
 

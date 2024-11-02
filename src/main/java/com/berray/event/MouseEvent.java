@@ -36,6 +36,11 @@ public class MouseEvent extends Event {
   public static final String EVENT_NAME_HOVER_LEAVE = "hoverLeave";
 
   private final Map<Button, ButtonState> buttonStateCache = new EnumMap<>(Button.class);
+  /**
+   * true when this event is processed an no other (game object) listener should be
+   * notified of the event.
+   */
+  private boolean processed = false;
 
 
   public MouseEvent(String name, List<Object> parameters) {
@@ -48,6 +53,14 @@ public class MouseEvent extends Event {
 
   public Vec2 getGameObjectPos() {
     return getParameter(2);
+  }
+
+  public void setProcessed() {
+    this.processed = true;
+  }
+
+  public boolean isProcessed() {
+    return processed;
   }
 
   public ButtonState getButtonState(Button button) {

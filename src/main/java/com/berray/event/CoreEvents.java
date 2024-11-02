@@ -2,7 +2,8 @@ package com.berray.event;
 
 public interface CoreEvents {
   String ADD = AddEvent.EVENT_NAME;
-  String SCENE_GRAPH_ADDED = SceneGraphAddedEvent.EVENT_NAME;
+  String SCENE_GRAPH_ADDED = SceneGraphEvent.EVENT_NAME_ADDED;
+  String SCENE_GRAPH_REMOVED = SceneGraphEvent.EVENT_NAME_REMOVED;
   String PROPERTY_CHANGED = PropertyChangeEvent.EVENT_NAME;
   String UPDATE = UpdateEvent.EVENT_NAME;
   String PHYSICS_RESOLVE = PhysicsResolveEvent.EVENT_NAME;

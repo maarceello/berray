@@ -19,7 +19,7 @@ public class PanelDragManager {
   }
 
   public void dragUpdate(MouseEvent event) {
-    Vec2 delta = event.getWindowPos().sub(dragStart).scale(2.0f);
+    Vec2 delta = event.getWindowPos().sub(dragStart);
     panel.set("pos", panelStart.add(delta));
   }
 

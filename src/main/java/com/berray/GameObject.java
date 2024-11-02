@@ -2,8 +2,8 @@ package com.berray;
 
 import com.berray.components.core.AnchorType;
 import com.berray.components.core.Component;
-import com.berray.event.*;
 import com.berray.event.EventListener;
+import com.berray.event.*;
 import com.berray.math.Matrix4;
 import com.berray.math.Rect;
 import com.berray.math.Vec2;
@@ -15,6 +15,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -84,7 +85,9 @@ public class GameObject {
    * Bounding box in world coordinates.
    */
   protected Rect boundingBox;
-  /** Order in which to draw the game objects children. */
+  /**
+   * Order in which to draw the game objects children.
+   */
   protected DrawOrder drawOrder = DrawOrder.DEPTH_FIRST;
 
   public GameObject() {
@@ -167,6 +170,22 @@ public class GameObject {
     children.remove(gameObject);
     gameObject.parent = null;
     gameObject.game = null;
+    // trigger event that the object was removed from the scene graph
+    gameObject.emitSceneGraphRemovedEvent(this);
+  }
+
+  /**
+   * Fired when the game object or ist subtree was removed from the scene graph
+   *
+   * @param removePoint game object from which the subtree was removed
+   * @type emit-event
+   */
+  protected void emitSceneGraphRemovedEvent(GameObject removePoint) {
+    trigger(CoreEvents.SCENE_GRAPH_REMOVED, removePoint);
+    // also notify children that the subtree was removed
+    for (GameObject child : children) {
+      child.emitSceneGraphRemovedEvent(removePoint);
+    }
   }
 
   public void destroy() {
@@ -192,6 +211,8 @@ public class GameObject {
     GameObject previous = children.set(index, other);
     previous.parent = null;
     previous.game = null;
+    previous.emitSceneGraphRemovedEvent(this);
+
     other.parent = this;
     other.setGame(this.game);
     // force recalculation of bounding rectangle
@@ -228,6 +249,16 @@ public class GameObject {
   public List<GameObject> getChildren() {
     return children;
   }
+
+  /**
+   * Returns children with the specified tag. This method checks only the direct children of the game object.
+   *
+   * @see #getTagStream(String)
+   */
+  public List<GameObject> getChildren(String tag) {
+    return children.stream().filter(child -> child.is(tag)).collect(Collectors.toList());
+  }
+
 
   public void addComponents(Object... components) {
     addComponents(Arrays.asList(components));
@@ -270,7 +301,9 @@ public class GameObject {
     return parent;
   }
 
-  /** Called by the game to get the code, which will be called to render the object. */
+  /**
+   * Called by the game to get the code, which will be called to render the object.
+   */
   public void visitDraw(BiConsumer<String, Runnable> visitor) {
     if (paused) {
       return;
@@ -286,7 +319,9 @@ public class GameObject {
     }
   }
 
-  /** Called by the game to get the code, which will be called to render the objects children. */
+  /**
+   * Called by the game to get the code, which will be called to render the objects children.
+   */
   public void visitDrawChildren(BiConsumer<String, Runnable> visitor) {
     // don't draw children of paused objects
     if (paused) {
@@ -544,6 +579,10 @@ public class GameObject {
     eventManager.trigger(eventName, Arrays.asList(params));
   }
 
+  public void trigger(Event event) {
+    eventManager.trigger(event);
+  }
+
   public GameObject getRoot() {
     return (parent == null) ? this : parent.getRoot();
   }
@@ -691,12 +730,12 @@ public class GameObject {
 
     // find combined bounding box of this game object and all of its children
     for (GameObject child : children) {
-      Rect boundingBox = child.getBoundingBox();
-      if (boundingBox != null) {
-        x1 = Math.min(x1, boundingBox.getX());
-        y1 = Math.min(y1, boundingBox.getY());
-        x2 = Math.max(x2, boundingBox.getX() + boundingBox.getWidth());
-        y2 = Math.max(y2, boundingBox.getY() + boundingBox.getHeight());
+      Rect childBoundingBox = child.getBoundingBox();
+      if (childBoundingBox != null) {
+        x1 = Math.min(x1, childBoundingBox.getX());
+        y1 = Math.min(y1, childBoundingBox.getY());
+        x2 = Math.max(x2, childBoundingBox.getX() + childBoundingBox.getWidth());
+        y2 = Math.max(y2, childBoundingBox.getY() + childBoundingBox.getHeight());
       }
     }
 

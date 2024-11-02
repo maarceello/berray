@@ -87,6 +87,7 @@ public class Button extends GameObject implements CoreComponentShortcuts {
     Rect boundingBox = getBoundingBox();
     armed = false;
     boolean stillhovered = boundingBox.contains(absoluteMousePos);
+    emitClickEvent(pressed);
     if (toggleButton) {
       // toggle button
       setPressed(!pressed);
@@ -96,14 +97,24 @@ public class Button extends GameObject implements CoreComponentShortcuts {
         return;
       }
     }
+
     // push button or the toggle button is released
     replaceChild(0, stillhovered && hoverChild != null ? hoverChild : neutralChild);
   }
 
+  /**
+   * Fired when the button was clicked,
+   * @type emit-event
+   * */
+  private void emitClickEvent(boolean pressed) {
+    trigger("click", this, pressed);
+  }
 
-  private void onMousePress(Event event) {
+
+  private void onMousePress(MouseEvent event) {
     replaceChild(0, getArmedGameObject());
     armed = true;
+    event.setProcessed();
   }
 
   private void onHoverLeave(Event event) {

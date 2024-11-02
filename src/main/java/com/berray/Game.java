@@ -35,6 +35,7 @@ public class Game {
 
   private EventManager eventManager;
   private DefaultAssetManager assetManager;
+  private MouseManager mouseManager;
 
 
   // Constructor
@@ -63,7 +64,8 @@ public class Game {
     eventTypeFactory.registerEventType(MouseEvent.EVENT_NAME_HOVER_ENTER, MouseEvent::createMouseEvent);
     eventTypeFactory.registerEventType(AnimationEvent.EVENT_NAME_ANIMATION_END, AnimationEvent::new);
     eventTypeFactory.registerEventType(AnimationEvent.EVENT_NAME_ANIMATION_START, AnimationEvent::new);
-    eventTypeFactory.registerEventType(SceneGraphAddedEvent.EVENT_NAME, SceneGraphAddedEvent::new);
+    eventTypeFactory.registerEventType(SceneGraphEvent.EVENT_NAME_ADDED, SceneGraphEvent::new);
+    eventTypeFactory.registerEventType(SceneGraphEvent.EVENT_NAME_REMOVED, SceneGraphEvent::new);
     eventTypeFactory.registerEventType(PhysicsBeforeResolveEvent.EVENT_NAME, PhysicsBeforeResolveEvent::new);
     eventTypeFactory.registerEventType(PhysicsCollideEvent.EVENT_NAME, PhysicsCollideEvent::new);
     eventTypeFactory.registerEventType(PhysicsCollideUpdateEvent.EVENT_NAME, PhysicsCollideUpdateEvent::new);
@@ -73,7 +75,12 @@ public class Game {
     eventTypeFactory.registerEventType(PhysicsEvent.EVENT_NAME_FALL,  PhysicsEvent::new);
     eventTypeFactory.registerEventType(PhysicsEvent.EVENT_NAME_FALL_OFF,  PhysicsEvent::new);
     eventManager = new EventManager();
+    mouseManager = new MouseManager();
     init();
+  }
+
+  public MouseManager getMouseManager() {
+    return mouseManager;
   }
 
   public DefaultAssetManager getAssetManager() {
@@ -90,6 +97,8 @@ public class Game {
     // forward update events down the object tree
     on(CoreEvents.UPDATE, event -> root.trigger(event.getName(), event.getParameters()));
     layers.add(DEFAULT_LAYER);
+    // forward mouse events to mouse mangager
+    mouseManager.registerListeners(this);
   }
 
   public void setLayers(List<String> layers) {
@@ -157,6 +166,7 @@ public class Game {
    * Update all game objects
    */
   public void update(float frameTime) {
+    eventManager.trigger(CoreEvents.UPDATE, Collections.singletonList(frameTime));
     root.update(frameTime);
   }
 

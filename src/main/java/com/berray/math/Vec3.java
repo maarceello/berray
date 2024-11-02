@@ -80,6 +80,10 @@ public class Vec3 {
     return add(speed);
   }
 
+  /** Transforms this {@link Vec3} to a {@link Vec2} by dropping the z component. */
+  public Vec2 toVec2() {
+    return new Vec2(x, y);
+  }
 
   public Raylib.Vector3 toVector3() {
     return new Jaylib.Vector3(x, y, z);

@@ -11,7 +11,7 @@ import java.util.List;
 public abstract class PosComponent<E> extends Component {
   protected E pos;
 
-  public PosComponent(E pos) {
+  protected PosComponent(E pos) {
     super("pos");
     this.pos = pos;
   }
@@ -64,7 +64,7 @@ public abstract class PosComponent<E> extends Component {
 
 
   /**
-   * Moves the position by a delta. This action does ignore the frame time.
+   * Moves the position by a delta. This action ignores the frame time.
    *
    * @type action
    */

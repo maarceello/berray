@@ -65,6 +65,7 @@ public class TextComponent extends Component {
    */
   public void setFontHeight(int fontHeight) {
     this.fontHeight = fontHeight;
+    updateSize();
   }
 
   /**

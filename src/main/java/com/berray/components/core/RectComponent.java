@@ -3,6 +3,7 @@ package com.berray.components.core;
 import com.berray.GameObject;
 import com.berray.math.Color;
 import com.berray.math.Vec2;
+import com.raylib.Jaylib;
 
 import static com.raylib.Jaylib.*;
 
@@ -10,6 +11,7 @@ import static com.raylib.Jaylib.*;
 public class RectComponent extends Component {
   private Vec2 size;
   private boolean fill = true;
+  private float lineThickness = 1.0f;
 
   public RectComponent(float width, float height) {
     super("rect");
@@ -35,11 +37,20 @@ public class RectComponent extends Component {
     return this;
   }
 
+  /**
+   * sets whether the rectangle should be drawn filled or as a wireframe.
+   *
+   * @type configuration
+   */
+  public RectComponent lineThickness(float lineThickness) {
+    this.lineThickness = lineThickness;
+    return this;
+  }
 
   /**
    * Returns the size of the rectangle
    *
-   * @type configuration
+   * @type property
    */
   private Vec2 getSize() {
     return size;
@@ -48,7 +59,7 @@ public class RectComponent extends Component {
   /**
    * Sets the size of the rectangle. Note that this forces recalculation of the transformation matrix.
    *
-   * @type configuration
+   * @type property
    */
   public void setSize(Vec2 size) {
     this.size = size;
@@ -59,7 +70,7 @@ public class RectComponent extends Component {
   /**
    * Returns whether the rectangle should be filled or not.
    *
-   * @type configuration
+   * @type property
    */
   public boolean getFill() {
     return fill;
@@ -68,12 +79,29 @@ public class RectComponent extends Component {
   /**
    * Sets whether the rectangle should be filled or not.
    *
-   * @type configuration
+   * @type property
    */
   public void setFill(boolean fill) {
     this.fill = fill;
   }
 
+  /**
+   * Returns the thickness of the drawn line.
+   *
+   * @type property
+   */
+  public float getLineThickness() {
+    return lineThickness;
+  }
+
+  /**
+   * Sets the thickness of the drawn line. Default is 1.0;
+   *
+   * @type property
+   */
+  public void setLineThickness(float lineThickness) {
+    this.lineThickness = lineThickness;
+  }
 
   @Override
   public void draw() {
@@ -84,7 +112,7 @@ public class RectComponent extends Component {
       if (fill) {
         DrawRectangle(0, 0, (int) size.getX(), (int) size.getY(), color.toRaylibColor());
       } else {
-        DrawRectangleLines(0, 0, (int) size.getX(), (int) size.getY(), color.toRaylibColor());
+        DrawRectangleLinesEx(new Jaylib.Rectangle(0, 0, (int) size.getX(), (int) size.getY()),lineThickness, color.toRaylibColor());
       }
     }
     rlPopMatrix();

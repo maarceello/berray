@@ -2,12 +2,11 @@ package com.berray.objects.gui.panel;
 
 import com.berray.GameObject;
 import com.berray.components.core.AnchorType;
-import com.berray.components.core.AreaComponent;
 import com.berray.components.core.ColorComponent;
 import com.berray.event.CoreEvents;
-import com.berray.event.MouseEvent;
 import com.berray.math.Color;
 import com.berray.math.Vec2;
+import com.berray.objects.gui.Button;
 import com.berray.objects.gui.EventListenerCapable;
 import com.berray.objects.gui.GameObjectBuilder;
 
@@ -21,10 +20,10 @@ import static com.berray.components.core.AreaComponent.area;
 import static com.berray.components.core.MouseComponent.mouse;
 import static com.berray.components.core.PosComponent2d.pos;
 import static com.berray.components.core.RectComponent.rect;
-import static com.berray.components.core.TextComponent.*;
+import static com.berray.components.core.TextComponent.text;
 
 public class PanelBuilder implements GameObjectBuilder {
-  public List<Float> columnWidths = new ArrayList<>();
+  public List<Float> columnWidths;
   public List<Float> rowHeights = new ArrayList<>();
   private List<RowBuilder> rows = new ArrayList<>();
   private EventListenerCapable dataObject;
@@ -41,10 +40,23 @@ public class PanelBuilder implements GameObjectBuilder {
   private Color backgroundColor;
   private Color foregroundColor;
 
-  /** Title for the panel. default: <code>null</code> for no title. */
+  /**
+   * Size of the font for the title bar and the default size for the panel.
+   */
+  private int fontSize = 20;
+
+  /**
+   * Title for the panel. default: <code>null</code> for no title.
+   */
   private String title = null;
-  /** true when the panel can be dragged by the titlebar, false when it should be static. */
+  /**
+   * true when the panel can be dragged by the titlebar, false when it should be static.
+   */
   private boolean moveable = false;
+  /**
+   * true when the panel can be minimized (only the title bar is shown).
+   */
+  private boolean minimizable = false;
 
   public PanelBuilder() {
     this.columnWidths = Collections.emptyList();
@@ -55,10 +67,30 @@ public class PanelBuilder implements GameObjectBuilder {
     return this;
   }
 
-  public PanelBuilder movable(boolean moveable) {
-    this.moveable = moveable;
+  public PanelBuilder fontSize(int fontSize) {
+    this.fontSize = fontSize;
     return this;
   }
+
+
+  public PanelBuilder movable(boolean moveable) {
+    this.moveable = moveable;
+    // movable panels  needs a title bar
+    if (title == null) {
+      title = "";
+    }
+    return this;
+  }
+
+  public PanelBuilder minimizable(boolean minimizable) {
+    this.minimizable = minimizable;
+    // minimizable panels  needs a title bar
+    if (title == null) {
+      title = "";
+    }
+    return this;
+  }
+
 
   public PanelBuilder columnWidths(Float... columnWidths) {
     this.columnWidths = Arrays.asList(columnWidths);
@@ -107,81 +139,128 @@ public class PanelBuilder implements GameObjectBuilder {
   public GameObject buildGameObject() {
     GameObject panel = GameObject.makeGameObject(
         pos(0, 0),
-        anchor(AnchorType.TOP_LEFT)
+        anchor(AnchorType.TOP_LEFT),
+        "panel"
     );
     float totalWidth = (float) columnWidths.stream().mapToDouble(f -> f).sum() + frameSize * 2;
 
-    int rowPos = 0;
+    int titlebarHeight = 0;
     if (title != null) {
-      GameObject titleRow = createTitleRow(totalWidth);
+      GameObject titleRow = createTitleRow(panel, totalWidth);
       panel.add(titleRow);
-      rowPos += titleRow.<Vec2>get("size").getY() + 1;
-
-      if (moveable) {
-        titleRow.addComponents(
-            mouse(),
-            area()
-        );
-
-        PanelDragManager dragManager = new PanelDragManager(panel);
-        titleRow.on(CoreEvents.DRAG_START, dragManager::dragStart);
-        titleRow.on(CoreEvents.DRAGGING, dragManager::dragUpdate);
-        titleRow.on(CoreEvents.DRAG_FINISH, dragManager::dragFinish);
-      }
-
+      titlebarHeight += titleRow.<Vec2>get("size").getY() + 1;
     }
 
+    GameObject content = panel.add(pos(0, titlebarHeight), "content");
+    int rowPos = 0;
     for (int row = 0; row < rows.size(); row++) {
       RowBuilder rowBuilder = rows.get(row);
       GameObject rowObject = rowBuilder.buildGameObject(this);
       rowObject.set("pos", new Vec2(frameSize, rowPos + frameSize));
-      panel.addChild(rowObject);
+      content.addChild(rowObject);
 
       rowPos += rowHeights.get(row);
     }
 
     if (backgroundColor != null) {
       panel.addComponents(
-          rect(totalWidth, rowPos + frameSize*2),
-          ColorComponent.color(backgroundColor)
+          rect(totalWidth, titlebarHeight + rowPos + frameSize * 2),
+          ColorComponent.color(backgroundColor),
+          "background"
       );
     }
 
     if (frameColor != null) {
       panel.add(
-          rect(totalWidth - frameSize, rowPos+frameSize).fill(false),
+          rect(totalWidth - frameSize, titlebarHeight + rowPos + frameSize).fill(false),
           pos(frameSize / 2, frameSize / 2),
           ColorComponent.color(frameColor),
-          anchor(AnchorType.TOP_LEFT)
+          anchor(AnchorType.TOP_LEFT),
+          "frame"
       );
     }
+
+    panel.setProperty("minimizedState", false);
+
+    float finalTitlebarHeight = titlebarHeight;
+    float finalRowPos = rowPos;
+    panel.registerAction("toggleMinimize", () -> {
+      Boolean state = panel.getProperty("minimizedState");
+      if (Boolean.TRUE == state) {
+        // restore state
+        content.setPaused(false);
+        panel.getChildren("frame").forEach(gameObject -> gameObject.set("size", new Vec2(totalWidth - frameSize, finalTitlebarHeight + finalRowPos + frameSize)));
+        panel.set("size", new Vec2(totalWidth, finalTitlebarHeight + finalRowPos + frameSize * 2));
+      } else {
+        // minimize panel
+        content.setPaused(true);
+        panel.getChildren("frame").forEach(gameObject -> gameObject.set("size", new Vec2(totalWidth - frameSize, finalTitlebarHeight + frameSize)));
+        panel.set("size", new Vec2(totalWidth, finalTitlebarHeight + frameSize * 2));
+      }
+      panel.setProperty("minimizedState", Boolean.TRUE != state);
+    });
 
 
     return panel;
   }
 
-  private GameObject createTitleRow(float width) {
+  private GameObject createTitleRow(GameObject panel, float width) {
 
-    GameObject background = GameObject.makeGameObject(
+    GameObject titlebarRow = GameObject.makeGameObject(
         pos(frameSize, frameSize),
         ColorComponent.color(foregroundColor),
-        anchor(AnchorType.TOP_LEFT)
+        anchor(AnchorType.TOP_LEFT),
+        "titlebar"
     );
 
-    GameObject titleText = background.add(
+    float textWidth = width - frameSize * 2;
+    // do we need space for the minimize icon?
+    if (minimizable) {
+      // yes. the icon is square, so reserve the same width as the height
+      textWidth -= fontSize;
+
+      GameObject minimizeButton = titlebarRow.add(
+          new Button("minimize", false)
+              .neutral(
+                  rect(fontSize - 4.0f, fontSize - 4.0f).fill(false).lineThickness(2),
+                  ColorComponent.color(backgroundColor == null ? foregroundColor : backgroundColor),
+                  anchor(AnchorType.TOP_LEFT)
+              ),
+          pos(textWidth + 2, 2),
+          anchor(AnchorType.TOP_LEFT),
+          "minimizeButton"
+      );
+      minimizeButton.on("click", event -> titlebarRow.getParent().doAction("toggleMinimize"));
+    }
+
+    // set text
+    GameObject titleText = titlebarRow.add(
         text(title),
-        pos(width / 2 - frameSize, 0),
+        pos(textWidth / 2, 0),
         anchor(AnchorType.TOP),
         ColorComponent.color(backgroundColor == null ? foregroundColor : backgroundColor)
     );
+    titleText.set("fontHeight", fontSize);
 
-    if (backgroundColor != null ) {
-      background.addComponents(
-          rect(width - frameSize*2, titleText.<Integer>get("fontHeight")).fill(true)
+    if (backgroundColor != null) {
+      titlebarRow.addComponents(
+          rect(width - frameSize * 2, fontSize).fill(true)
       );
     }
 
-    return background;
+    if (moveable) {
+      titlebarRow.addComponents(
+          mouse(),
+          area()
+      );
+
+      PanelDragManager dragManager = new PanelDragManager(panel);
+      titlebarRow.on(CoreEvents.DRAG_START, dragManager::dragStart);
+      titlebarRow.on(CoreEvents.DRAGGING, dragManager::dragUpdate);
+      titlebarRow.on(CoreEvents.DRAG_FINISH, dragManager::dragFinish);
+    }
+
+    return titlebarRow;
   }
 
   public static PanelBuilder makePanel() {

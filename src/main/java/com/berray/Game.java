@@ -166,7 +166,7 @@ public class Game {
    * Update all game objects
    */
   public void update(float frameTime) {
-    eventManager.trigger(CoreEvents.UPDATE, Collections.singletonList(frameTime));
+    eventManager.trigger(CoreEvents.UPDATE, Arrays.asList(null, frameTime));
     root.update(frameTime);
   }
 
@@ -345,7 +345,7 @@ public class Game {
   public void onUpdate(String tag, EventListener<UpdateEvent> eventListener) {
     on(CoreEvents.UPDATE, (UpdateEvent event) -> {
       // only propagate event when the object has the required tag
-      if (event.getSource().is(tag)) {
+      if (event.getSource() != null && event.getSource().is(tag)) {
         eventListener.onEvent(event);
       }
     });

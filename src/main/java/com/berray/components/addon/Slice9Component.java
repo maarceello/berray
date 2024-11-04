@@ -8,7 +8,8 @@ import com.berray.math.Vec2;
 import com.raylib.Jaylib;
 import com.raylib.Raylib;
 
-import static com.raylib.Jaylib.*;
+import static com.raylib.Jaylib.NPatchInfo;
+import static com.raylib.Jaylib.Texture;
 
 public class Slice9Component extends Component {
   /**
@@ -50,24 +51,18 @@ public class Slice9Component extends Component {
 
   @Override
   public void draw() {
-    rlPushMatrix();
-    {
-      rlMultMatrixf(gameObject.getWorldTransformWithoutAnchor().toFloatTransposed());
+    Texture texture = getAssetManager().getAsset(this.textureName, AssetType.SPRITE).getAsset();
 
-      Texture texture = getAssetManager().getAsset(this.textureName, AssetType.SPRITE).getAsset();
+    Color color = gameObject.getOrDefault("color", Color.WHITE);
 
-      Color color = gameObject.getOrDefault("color", Color.WHITE);
-
-      NPatchInfo nPatchInfo = new NPatchInfo()
-          .top(top)
-          .bottom(bottom)
-          .left(left)
-          .right(right)
-          .layout(Raylib.NPATCH_NINE_PATCH)
-          .source(new Jaylib.Rectangle(0, 0, texture.width(), texture.height()));
-      Raylib.DrawTextureNPatch(texture, nPatchInfo, new Jaylib.Rectangle(0, 0, size.getX(), size.getY()), new Jaylib.Vector2(0, 0), 0, color.toRaylibColor());
-    }
-    rlPopMatrix();
+    NPatchInfo nPatchInfo = new NPatchInfo()
+        .top(top)
+        .bottom(bottom)
+        .left(left)
+        .right(right)
+        .layout(Raylib.NPATCH_NINE_PATCH)
+        .source(new Jaylib.Rectangle(0, 0, texture.width(), texture.height()));
+    Raylib.DrawTextureNPatch(texture, nPatchInfo, new Jaylib.Rectangle(0, 0, size.getX(), size.getY()), new Jaylib.Vector2(0, 0), 0, color.toRaylibColor());
   }
 
   /**

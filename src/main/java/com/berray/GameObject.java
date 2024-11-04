@@ -21,6 +21,7 @@ import java.util.stream.StreamSupport;
 
 import static com.berray.event.CoreEvents.PHYSICS_COLLIDE;
 import static com.berray.event.CoreEvents.SCENE_GRAPH_ADDED;
+import static com.raylib.Raylib.*;
 
 public class GameObject {
   private static final AtomicInteger nextComponentId = new AtomicInteger(0);
@@ -311,10 +312,15 @@ public class GameObject {
 
     if (Boolean.TRUE.equals(get("render", false))) {
       visitor.accept(get("layer", Game.DEFAULT_LAYER), () -> {
-        ensureTransformCalculated();
-        for (Component c : components.values()) {
-          c.draw();
+        rlPushMatrix();
+        {
+          ensureTransformCalculated();
+          rlMultMatrixf(getWorldTransform().toFloatTransposed());
+          for (Component c : components.values()) {
+            c.draw();
+          }
         }
+        rlPopMatrix();
       });
     }
   }
@@ -742,6 +748,17 @@ public class GameObject {
 
     return new Rect(x1, y1, x2 - x1, y2 - y1);
   }
+
+  public Vec3 worldPosToLocalPos(Vec3 worldPos) {
+    Matrix4 inverseTransform = getWorldTransform().inverse();
+    return inverseTransform.multiply(worldPos);
+  }
+
+  public Vec2 worldPosToLocalPos(Vec2 worldPos) {
+    Matrix4 inverseTransform = getWorldTransform().inverse();
+    return inverseTransform.multiply(worldPos.getX(), worldPos.getY(), 0).toVec2();
+  }
+
 
   public boolean exists() {
     return parent != null;

@@ -5,6 +5,7 @@ import com.raylib.Raylib;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class Rect {
   private float x;
@@ -21,6 +22,14 @@ public class Rect {
     this.width = other.width;
     this.height = other.height;
   }
+
+  public Rect(Vec2 pos, Vec2 size) {
+    this.x = pos.getX();
+    this.y = pos.getY();
+    this.width = size.getX();
+    this.height = size.getY();
+  }
+
 
   public Rect(float x, float y, float width, float height) {
     this.x = x;
@@ -82,14 +91,22 @@ public class Rect {
     return new Rect(x + delta.getX(), y + delta.getY(), width, height);
   }
 
-  public Raylib.Rectangle toRectangle() {
-    return new Jaylib.Rectangle(x, y, width, height);
+  /** Returns this rectangle so that the width and height are positiv. */
+  public Rect normalize() {
+    return new Rect(
+        Math.min(x, x+width),
+        Math.min(y, y+height),
+        Math.abs(width),
+        Math.abs(height)
+    );
   }
 
-  @Override
-  public String toString() {
-    return String.format("(%.3f, %.3f - %.3f, %.3f)", x, y, width, height);
+
+  /** Returns the center of the rectangle. */
+  public Vec2 getCenter() {
+    return new Vec2(x + width / 2, y + height / 2);
   }
+
 
   public boolean contains(Vec2 point) {
     return contains(point.getX(), point.getY());
@@ -98,5 +115,14 @@ public class Rect {
   public boolean contains(float x, float y) {
     return x >= this.x && x <= this.x + this.width &&
         y >= this.y && y <= this.y + this.height;
+  }
+
+  public Raylib.Rectangle toRectangle() {
+    return new Jaylib.Rectangle(x, y, width, height);
+  }
+
+  @Override
+  public String toString() {
+    return String.format("(%.3f, %.3f - %.3f, %.3f)", x, y, width, height);
   }
 }

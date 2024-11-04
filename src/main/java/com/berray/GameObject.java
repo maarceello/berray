@@ -749,6 +749,17 @@ public class GameObject {
     return new Rect(x1, y1, x2 - x1, y2 - y1);
   }
 
+  public Vec3 worldPosToLocalPos(Vec3 worldPos) {
+    Matrix4 inverseTransform = getWorldTransform().inverse();
+    return inverseTransform.multiply(worldPos);
+  }
+
+  public Vec2 worldPosToLocalPos(Vec2 worldPos) {
+    Matrix4 inverseTransform = getWorldTransform().inverse();
+    return inverseTransform.multiply(worldPos.getX(), worldPos.getY(), 0).toVec2();
+  }
+
+
   public boolean exists() {
     return parent != null;
   }

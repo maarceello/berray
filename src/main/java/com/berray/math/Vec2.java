@@ -109,6 +109,10 @@ public class Vec2 {
     return new Vec2(this.y, -this.x);
   }
 
+  public Vec3 toVec3(int z) {
+    return new Vec3(x,y,z);
+  }
+
   public Raylib.Vector2 toVector2() {
     return new Jaylib.Vector2(x, y);
   }

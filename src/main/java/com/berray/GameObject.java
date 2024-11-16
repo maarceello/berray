@@ -659,7 +659,7 @@ public class GameObject {
       Matrix4 posMatrix = getOrDefault("posTransform", Matrix4.identity());
       Matrix4 rotationMatrix = getOrDefault("rotationMatrix", Matrix4.identity());
       Vec2 size = getOrDefault("size", Vec2.origin());
-      AnchorType anchor = getOrDefault("anchor", AnchorType.CENTER);
+      AnchorType anchor = getOrDefault("anchor", AnchorType.TOP_LEFT);
       Vec3 scale = getOrDefault("scale", new Vec3(1.0f, 1.0f, 1.0f));
 
       float w2 = size.getX() / 2.0f;

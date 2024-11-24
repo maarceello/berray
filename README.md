@@ -35,6 +35,23 @@ Events can have parameters, there are event type specific. You can see them in t
 
 # Events
 
+
+## Event types
+
+There are some event types:
+
+1. local event, non propagating. This event is send by a component to its game object. The event does not propagate 
+   through the scene graph. Examples: "propertyChanged"
+2. external event, non propagating. This event is send by another game object (for example the parent or the game). The 
+   event does not propagate through the scene graph. Examples: "collide" 
+3. event bubbling down the scene graph. This event starts at some point in the scene graph and visits the children of the
+   current node. The mechanism by which the event is propagated and the cutoff condition depends on the event.
+   Examples: "sceneGraphAdded", "sceneGraphRemoved"
+4. event bubbling up the scene graph. This event starts at some point in the scene graph and visits the parents of the
+   current node. The mechanism by which the event is propagated and the cutoff condition depends on the event.
+   Examples: "actionPerformed"
+  
+
 Notes about event parameters:
 
 The first event parameter is always the game object which fired the event. This may be null when the event is global, 
@@ -170,9 +187,135 @@ Note: the default coordinate system uses y as the up vector.
 - [x] label
 - [x] button
 - [x] checkbox
-- [ ] slider
+- [x] slider
 - [ ] textarea (static), scrollable or autoremove rows after some time
 - [ ] textarea/inputfield (enter text in input field)
+
+
+Some thoughts on gui architecture:
+
+1. Vision
+
+* Berray provides easy and hassle-free gui components with databinding and one default design.
+
+2. Goals
+
+notes: a) must have   b) should have    c) may have 
+
+a. creation of the gui is easy (builder pattern?) and can be read from a file. Interaction ist provided by databinding
+  and actions.
+b. base components: 
+  * frames (closeable, movable, minimizeable, resizeable)
+  * panels (programmatically resizeable, scrollable)
+  * button (click button, toggle button, radio button, checkbox)
+  * scrollbar, progressbar 
+  * text display and input (label, text field, text area, no text effects, maybe embedded images)
+b. easy layouting. relayouting in case of resize is simple, but may be provided by custom strategies
+b. databinding and actions: changing one gui element triggers a (panel global) action which may be processed by listeners
+c. custom layout strategies and custom designs are possible and easy
+c. auxiliary components
+  * combo box
+  * tabs
+  * file chooser
+  * color chooser
+
+3. Processes
+
+* set design manager 
+  * game#setDesignManager() - stored in game
+* create panel 
+  * set layout manager (note: layout manager is required)
+  * set size in absolute pixels (note: size is required for outermost panel or frame)
+  * set default insets of zero
+  * set default border: none
+  * set bound object: none
+    
+* add border to panel
+  * set border (name)
+  * set layout dirty flag
+
+* add child to panel
+  * add child via game object
+  * set layout dirty flag
+
+* layout childs in panel according to layout
+  * calculate final insets (insets + border) and final inner size 
+  * call LayoutManager#layout with panel
+
+* draw panel
+  * check layout dirty flag
+    * if not: layout panel and clear layout dirty flag
+  * draw childs
+  * call design manager with panel and border (name) 
+    
+* create frame
+  * create panel as a holder for the frame
+  * add default frame border (from design manager?)
+  * add panel for title bar
+  * create child "content" (panel or game object)
+
+* add border and insets to panel (note: only panels can have borders or insets)
+  * set current border
+  * set layout dirty flag
+
+* create gui component (ie. button) with bound properties
+  * set action id
+  * set databinding map
+
+* add gui component (with id) to panel
+  * subprocess: "add child to panel"
+  * on "add" event
+    * gui component registers listener for event "bind"
+  * on "add to scene graph" event
+    * parent (panel) sends event "bind" with current databinding object
+    * register property changed listener from databinding map
+    * fire initial property changed event for all source properties
+  * on "remove from scene graph" event
+      * parent (panel) sends event "unbind" with removed databinding object
+      * gui component removes listeners from databinding object
+  * panel adds action performed event listener to child (doesn't matter if it is a gui component or not)
+    * note: if the panel contains non-gui containers, these are responsible for propagating the action performed event
+
+* execute action in gui component
+  * send action performed event 
+    * first parameter is game object
+    * 2nd parameter is action id (null if it does not exist)
+    * other parameter are dependent on the gui component type. Most often this parameter is missing (button) or has the 
+      new value of the component (slider, checkbox)
+  * components may intercept the action performed event and send another event. For example a radio group component
+    may intercept button clicks and translate these to an action performed event with the pressed button index and its 
+    own action id 
+
+4. Entities
+
+* frame: is a panel (with border) and has a title bar. can be moved, minimized, closed, resized
+  * state: normal, minimized, closed
+* panel (containing border)
+  * border
+  * insets
+  * layout dirty flag
+  * bound object
+* border (has size to all sides)
+  * size to all sides
+* gui components
+  * action id 
+  * databinding map
+    * source property
+    * destination property
+    * direction: source->destination, bidirectional
+* design manager (can be applied to game objects to create specific drawings. can add components, actions, listeners, everything )
+  * method: installPanel (panel)
+  * method: installButton (button)
+  * method: installLabel (label)
+  * method: get border (border name)
+
+* layout manager (lays out childs in a panel)
+  * method: layout panel (panel, list of components to layout, rectangle for content)
+
+5. Architecture
+
+
+
 
 ## 2d stack
 

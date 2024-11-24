@@ -16,7 +16,7 @@ import java.util.List;
 import static com.raylib.Raylib.LoadTexture;
 
 public class RaylibAssetLoader implements AssetLoader {
-  private List<String> supportedExtensions = Arrays.asList("png");
+  private List<String> supportedExtensions = Arrays.asList("png", "jpg");
 
   @Override
   public Asset loadAsset(String name, String params, ImageInputStream stream) {

@@ -117,9 +117,31 @@ public class Rect {
         y >= this.y && y <= this.y + this.height;
   }
 
+
+
+  /**
+   * Scales the rectangle 'other' so that is fits exactly in this rectangle. The destination rectangle is centered in
+   * this rectangle.
+   */
+  public Rect getFitRectangle(Rect other) {
+    float aspectRatio = other.width / other.height;
+    float otherAspectRatio = width / height;
+
+    float resizeFactor = (aspectRatio >= otherAspectRatio) ? (width / other.width) : (height / other.height);
+
+    float newWidth = other.width * resizeFactor;
+    float newHeight = other.height * resizeFactor;
+    float newX = x + (width - newWidth) / 2.0f;
+    float newY = y + (height - newHeight) / 2.0f;
+
+    return new Rect(newX, newY, newWidth, newHeight);
+  }
+
+
   public Raylib.Rectangle toRectangle() {
     return new Jaylib.Rectangle(x, y, width, height);
   }
+
 
   @Override
   public String toString() {

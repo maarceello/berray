@@ -1,7 +1,6 @@
-package com.berray.objects;
+package com.berray.components.core;
 
 import com.berray.GameObject;
-import com.berray.components.core.Component;
 import com.raylib.Raylib;
 
 public class CameraComponent extends Component {

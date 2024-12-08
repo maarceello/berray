@@ -6,6 +6,7 @@ public interface CoreEvents {
   String SCENE_GRAPH_REMOVED = SceneGraphEvent.EVENT_NAME_REMOVED;
   String PROPERTY_CHANGED = PropertyChangeEvent.EVENT_NAME;
   String UPDATE = UpdateEvent.EVENT_NAME;
+  // physics events
   String PHYSICS_RESOLVE = PhysicsResolveEvent.EVENT_NAME;
   String PHYSICS_COLLIDE_UPDATE = PhysicsCollideUpdateEvent.EVENT_NAME;
   String PHYSICS_BEFORE_RESOLVE = PhysicsBeforeResolveEvent.EVENT_NAME;
@@ -15,11 +16,14 @@ public interface CoreEvents {
   String PHYSICS_FALL_OFF = PhysicsEvent.EVENT_NAME_FALL_OFF;
   String PHYSICS_COLLIDE = PhysicsCollideEvent.EVENT_NAME;
   String PHYSICS_COLLIDE_END = PhysicsCollideEndEvent.EVENT_NAME;
+  // animation events
   String ANIMATION_END = AnimationEvent.EVENT_NAME_ANIMATION_END;
   String ANIMATION_START = AnimationEvent.EVENT_NAME_ANIMATION_END;
+  // key events
   String KEY_PRESS = KeyEvent.EVENT_NAME_KEY_PRESS;
   String KEY_DOWN = KeyEvent.EVENT_NAME_KEY_DOWN;
   String KEY_UP = KeyEvent.EVENT_NAME_KEY_UP;
+  // mouse events
   String MOUSE_CLICK = MouseEvent.EVENT_NAME_MOUSE_CLICK;
   String MOUSE_RELEASE = MouseEvent.EVENT_NAME_MOUSE_RELEASE;
   String MOUSE_PRESS = MouseEvent.EVENT_NAME_MOUSE_PRESS;
@@ -32,4 +36,8 @@ public interface CoreEvents {
   String HOVER_ENTER = MouseEvent.EVENT_NAME_HOVER_ENTER;
   String HOVER_LEAVE = MouseEvent.EVENT_NAME_HOVER_LEAVE;
 
+  // gui events
+  String ACTION_PERFORMED = ActionEvent.EVENT_NAME;
+  String BIND = BindEvent.EVENT_NAME_BIND;
+  String UNBIND = BindEvent.EVENT_NAME_UNBIND;
 }

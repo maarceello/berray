@@ -8,7 +8,7 @@ import com.berray.components.core.Rotate3dComponent;
 import com.berray.event.UpdateEvent;
 import com.berray.math.Color;
 import com.berray.math.Vec3;
-import com.berray.objects.CameraComponent;
+import com.berray.components.core.CameraComponent;
 import com.berray.objects.Root3D;
 import com.raylib.Jaylib;
 import com.raylib.Raylib;

@@ -174,7 +174,7 @@ Note: the default coordinate system uses y as the up vector.
 
 ### improvements
 
-- [ ] it should be possible to send event parameters lazy. i.e. add a Supplier as parameter and Events.getParameter()
+- [x] it should be possible to send event parameters lazy. i.e. add a Supplier as parameter and Events.getParameter()
   resolves the suppliers value and caches the result. Motivation: the hover event should calculate the mouse positions
   in object coordinates. This is expensive and maybe there are not even event listeners so the calculation is wasted.
 
@@ -221,46 +221,46 @@ c. auxiliary components
 
 3. Processes
 
-* set design manager 
+* [x] set design manager 
   * game#setDesignManager() - stored in game
-* create panel 
+* [x] create panel 
   * set layout manager (note: layout manager is required)
   * set size in absolute pixels (note: size is required for outermost panel or frame)
   * set default insets of zero
   * set default border: none
   * set bound object: none
     
-* add border to panel
+* [x] add border to panel
   * set border (name)
   * set layout dirty flag
 
-* add child to panel
+* [x] add child to panel
   * add child via game object
   * set layout dirty flag
 
-* layout childs in panel according to layout
+* [x] layout childs in panel according to layout
   * calculate final insets (insets + border) and final inner size 
   * call LayoutManager#layout with panel
 
-* draw panel
+* [x] draw panel
   * check layout dirty flag
     * if not: layout panel and clear layout dirty flag
   * draw childs
   * call design manager with panel and border (name) 
     
-* create frame
+* [x] create frame
   * create panel as a holder for the frame
   * add default frame border (from design manager?)
   * add panel for title bar
   * create child "content" (panel or game object)
 
-* add border and insets to panel (note: only panels can have borders or insets)
+* [x] add border and insets to panel (note: only panels can have borders or insets)
   * set current border
   * set layout dirty flag
 
-* create gui component (ie. button) with bound properties
-  * set action id
-  * set databinding map
+* [x] create gui component (ie. button) with bound properties
+  * [x] set action id
+  * [ ] set databinding map
 
 * add gui component (with id) to panel
   * subprocess: "add child to panel"
@@ -285,6 +285,25 @@ c. auxiliary components
   * components may intercept the action performed event and send another event. For example a radio group component
     may intercept button clicks and translate these to an action performed event with the pressed button index and its 
     own action id 
+
+* add subpanel which captures a property of the outer bound data object
+  * TODO: describe process
+
+* add sub panel which captures a list property of the outer bound data object. for each list entry another sub panel 
+  with the current list element bound is created  
+    * TODO: describe process
+    * set property of the enclosing data object
+
+
+Decisions:
+* the panel is the main store for the bound object
+* when a gui element is added to the scene graph (event "scene graph added"), 
+  * it searches the next panel in the scene graph
+  * it then registers the bind and unbind event listeners in the panel
+  * QUESTION 1: is it possible for the gui element to have a bound object other than the one in the panel?
+  * DECISISION 1: nope. it complicates matters when there are multiple bound object sources possible. 
+    * sub-panels can have a data object which is only part of the outer data object
+    * there should be some kind of loop which iterates though a list and adds panels 
 
 4. Entities
 

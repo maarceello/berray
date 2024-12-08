@@ -27,6 +27,10 @@ public interface CoreComponentShortcuts {
     return RectComponent.rect(width, height);
   }
 
+  default RectComponent rect(Vec2 size) {
+    return RectComponent.rect(size);
+  }
+
   default CircleComponent circle(float radius) {
     return CircleComponent.circle(radius);
   }

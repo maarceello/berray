@@ -57,6 +57,33 @@ public class Color {
     this.b = b;
   }
 
+  public float getA() {
+    return a;
+  }
+
+  public void setA(float a) {
+    this.a = a;
+  }
+
+  public Color brighter(float factor) {
+    // if we're black...return gray
+    if ( r == 0 && g == 0 && b == 0) {
+      return new Color(factor, factor, factor, a);
+    }
+
+    return new Color(
+        Math.min((r/factor), 1.0f),
+        Math.min((g/factor), 1.0f),
+        Math.min((b/factor), 1.0f),
+        a);
+  }
+
+  public Color darker(float factor) {
+    return new Color(r * factor, g * factor, b * factor, a);
+  }
+
+
+
   public Raylib.Color toRaylibColor() {
     if (raylibColor == null) {
       raylibColor = new Jaylib.Color((int) (r * 255), (int) (g * 255), (int) (b * 255), (int) (a * 255));

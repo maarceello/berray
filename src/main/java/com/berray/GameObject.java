@@ -149,7 +149,7 @@ public class GameObject {
    * `components` is an array of:
    * <p>
    * - a {@link Component}. Components are added to the child gameobject as is.
-   * - a {@link String}. I this case the string will be added as a tag to the child gameObject.
+   * - a {@link String}. In this case the string will be added as a tag to the child gameObject.
    * - the first component may be an instance of {@link GameObject}. In this case this object is
    * uses as the new object and all components and tags are added to this existing game object.
    */
@@ -302,6 +302,14 @@ public class GameObject {
     return parent;
   }
 
+  public <E extends GameObject> E findParent(Class<E> parentType) {
+    GameObject current = getParent();
+    while (current != null && !parentType.isInstance(current)){
+      current = current.getParent();
+    }
+    return (E) current;
+  }
+
   /**
    * Called by the game to get the code, which will be called to render the object.
    */
@@ -316,13 +324,23 @@ public class GameObject {
         {
           ensureTransformCalculated();
           rlMultMatrixf(getWorldTransform().toFloatTransposed());
+          preDrawComponents();
           for (Component c : components.values()) {
             c.draw();
           }
+          postDrawComponents();
         }
         rlPopMatrix();
       });
     }
+  }
+
+  /** Hook for GameObjects which want to do something after the components are drawn but before the children are drawn. */
+  protected void postDrawComponents() {
+  }
+
+  /** Hook for GameObjects which want to do something after the transform is applied and before the components are drawn. */
+  protected void preDrawComponents() {
   }
 
   /**
@@ -484,6 +502,10 @@ public class GameObject {
       throw new IllegalStateException("cannot find setter for property " + property + " in gameobject " + getClass().getSimpleName() + " with tags " + tags);
     }
     setterMethod.accept(value);
+  }
+
+  public boolean isWritable(String property) {
+    return setterMethods.containsKey(property);
   }
 
   public Set<String> getProperties() {

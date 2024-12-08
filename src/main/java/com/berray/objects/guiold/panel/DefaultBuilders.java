@@ -1,4 +1,4 @@
-package com.berray.objects.gui.panel;
+package com.berray.objects.guiold.panel;
 
 import com.berray.GameObject;
 import com.berray.components.core.AnchorType;
@@ -6,10 +6,10 @@ import com.berray.event.CoreEvents;
 import com.berray.event.PropertyChangeEvent;
 import com.berray.math.Color;
 import com.berray.math.Vec2;
-import com.berray.objects.gui.Button;
-import com.berray.objects.gui.EventListenerCapable;
-import com.berray.objects.gui.PropertyResolveService;
-import com.berray.objects.gui.Slider;
+import com.berray.objects.guiold.Button;
+import com.berray.objects.guiold.EventListenerCapable;
+import com.berray.objects.guiold.PropertyResolveService;
+import com.berray.objects.guiold.Slider;
 
 import java.util.function.Function;
 
@@ -18,7 +18,7 @@ import static com.berray.components.core.AnchorComponent.anchor;
 import static com.berray.components.core.ColorComponent.color;
 import static com.berray.components.core.RectComponent.rect;
 import static com.berray.components.core.TextComponent.text;
-import static com.berray.objects.gui.Button.button;
+import static com.berray.objects.guiold.Button.button;
 
 /**
  * Default panel builders

@@ -53,7 +53,7 @@ public class Label extends GameObject {
 
   private void processUpdate(UpdateEvent e) {
     Panel panel = findParent(Panel.class);
-    Object foo = panel == null ? null : panel.getBoundObject();
+    Object boundObject = panel == null ? null : panel.getBoundObject();
     if (boundObject != null) {
       set("text", PropertyResolveService.replaceText(text, boundObject));
     }

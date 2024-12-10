@@ -160,7 +160,6 @@ public class GameObject {
     if (gameObject == null) {
       throw new NullPointerException("gameObject must nor be null");
     }
-    gameObject.setGame(game);
     gameObject.addComponents(Arrays.asList(components));
     // trigger "add" event for all other interested parties
     addChild(gameObject);

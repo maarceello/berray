@@ -35,8 +35,7 @@ public class GuiTest extends BerrayApplication implements CoreComponentShortcuts
     );
 
     button.add(
-        text("button"),
-        color(Color.RED),
+        new Label("Type: ${type}"),
         pos(0, 0),
         "text"
     );
@@ -55,7 +54,7 @@ public class GuiTest extends BerrayApplication implements CoreComponentShortcuts
     new GuiTest().runGame();
   }
 
-  private static class DataObject {
+  public static class DataObject {
     private String type = "foobar";
 
     public String getType() {

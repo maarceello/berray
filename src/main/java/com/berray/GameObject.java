@@ -633,13 +633,20 @@ public class GameObject {
   /**
    * Sends event when the property "property" is changed
    */
-  public <E extends PropertyChangeEvent> void onPropertyChange(String property, EventListener<E> eventListener) {
+  public <E extends PropertyChangeEvent> void onPropertyChange(String property, EventListener<E> eventListener, Object owner) {
     on(PROPERTY_CHANGED, (E event) -> {
       // only propagate event when the requested property is changed
       if (Objects.equals(event.getPropertyName(), property)) {
         eventListener.onEvent(event);
       }
-    });
+    }, owner);
+  }
+
+  /**
+   * Sends event when the property "property" is changed
+   */
+  public <E extends PropertyChangeEvent> void onPropertyChange(String property, EventListener<E> eventListener) {
+    onPropertyChange(property, eventListener, null);
   }
 
 

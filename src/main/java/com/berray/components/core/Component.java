@@ -5,10 +5,10 @@ import com.berray.GameObject;
 import com.berray.assets.AssetManager;
 import com.berray.event.Event;
 import com.berray.event.EventListener;
+import com.berray.event.PropertyChangeEvent;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -166,6 +166,13 @@ public class Component {
    */
   public <E extends Event> void on(String eventName, EventListener<E> eventListener) {
     gameObject.on(eventName, eventListener, this);
+  }
+
+  /**
+   * Registers an event listener. Upon deletion the event listener will be removed.
+   */
+  public <E extends PropertyChangeEvent> void onPropertyChange(String propertyName, EventListener<E> eventListener) {
+    gameObject.onPropertyChange(propertyName, eventListener, this);
   }
 
   /**

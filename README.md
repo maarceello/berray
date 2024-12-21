@@ -293,7 +293,7 @@ c. auxiliary components
 #### Data Binding
 
 * Preconditions: there are three ways to create a panel. The type of the panel is fixed after creation:
-  * unbound
+  * unbound. This panel is skipped when a parent panel is searched. 
   * bound to object (this can be changed or removed, even to a completely other object type. But not to the "property bound" panel type )
   * bound to property (the property can be changed or removed. But the bound object cannot be set directly)
 
@@ -338,7 +338,7 @@ c. auxiliary components
     * alternative: instead of updating the property in the update method, we could add a property change listener 
       to the bound object, if it supports change listener. 
 
-* set bound property
+* set bound property name
   * fire property change "bound property"
   * find next panel in parent hierarchie with bound object (calculated by property or set directly)
   * get bound object from parent panel und resolve property. 
@@ -349,6 +349,7 @@ c. auxiliary components
 * set bound object
   * TODO: this can either fail or it can set the property value of the parents bound object. both would be feasible.
 
+##### lists, arrays, maps
 
 * add sub panel which captures a list property of the outer bound data object. for each list entry another sub panel 
   with the current list element bound is created  

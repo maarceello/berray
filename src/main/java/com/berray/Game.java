@@ -9,6 +9,7 @@ import com.berray.math.Collision;
 import com.berray.math.Rect;
 import com.berray.math.Vec2;
 import com.berray.math.Vec3;
+import com.berray.objects.gui.DefaultLookAndFeel;
 import com.berray.objects.gui.LookAndFeelManager;
 import com.raylib.Raylib;
 
@@ -37,7 +38,7 @@ public class Game {
   private EventManager eventManager;
   private DefaultAssetManager assetManager;
   private MouseManager mouseManager;
-  private LookAndFeelManager lookAndFeelManager;
+  private LookAndFeelManager lookAndFeelManager = new DefaultLookAndFeel();
 
 
   // Constructor

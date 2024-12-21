@@ -194,11 +194,11 @@ Note: the default coordinate system uses y as the up vector.
 
 Some thoughts on gui architecture:
 
-1. Vision
+### Vision
 
 * Berray provides easy and hassle-free gui components with databinding and one default design.
 
-2. Goals
+### Goals
 
 notes: a) must have   b) should have    c) may have 
 
@@ -219,7 +219,9 @@ c. auxiliary components
   * file chooser
   * color chooser
 
-3. Processes
+### Processes
+
+#### Scene Graph  
 
 * [x] set design manager 
   * game#setDesignManager() - stored in game
@@ -262,6 +264,8 @@ c. auxiliary components
   * [x] set action id
   * [ ] set databinding map
 
+#### Actions
+
 * add gui component (with id) to panel
   * subprocess: "add child to panel"
   * on "add" event
@@ -286,8 +290,65 @@ c. auxiliary components
     may intercept button clicks and translate these to an action performed event with the pressed button index and its 
     own action id 
 
-* add subpanel which captures a property of the outer bound data object
-  * TODO: describe process
+#### Data Binding
+
+* Preconditions: there are three ways to create a panel. The type of the panel is fixed after creation:
+  * unbound
+  * bound to object (this can be changed or removed, even to a completely other object type. But not to the "property bound" panel type )
+  * bound to property (the property can be changed or removed. But the bound object cannot be set directly)
+
+##### bound object 
+
+* add panel with a bound object
+  * set type of panel to "bound to object"
+
+* set bound object
+  * if new object is not equal to the current:
+    * set new bound object
+    * fire property change "bound object"
+
+* set bound property
+  * fail with "wrong panel type" message 
+
+##### bound property
+
+* add panel which captures a property of the outer bound data object
+  * set type of panel to "bound to property"
+  * add event listener "add to scene graph":
+    * find next panel in parent hierarchie with bound object (calculated by property or set directly)
+    * add property listener on panel with property "bound object" (with owner "this")
+    * get (initial) bound object from parent panel und resolve property. set as "bound object" if non null
+  * add event listener "remove from scene graph"
+    * find next panel in parent hierarchie
+    * remove all listeners with owner "this"
+    * if current "bound object" is not null
+      * clear "bound object"
+      * fire property changed "bound object"
+  * event listener "bound object" (on parent object)
+    * get bound object from parent
+    * if it is different from the current object
+      * set "bound object" to new object
+      * fire property change "bound object"
+  * add event listener "update"
+    * get bound object from parent
+    * resolve property against parents bound object
+    * if new object is not equals to the current bound object
+      * set new bound object
+      * fire property changed "bound object"
+    * alternative: instead of updating the property in the update method, we could add a property change listener 
+      to the bound object, if it supports change listener. 
+
+* set bound property
+  * fire property change "bound property"
+  * find next panel in parent hierarchie with bound object (calculated by property or set directly)
+  * get bound object from parent panel und resolve property. 
+  * if the resolved object is not equal to the current "bound object"
+    * set as "bound object"
+    * fire property changed "bound object"
+
+* set bound object
+  * TODO: this can either fail or it can set the property value of the parents bound object. both would be feasible.
+
 
 * add sub panel which captures a list property of the outer bound data object. for each list entry another sub panel 
   with the current list element bound is created  
@@ -305,7 +366,7 @@ Decisions:
     * sub-panels can have a data object which is only part of the outer data object
     * there should be some kind of loop which iterates though a list and adds panels 
 
-4. Entities
+### Entities
 
 * frame: is a panel (with border) and has a title bar. can be moved, minimized, closed, resized
   * state: normal, minimized, closed
@@ -330,8 +391,6 @@ Decisions:
 
 * layout manager (lays out childs in a panel)
   * method: layout panel (panel, list of components to layout, rectangle for content)
-
-5. Architecture
 
 
 

@@ -19,8 +19,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import static com.berray.event.CoreEvents.PHYSICS_COLLIDE;
-import static com.berray.event.CoreEvents.SCENE_GRAPH_ADDED;
+import static com.berray.event.CoreEvents.*;
 import static com.raylib.Raylib.*;
 
 public class GameObject {
@@ -34,7 +33,7 @@ public class GameObject {
   /**
    * Components for this game object.
    */
-  protected final Map<Class<?>, Component> components;
+  protected final Map<Class<?>, ComponentHolder> components;
 
   /**
    * registered getter methods from components.
@@ -189,8 +188,8 @@ public class GameObject {
   }
 
   public void destroy() {
-    for (Component component : components.values()) {
-      component.destroy();
+    for (ComponentHolder component : components.values()) {
+      component.getComponent().destroy();
     }
     components.clear();
     // remove all event listeners
@@ -274,10 +273,10 @@ public class GameObject {
       } else if (c instanceof Component) {
         Component component = (Component) c;
         if (this.components.containsKey(component.getClass())) {
-          throw new IllegalArgumentException("Component " + component.getClass() + " is already registered in object with tags " + tags);
+          throw new IllegalArgumentException("Component " + component.getClass() + " is already registered in object with tags " + tags, this.components.get(component.getClass()).getWhereAdded());
         }
         component.setId(nextComponentId.incrementAndGet());
-        this.components.put(component.getClass(), component);
+        this.components.put(component.getClass(), new ComponentHolder(component));
         this.tags.add(component.getTag());
         component.setGameObject(this);
       } else if (c instanceof Property) {
@@ -324,8 +323,8 @@ public class GameObject {
           ensureTransformCalculated();
           rlMultMatrixf(getWorldTransform().toFloatTransposed());
           preDrawComponents();
-          for (Component c : components.values()) {
-            c.draw();
+          for (ComponentHolder c : components.values()) {
+            c.getComponent().draw();
           }
           postDrawComponents();
         }
@@ -566,7 +565,11 @@ public class GameObject {
 
   @SuppressWarnings("unchecked")
   public <E extends Component> E getComponent(Class<E> type) {
-    return (E) components.get(type);
+    ComponentHolder componentHolder = components.get(type);
+    if (componentHolder == null) {
+      return null;
+    }
+    return (E) componentHolder.getComponent();
   }
 
   public void addTag(String tag) {
@@ -615,7 +618,7 @@ public class GameObject {
   }
 
   /**
-   * Update all game objects
+   * Sends event when this object is colliding with an object tagged "tag".
    */
   public <E extends PhysicsCollideEvent> void onCollide(String tag, EventListener<E> eventListener) {
     on(PHYSICS_COLLIDE, (E event) -> {
@@ -626,6 +629,19 @@ public class GameObject {
       }
     });
   }
+
+  /**
+   * Sends event when the property "property" is changed
+   */
+  public <E extends PropertyChangeEvent> void onPropertyChange(String property, EventListener<E> eventListener) {
+    on(PROPERTY_CHANGED, (E event) -> {
+      // only propagate event when the requested property is changed
+      if (Objects.equals(event.getPropertyName(), property)) {
+        eventListener.onEvent(event);
+      }
+    });
+  }
+
 
   /**
    * marks the objects that the world transformation should be recalculated .

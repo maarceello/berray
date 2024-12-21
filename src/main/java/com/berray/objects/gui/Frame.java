@@ -21,13 +21,15 @@ public class Frame extends Panel {
     super(size, null);
     setLayoutManager(new FrameLayout());
     titleBar = add(
-        TextComponent.text("title"),
+        new Label("title"),
         pos(0,0),
         anchor(AnchorType.TOP),
-        ColorComponent.color(Color.GREEN),
         "titlebar"
     );
+    titleBar.set("color", Color.GOLD);
     contentPane = add(new Panel(size, layoutManager), pos(0,0), "contentPane");
+
+    registerPropertySetter("title", title -> titleBar.set("label", title));
   }
 
   @Override

@@ -12,6 +12,7 @@ public class Panel extends Container {
   private Object boundObject;
   /** property which should be used from the parent bound object. */
   private String parentBoundObjectProperty;
+  private String boundProperty;
 
   public Panel(Vec2 size, LayoutManager layoutManager) {
     super(layoutManager);
@@ -58,6 +59,11 @@ public class Panel extends Container {
       trigger(CoreEvents.UNBIND, this, this.boundObject);
     }
   }
+
+  public void bindToProperty(String property) {
+    this.boundProperty = property;
+ }
+
 
   public void unbind() {
     bind(null);

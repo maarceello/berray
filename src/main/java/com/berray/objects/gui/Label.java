@@ -11,22 +11,41 @@ import static com.berray.components.core.TextComponent.text;
 public class Label extends GameObject {
 
   /** Current text with placeholder. */
-  private final String text;
+  private String label;
   /** Data object which is currently bound. */
   private Object boundObject;
   /** Next panel in the scene graph. */
   private Panel panel;
 
-  public Label(String text) {
-    this.text = text;
+  public Label(String label) {
+    this.label = label;
     addComponents(
-        text(text),
+        text(label),
         color(Color.WHITE)
     );
     on(CoreEvents.UPDATE, this::processUpdate);
 
     on(CoreEvents.SCENE_GRAPH_ADDED, this::processScreenGraphAdded);
     on(CoreEvents.SCENE_GRAPH_REMOVED, this::processScreenGraphRemove);
+    registerBoundProperty("label", this::getLabel, this::setLabel);
+  }
+
+  /**
+   * Sets the labels text (which may contain placeholder).
+   *
+   * @type property
+   */
+  public void setLabel(String label) {
+    this.label = label;
+  }
+
+  /**
+   * Returns the labels text (which may contain placeholder).
+   *
+   * @type property
+   */
+  public String getLabel() {
+    return label;
   }
 
   private void processScreenGraphRemove(SceneGraphEvent e) {
@@ -55,10 +74,10 @@ public class Label extends GameObject {
     Panel panel = findParent(Panel.class);
     Object boundObject = panel == null ? null : panel.getBoundObject();
     if (boundObject != null) {
-      set("text", PropertyResolveService.replaceText(text, boundObject));
+      set("text", PropertyResolveService.replaceText(label, boundObject));
     }
     else {
-      set("text", text);
+      set("text", label);
     }
   }
 

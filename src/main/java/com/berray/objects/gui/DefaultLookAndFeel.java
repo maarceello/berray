@@ -1,6 +1,7 @@
 package com.berray.objects.gui;
 
 import com.berray.GameObject;
+import com.berray.components.core.Component;
 import com.berray.event.CoreEvents;
 import com.berray.event.PropertyChangeEvent;
 import com.berray.math.Color;
@@ -8,6 +9,7 @@ import com.berray.math.Insets;
 import com.berray.math.Rect;
 import com.berray.math.Vec2;
 import com.berray.objects.gui.layout.NopLayoutManager;
+import com.berray.objects.gui.model.SliderModel;
 import com.raylib.Jaylib;
 
 import static com.raylib.Raylib.*;
@@ -17,7 +19,9 @@ public class DefaultLookAndFeel implements LookAndFeelManager {
   private Color foregroundColorLight;
   private Color foregroundColorDark;
   private Color backgroundColor;
-  private int borderThickness = 10;
+  private int borderThickness = 4;
+  private int sliderKnobWidth = 20;
+  private int sliderKnobGap = 2;
 
   public DefaultLookAndFeel() {
     setForegroundColor(Color.GOLD);
@@ -47,17 +51,17 @@ public class DefaultLookAndFeel implements LookAndFeelManager {
         drawBevelBorder(target, borderThickness, foregroundColorLight, foregroundColorDark);
         break;
       case "lowered":
-        drawBevelBorder(target, borderThickness,foregroundColorDark, foregroundColorLight);
+        drawBevelBorder(target, borderThickness, foregroundColorDark, foregroundColorLight);
         break;
       case "bevel":
         drawBevelBorder(target, borderThickness / 3, foregroundColorLight, foregroundColorDark);
-        drawBevelBorder(target.reduce(borderThickness / 3), borderThickness - (2 * borderThickness / 3), foregroundColor, foregroundColor);
-        drawBevelBorder(target.reduce((borderThickness / 3) * 2), borderThickness / 3, foregroundColorDark, foregroundColorLight);
+        drawBevelBorder(target.reduce(borderThickness / 3.0f), borderThickness - (2 * borderThickness / 3), foregroundColor, foregroundColor);
+        drawBevelBorder(target.reduce((borderThickness / 3.0f) * 2), borderThickness / 3, foregroundColorDark, foregroundColorLight);
         break;
       case "emboss":
         drawBevelBorder(target, borderThickness / 3, foregroundColorDark, foregroundColorLight);
-        drawBevelBorder(target.reduce(borderThickness / 3), borderThickness - (2 * borderThickness / 3), foregroundColor, foregroundColor);
-        drawBevelBorder(target.reduce((borderThickness / 3) * 2), borderThickness / 3, foregroundColorLight, foregroundColorDark);
+        drawBevelBorder(target.reduce(borderThickness / 3.0f), borderThickness - (2 * borderThickness / 3), foregroundColor, foregroundColor);
+        drawBevelBorder(target.reduce((borderThickness / 3.0f) * 2), borderThickness / 3, foregroundColorLight, foregroundColorDark);
         break;
       case "solid":
       default:
@@ -105,6 +109,11 @@ public class DefaultLookAndFeel implements LookAndFeelManager {
   }
 
   @Override
+  public void clearBackground(Button button) {
+    DrawRectangleRec(button.getPaintArea().toRectangle(), foregroundColor.toRaylibColor());
+  }
+
+  @Override
   public void installToButton(Button button) {
     button.setBorder("raised");
     button.setLayoutManager(new NopLayoutManager());
@@ -118,7 +127,51 @@ public class DefaultLookAndFeel implements LookAndFeelManager {
   }
 
   @Override
-  public void clearBackground(Button button) {
-    DrawRectangleRec(button.getPaintArea().toRectangle(), foregroundColor.toRaylibColor());
+  public void installToSlider(Slider slider) {
+    slider.addComponents(new DrawSliderComponent());
+  }
+
+
+  private class DrawSliderComponent extends Component {
+
+    public DrawSliderComponent() {
+      super("drawSliderComponent");
+    }
+
+    @Override
+    public void add(GameObject gameObject) {
+      registerGetter("render", () -> true);
+    }
+
+    @Override
+    public void draw() {
+      super.draw();
+
+      Vec2 size = gameObject.get("size");
+      Rect sliderRect = new Rect(Vec2.origin(), size);
+      DrawRectangleRec(sliderRect.toRectangle(), foregroundColor.toRaylibColor());
+      drawBevelBorder(sliderRect, borderThickness, foregroundColorDark, foregroundColorLight);
+
+      SliderModel model = gameObject.get("model");
+      int min = model.getMin();
+      int max = model.getMax();
+      int value = model.getValue();
+      if (max - min == 0) {
+        return;
+      }
+      float percent = (float) value / (max - min);
+
+
+      // calculate center and size of knob
+      float innerWidth = size.getX() - borderThickness * 2 - sliderKnobWidth - sliderKnobGap * 2;
+      float innerInsets = borderThickness + sliderKnobGap + sliderKnobWidth / 2.0f;
+      Vec2 knobPos = sliderRect.getPos().add(new Vec2(innerWidth * percent + innerInsets, size.getY() / 2.0f));
+      Vec2 knobSize = new Vec2(sliderKnobWidth, size.getY() - borderThickness * 2 - sliderKnobGap);
+
+      Rect knobRectangle = new Rect(knobPos.sub(knobSize.scale(0.5f)), knobSize);
+      drawBevelBorder(knobRectangle, borderThickness, foregroundColorLight, foregroundColorDark);
+
+
+    }
   }
 }

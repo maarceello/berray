@@ -3,80 +3,52 @@ package com.berray.objects.gui;
 import com.berray.GameObject;
 import com.berray.components.core.Component;
 import com.berray.event.CoreEvents;
-import com.berray.event.PropertyChangeEvent;
-import com.berray.event.SceneGraphEvent;
 import com.berray.event.UpdateEvent;
+import com.berray.objects.guiold.PropertyResolveService;
 
 /** Gui helper component to watch parent bound objects. */
 public class PropertyWatchComponent extends Component {
   private String boundProperty;
 
-  public PropertyWatchComponent(String... dependencies) {
-    super("propertyWatch", dependencies);
+  public PropertyWatchComponent(String boundProperty) {
+    super("propertyWatch");
+    this.boundProperty = boundProperty;
   }
 
   @Override
   public void add(GameObject gameObject) {
     super.add(gameObject);
 
-    on(CoreEvents.SCENE_GRAPH_ADDED,  this::processSceneGraphAdded);
-    on(CoreEvents.SCENE_GRAPH_REMOVED,  this::processSceneGraphRemoved);
     on(CoreEvents.UPDATE,  this::processUpdate);
+
+    registerBoundProperty("boundProperty", this::getBoundProperty, this::setBoundProperty);
   }
 
-  private void processSceneGraphAdded(SceneGraphEvent event) {
-    // * add event listener "add to scene graph":
-    //   * find next panel in parent hierarchie with bound object (calculated by property or set directly)
-    //   * add property listener on panel with property "bound object" (with owner "this")
-    //   * get (initial) bound object from parent panel und resolve property. set as "bound object" if non null
-
-    // get next panel. Either it is our game object or one of the parents in the scene graph.
-    Panel panel = getPanel();
-    if (panel == null) {
-      // no panel in the scene graph
-      return;
-    }
-
-    panel.get
-
-  }
-
+  /**
+   * Returns the next panel up the hierarchie (other than our own game object) which is bound to either an object
+   * directly or through a property.
+   */
   private Panel getPanel() {
-    if (gameObject instanceof Panel) {
-      return (Panel) gameObject;
-    }
+    Panel currentPanel = (Panel) gameObject;
 
-    Panel currentPanel
+    do {
+      currentPanel = currentPanel.findParent(Panel.class);
+    } while (currentPanel != null && currentPanel.getPanelType() == Panel.PanelType.UNBOUND);
 
-    return gameObject.findParent(Panel.class);
-  }
-
-  private void processSceneGraphRemoved(SceneGraphEvent event) {
-    // * add event listener "remove from scene graph"
-    //   * find next panel in parent hierarchie
-    //   * remove all listeners with owner "this"
-    //   * if current "bound object" is not null
-    //   * clear "bound object"
-    //   * fire property changed "bound object"
-  }
-
-
-  private void processBoundObjectChanged(PropertyChangeEvent event) {
-    // * get bound object from parent
-    // * if it is different from the current object
-    //   * set "bound object" to new object
-    //   * fire property change "bound object"
+    return currentPanel;
   }
 
   private void processUpdate(UpdateEvent event) {
-    // * get bound object from parent
-    // * resolve property against parents bound object
-    // * if new object is not equals to the current bound object
-    //   * set new bound object
-    //   * fire property changed "bound object"
+    Panel panelWithParentObject = getPanel();
+    if (panelWithParentObject == null) {
+      // no panel in the scene graph
+      return;
+    }
+    // get bound object from parent panel und resolve property. set as "bound object" (even if null)
+    Object parentObject = panelWithParentObject.get("boundObject");
+    Object value = parentObject == null ? null : PropertyResolveService.getInstance().getProperty(parentObject, boundProperty);
+    gameObject.set("boundObject", value);
   }
-
-
 
   private String getBoundProperty() {
     return boundProperty;

@@ -16,4 +16,6 @@ public interface LookAndFeelManager {
   void installToButton(Button button);
 
   void clearBackground(Button button);
+
+  void installToSlider(Slider slider);
 }

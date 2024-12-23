@@ -12,8 +12,6 @@ public class Label extends GameObject {
 
   /** Current text with placeholder. */
   private String label;
-  /** Data object which is currently bound. */
-  private Object boundObject;
   /** Next panel in the scene graph. */
   private Panel panel;
 
@@ -71,10 +69,9 @@ public class Label extends GameObject {
   }
 
   private void processUpdate(UpdateEvent e) {
-    Panel panel = findParent(Panel.class);
-    Object boundObject = panel == null ? null : panel.getBoundObject();
-    if (boundObject != null) {
-      set("text", PropertyResolveService.replaceText(label, boundObject));
+    Object parentsBoundObject = panel == null ? null : panel.getBoundObject();
+    if (parentsBoundObject != null) {
+      set("text", PropertyResolveService.getInstance().replaceText(label, parentsBoundObject));
     }
     else {
       set("text", label);

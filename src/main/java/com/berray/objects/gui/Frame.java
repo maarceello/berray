@@ -18,7 +18,7 @@ public class Frame extends Panel {
   private Panel contentPane;
 
   public Frame(Vec2 size, LayoutManager layoutManager) {
-    super(size, null);
+    super(PanelType.BOUND_OBJECT, size, null);
     setLayoutManager(new FrameLayout());
     titleBar = add(
         new Label("title"),
@@ -27,7 +27,7 @@ public class Frame extends Panel {
         "titlebar"
     );
     titleBar.set("color", Color.GOLD);
-    contentPane = add(new Panel(size, layoutManager), pos(0,0), "contentPane");
+    contentPane = add(panel(size, layoutManager), pos(0,0), "contentPane");
 
     registerPropertySetter("title", title -> titleBar.set("label", title));
   }

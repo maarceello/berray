@@ -3,7 +3,6 @@ package com.berray.objects.gui;
 import com.berray.event.CoreEvents;
 import com.berray.math.Vec2;
 import com.berray.objects.gui.layout.LayoutManager;
-import com.berray.objects.guiold.PropertyResolveService;
 
 /** Gui panel. */
 public class Panel extends Container {
@@ -13,22 +12,20 @@ public class Panel extends Container {
 
   private PanelType panelType = PanelType.UNBOUND;
 
-  public Panel(Vec2 size, LayoutManager layoutManager) {
+  protected Panel(PanelType panelType, Vec2 size, LayoutManager layoutManager) {
     super(layoutManager);
 
+    this.panelType = panelType;
     setSize(size);
     registerBoundProperty("boundObject", this::getBoundObject, this::setBoundObject);
   }
 
+  public PanelType getPanelType() {
+    return panelType;
+  }
+
   public Object getBoundObject() {
-    if (boundObject != null) {
-      return boundObject;
-    }
-    Panel parentPanel = findParent(Panel.class);
-    if (parentPanel == null) {
-      return null;
-    }
-    return parentPanel.getBoundObject();
+    return boundObject;
   }
 
   private void setBoundObject(Object boundObject) {
@@ -51,6 +48,28 @@ public class Panel extends Container {
       trigger(CoreEvents.UNBIND, this, this.boundObject);
     }
   }
+
+  /** Creates a panel which does not contribute to data binding. */
+  public static Panel panel(Vec2 size, LayoutManager layoutManager) {
+    return new Panel(PanelType.UNBOUND, size, layoutManager);
+  }
+
+  /** Creates a panel in which the bound object must be set explicitly. */
+  public static Panel panelWithBoundObject(Vec2 size, LayoutManager layoutManager, Object boundObject) {
+    Panel panel = new Panel(PanelType.BOUND_OBJECT, size, layoutManager);
+    panel.set("boundObject", boundObject);
+    return panel;
+  }
+
+  /** Creates a panel in which the bound object must be set explicitly. */
+  public static Panel panelWithBoundProperty(Vec2 size, LayoutManager layoutManager, String property) {
+    Panel panel = new Panel(PanelType.BOUND_PROPERTY, size, layoutManager);
+    panel.addComponents(
+        new PropertyWatchComponent(property)
+    );
+    return panel;
+  }
+
 
   public enum PanelType {
     /** Panel is just for grouping, not for data binding. */

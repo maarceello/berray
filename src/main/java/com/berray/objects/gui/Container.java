@@ -29,18 +29,6 @@ public class Container extends GameObject {
     this.layoutDirty = true;
     this.insets = Insets.NONE;
 
-    /*
-    addComponents(
-        RectComponent.rect(size).fill(false),
-        ColorComponent.color(Color.BLACK)
-    );
-
-    on(CoreEvents.PROPERTY_CHANGED, (PropertyChangeEvent event) -> {
-      if (event.getPropertyName().equals("size")) {
-        setSize(event.getNewValue());
-      }
-    });
-*/
     registerBoundProperty("border", this::getBorder, this::setBorder);
     registerBoundProperty("size", this::getSize, this::setSize);
     registerPropertyGetter("render", () -> true);

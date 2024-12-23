@@ -30,19 +30,19 @@ public class DefaultBuilders {
       Color color = foregroundColor != null ? foregroundColor : panelBuilder.getForegroundColor();
       EventListenerCapable dataObject = panelBuilder.getDataObject();
       GameObject label = makeGameObject(
-          text(PropertyResolveService.replaceText(text, dataObject)),
+          text(PropertyResolveService.getInstance().replaceText(text, dataObject)),
           color(color),
           anchor(AnchorType.TOP_LEFT)
       );
       if (dataObject != null) {
-        dataObject.onPropertyChange(event -> label.set("text", PropertyResolveService.replaceText(text, dataObject)));
+        dataObject.onPropertyChange(event -> label.set("text", PropertyResolveService.getInstance().replaceText(text, dataObject)));
       }
       return label;
     };
   }
 
   public Function<PanelBuilder, GameObject> sliderBuilder(String property, float height, float min, float max) {
-    return (panelBuilder) -> {
+    return panelBuilder -> {
       Color foregroundColor = panelBuilder.getForegroundColor();
       EventListenerCapable dataObject = panelBuilder.getDataObject();
       GameObject slider = GameObject.makeGameObject(

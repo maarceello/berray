@@ -78,7 +78,6 @@ public class Vec2 {
     return (float) Math.toDegrees(Math.atan2(this.y - other.y, this.x - other.x));
   }
 
-
   public Vec2 negate() {
     return new Vec2(-x, -y);
   }

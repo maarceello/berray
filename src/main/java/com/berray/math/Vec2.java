@@ -33,6 +33,13 @@ public class Vec2 {
     return new Vec2((float) Math.cos(rad), (float) Math.sin(rad));
   }
 
+  public static Vec2 linearInterpolate(Vec2 first, Vec2 second, float ratio) {
+    float x = first.x + (second.x - first.x) * ratio;
+    float y = first.y + (second.y - first.y) * ratio;
+    return new Vec2(x,y);
+  }
+
+
   public float getX() {
     return x;
   }
@@ -133,4 +140,5 @@ public class Vec2 {
   public String toString() {
     return String.format("(%.3f, %.3f)", x, y);
   }
+
 }

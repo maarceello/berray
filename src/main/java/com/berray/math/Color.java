@@ -33,6 +33,14 @@ public class Color {
     this.a = a;
   }
 
+  public static Color linearInterpolate(Color first, Color second, float ratio) {
+    float r = first.r + (second.r - first.r) * ratio;
+    float g = first.g + (second.g - first.g) * ratio;
+    float b = first.b + (second.b - first.b) * ratio;
+    float a = first.a + (second.a - first.a) * ratio;
+    return new Color(r, g, b, a);
+  }
+
   public float getR() {
     return r;
   }

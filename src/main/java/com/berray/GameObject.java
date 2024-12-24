@@ -189,7 +189,7 @@ public class GameObject {
 
   public void destroy() {
     for (ComponentHolder component : components.values()) {
-      component.getComponent().destroy();
+      component.getComponents().forEach(Component::destroy);
     }
     components.clear();
     // remove all event listeners
@@ -272,11 +272,16 @@ public class GameObject {
         addTag(c.toString());
       } else if (c instanceof Component) {
         Component component = (Component) c;
-        if (this.components.containsKey(component.getClass())) {
-          throw new IllegalArgumentException("Component " + component.getClass() + " is already registered in object with tags " + tags, this.components.get(component.getClass()).getWhereAdded());
+        ComponentHolder componentHolder = this.components.get(component.getClass());
+        if (componentHolder != null && !component.allowMultiple()) {
+          throw new IllegalArgumentException("Component " + component.getClass() + " is already registered in object with tags " + tags, componentHolder.getWhereAdded());
+        }
+        if (componentHolder == null) {
+          componentHolder = new ComponentHolder();
+          this.components.put(component.getClass(), componentHolder);
         }
         component.setId(nextComponentId.incrementAndGet());
-        this.components.put(component.getClass(), new ComponentHolder(component));
+        componentHolder.addComponent(component);
         this.tags.add(component.getTag());
         component.setGameObject(this);
       } else if (c instanceof Property) {
@@ -324,7 +329,7 @@ public class GameObject {
           rlMultMatrixf(getWorldTransform().toFloatTransposed());
           preDrawComponents();
           for (ComponentHolder c : components.values()) {
-            c.getComponent().draw();
+            c.getComponents().forEach(Component::draw);
           }
           postDrawComponents();
         }
@@ -335,10 +340,12 @@ public class GameObject {
 
   /** Hook for GameObjects which want to do something after the components are drawn but before the children are drawn. */
   protected void postDrawComponents() {
+    // can be implemented by subclasses
   }
 
   /** Hook for GameObjects which want to do something after the transform is applied and before the components are drawn. */
   protected void preDrawComponents() {
+    // can be implemented by subclasses
   }
 
   /**
@@ -569,7 +576,7 @@ public class GameObject {
     if (componentHolder == null) {
       return null;
     }
-    return (E) componentHolder.getComponent();
+    return (E) componentHolder.getComponents().get(0);
   }
 
   public void addTag(String tag) {

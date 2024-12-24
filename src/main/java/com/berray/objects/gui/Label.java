@@ -47,25 +47,12 @@ public class Label extends GameObject {
   }
 
   private void processScreenGraphRemove(SceneGraphEvent e) {
-    // when we're removed from the scene graph:
-    // - remove listener from panel
-    // - delete references to panel and data object
-    if (this.panel != null) {
-      panel.removeListener(this);
-    }
     this.panel = null;
-    this.boundObject = null;
   }
 
   private void processScreenGraphAdded(SceneGraphEvent e) {
     // find next panel which is responsible for managing the bound data objects and events
     this.panel = findParent(Panel.class);
-    // do we have a panel? add listeners and keep a reference to the currently bound data object.
-    if (panel != null) {
-      panel.on(CoreEvents.BIND, this::processBind, this);
-      panel.on(CoreEvents.UNBIND, this::processUnbind, this);
-      this.boundObject = panel.get("boundObject");
-    }
   }
 
   private void processUpdate(UpdateEvent e) {
@@ -78,11 +65,4 @@ public class Label extends GameObject {
     }
   }
 
-  private void processUnbind(BindEvent e) {
-    this.boundObject = null;
-  }
-
-  private void processBind(BindEvent e) {
-    this.boundObject = e.getBindTarget();
-  }
 }

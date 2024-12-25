@@ -76,7 +76,7 @@ public class Slider extends Container implements CoreComponentShortcuts {
     int min = getMin();
     int max = getMax();
     Vec2 relativePos = event.getGameObjectPos();
-    float percent = relativePos.getX() / size.getX();
+    float percent = clamp(relativePos.getX() / size.getX(), 0.0f, 1.0f);
     set("value", (int) (min + (max - min) * percent));
   }
 
@@ -85,16 +85,21 @@ public class Slider extends Container implements CoreComponentShortcuts {
     int min = getMin();
     int max = getMax();
     Vec2 relativePos = event.getGameObjectPos();
-    float percent = relativePos.getX() / size.getX();
+    float percent = clamp(relativePos.getX() / size.getX(), 0.0f, 1.0f);
     set("value", (int) (min + (max - min) * percent));
+  }
+
+  private float clamp(float value, float min, float max) {
+    return Math.max(Math.min(value, max), min);
   }
 
   /**
    * Fired when the button was clicked,
    * @type emit-event
    */
-  private void emitSetValueEvent(float value) {
+  private void emitSetValueEvent(int value) {
     // send action event to the next panel in the object tree
+    trigger(ActionEvent.EVENT_NAME, this, actionId, value);
     Panel nextPanelInTree = findParent(Panel.class);
     if (nextPanelInTree != null) {
       nextPanelInTree.trigger(ActionEvent.EVENT_NAME, this, actionId, value);

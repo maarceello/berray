@@ -1,5 +1,6 @@
 package com.berray.objects.gui;
 
+import com.berray.event.ActionEvent;
 import com.berray.event.CoreEvents;
 import com.berray.math.Vec2;
 import com.berray.objects.gui.layout.LayoutManager;
@@ -18,6 +19,14 @@ public class Panel extends Container {
     this.panelType = panelType;
     setSize(size);
     registerBoundProperty("boundObject", this::getBoundObject, this::setBoundObject);
+    on(CoreEvents.ACTION_PERFORMED, this::forwardActionPerformed);
+  }
+
+  private void forwardActionPerformed(ActionEvent actionEvent) {
+    Panel parentPanel = findParent(Panel.class);
+    if (parentPanel != null) {
+      parentPanel.trigger(actionEvent);
+    }
   }
 
   public PanelType getPanelType() {
@@ -25,6 +34,12 @@ public class Panel extends Container {
   }
 
   public Object getBoundObject() {
+    if (panelType == PanelType.UNBOUND) {
+      // unbound panels don't participate in data binding and therefore forward the get bound object call to the
+      // next panel down the scene graph
+      Panel parentPanel = findParent(Panel.class);
+      return parentPanel != null ? parentPanel.getBoundObject() : null;
+    }
     return boundObject;
   }
 

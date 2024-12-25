@@ -2,22 +2,43 @@ package com.berray.objects.gui.model;
 
 import com.berray.objects.guiold.PropertyResolveService;
 
+import java.util.function.Function;
+
 public class PropertySliderModel implements SliderModel{
   private Object modelObject;
-  private String minProperty = "min";
-  private String maxProperty = "max";
+  private Function<Object, Integer> minFunction;
+  private Function<Object, Integer> maxFunction;
   private String valueProperty = "value";
 
   public PropertySliderModel(Object modelObject) {
     this.modelObject = modelObject;
   }
 
-  public PropertySliderModel(Object modelObject, String minProperty, String maxProperty, String valueProperty) {
+  public PropertySliderModel(Object modelObject, String valueProperty) {
     this.modelObject = modelObject;
-    this.minProperty = minProperty;
-    this.maxProperty = maxProperty;
     this.valueProperty = valueProperty;
   }
+
+  public PropertySliderModel minFixed(int value) {
+    minFunction = object -> value;
+    return this;
+  }
+
+  public PropertySliderModel maxFixed(int value) {
+    maxFunction = object -> value;
+    return this;
+  }
+
+  public PropertySliderModel minProperty(String minProperty) {
+    minFunction = object -> (Integer) PropertyResolveService.getInstance().getProperty(object, minProperty);
+    return this;
+  }
+
+  public PropertySliderModel maxProperty(String maxProperty) {
+    maxFunction = object -> (Integer) PropertyResolveService.getInstance().getProperty(object, maxProperty);
+    return this;
+  }
+
 
   @Override
   public int getValue() {
@@ -39,25 +60,20 @@ public class PropertySliderModel implements SliderModel{
 
   @Override
   public int getMin() {
-    return (Integer) PropertyResolveService.getInstance().getProperty(modelObject, minProperty);
+    return toInt(minFunction.apply(modelObject));
   }
 
   @Override
   public int getMax() {
-    Integer max = (Integer)  PropertyResolveService.getInstance().getProperty(modelObject, maxProperty);
-    return max == null ? 0 : max;
+    return toInt(maxFunction.apply(modelObject));
+  }
+
+  private int toInt(Integer integer) {
+    return integer == null ? 0 : integer;
   }
 
   public void setModelObject(Object modelObject) {
     this.modelObject = modelObject;
-  }
-
-  public void setMinProperty(String minProperty) {
-    this.minProperty = minProperty;
-  }
-
-  public void setMaxProperty(String maxProperty) {
-    this.maxProperty = maxProperty;
   }
 
   public void setValueProperty(String valueProperty) {

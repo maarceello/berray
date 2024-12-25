@@ -77,6 +77,7 @@ public class Game {
     eventTypeFactory.registerEventType(PhysicsEvent.EVENT_NAME_HEADBUTT,  PhysicsEvent::new);
     eventTypeFactory.registerEventType(PhysicsEvent.EVENT_NAME_FALL,  PhysicsEvent::new);
     eventTypeFactory.registerEventType(PhysicsEvent.EVENT_NAME_FALL_OFF,  PhysicsEvent::new);
+    eventTypeFactory.registerEventType(ActionEvent.EVENT_NAME, ActionEvent::new);
     eventManager = new EventManager();
     mouseManager = new MouseManager();
     init();

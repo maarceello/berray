@@ -130,6 +130,16 @@ public class AnimateComponent<E> extends Component {
     return this;
   }
 
+  public List<KeyFrame<E>> getKeyFrames() {
+    return keyFrames;
+  }
+
+  public void setKeyFrames(List<KeyFrame<E>> keyFrames) {
+    this.keyFrames = keyFrames;
+    // reset animation when the keyframes are changed
+    this.currentFrameTime = 0;
+    this.currentKeyFrameIndex = 0;
+  }
 
   private void processUpdate(UpdateEvent e) {
     if (!running) {

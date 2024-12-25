@@ -4,7 +4,7 @@ import com.raylib.Jaylib;
 import com.raylib.Raylib;
 
 public class Vec3 {
-  public static final Vec3 ORIGIN = new Vec3(0, 0, 0);
+  private static final Vec3 ORIGIN = new Vec3(0, 0, 0);
   final float x;
   final float y;
   final float z;
@@ -79,6 +79,14 @@ public class Vec3 {
   public Vec3 move(Vec3 speed) {
     return add(speed);
   }
+
+  public static Vec3 linearInterpolate(Vec3 first, Vec3 second, float ratio) {
+    float x = first.x + (second.x - first.x) * ratio;
+    float y = first.y + (second.y - first.y) * ratio;
+    float z = first.z + (second.z - first.z) * ratio;
+    return new Vec3(x, y, z);
+  }
+
 
   /** Transforms this {@link Vec3} to a {@link Vec2} by dropping the z component. */
   public Vec2 toVec2() {

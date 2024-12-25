@@ -176,8 +176,8 @@ public class PropertyResolveService {
   @SuppressWarnings("unchecked")
   private Object getListProperty(Object object, String property) {
     List<Object> list = (List<Object>) object;
-    if (property.equals("size")) {
-      return list.size();
+    if (property.equals("#size-minus-1")) {
+      return list.size()-1;
     }
     return list.get(toIndex(property));
   }
@@ -185,8 +185,8 @@ public class PropertyResolveService {
   @SuppressWarnings("unchecked")
   private Object getMapProperty(Object object, String property) {
     Map<?, Object> map = (Map<?, Object>) object;
-    if (property.equals("size")) {
-      return map.size();
+    if (property.equals("#size-minus-1")) {
+      return map.size()-1;
     }
     String key = toMapKey(property);
     return map.get(key);

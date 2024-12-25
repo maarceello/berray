@@ -36,7 +36,7 @@ public class Vec2 {
   public static Vec2 linearInterpolate(Vec2 first, Vec2 second, float ratio) {
     float x = first.x + (second.x - first.x) * ratio;
     float y = first.y + (second.y - first.y) * ratio;
-    return new Vec2(x,y);
+    return new Vec2(x, y);
   }
 
 

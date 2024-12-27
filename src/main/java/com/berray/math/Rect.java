@@ -5,7 +5,6 @@ import com.raylib.Raylib;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class Rect {
   private float x;
@@ -91,18 +90,22 @@ public class Rect {
     return new Rect(x + delta.getX(), y + delta.getY(), width, height);
   }
 
-  /** Returns this rectangle so that the width and height are positiv. */
+  /**
+   * Returns this rectangle so that the width and height are positiv.
+   */
   public Rect normalize() {
     return new Rect(
-        Math.min(x, x+width),
-        Math.min(y, y+height),
+        Math.min(x, x + width),
+        Math.min(y, y + height),
         Math.abs(width),
         Math.abs(height)
     );
   }
 
 
-  /** Returns the center of the rectangle. */
+  /**
+   * Returns the center of the rectangle.
+   */
   public Vec2 getCenter() {
     return new Vec2(x + width / 2, y + height / 2);
   }
@@ -117,12 +120,41 @@ public class Rect {
         y >= this.y && y <= this.y + this.height;
   }
 
+
+  /**
+   * Scales the rectangle 'other' so that is fits exactly in this rectangle. The destination rectangle is centered in
+   * this rectangle.
+   */
+  public Rect getFitRectangle(Rect other) {
+    float aspectRatio = other.width / other.height;
+    float otherAspectRatio = width / height;
+
+    float resizeFactor = (aspectRatio >= otherAspectRatio) ? (width / other.width) : (height / other.height);
+
+    float newWidth = other.width * resizeFactor;
+    float newHeight = other.height * resizeFactor;
+    float newX = x + (width - newWidth) / 2.0f;
+    float newY = y + (height - newHeight) / 2.0f;
+
+    return new Rect(newX, newY, newWidth, newHeight);
+  }
+
+
   public Raylib.Rectangle toRectangle() {
     return new Jaylib.Rectangle(x, y, width, height);
   }
 
+
   @Override
   public String toString() {
     return String.format("(%.3f, %.3f - %.3f, %.3f)", x, y, width, height);
+  }
+
+  public Rect reduce(Insets insets) {
+    return new Rect(x + insets.getLeft(), y + insets.getTop(), width - insets.getLeft() - insets.getRight(), height - insets.getTop() - insets.getBottom());
+  }
+
+  public Rect reduce(float value) {
+    return new Rect(x + value, y + value, width - value * 2, height - value * 2);
   }
 }

@@ -9,6 +9,8 @@ import com.berray.math.Collision;
 import com.berray.math.Rect;
 import com.berray.math.Vec2;
 import com.berray.math.Vec3;
+import com.berray.objects.gui.DefaultLookAndFeel;
+import com.berray.objects.gui.LookAndFeelManager;
 import com.raylib.Raylib;
 
 import java.nio.file.FileSystems;
@@ -36,6 +38,7 @@ public class Game {
   private EventManager eventManager;
   private DefaultAssetManager assetManager;
   private MouseManager mouseManager;
+  private LookAndFeelManager lookAndFeelManager = new DefaultLookAndFeel();
 
 
   // Constructor
@@ -74,6 +77,7 @@ public class Game {
     eventTypeFactory.registerEventType(PhysicsEvent.EVENT_NAME_HEADBUTT,  PhysicsEvent::new);
     eventTypeFactory.registerEventType(PhysicsEvent.EVENT_NAME_FALL,  PhysicsEvent::new);
     eventTypeFactory.registerEventType(PhysicsEvent.EVENT_NAME_FALL_OFF,  PhysicsEvent::new);
+    eventTypeFactory.registerEventType(ActionEvent.EVENT_NAME, ActionEvent::new);
     eventManager = new EventManager();
     mouseManager = new MouseManager();
     init();
@@ -89,6 +93,14 @@ public class Game {
 
   public AssetLoaders getAssetLoaders() {
     return assetLoaders;
+  }
+
+  public LookAndFeelManager getDefaultLookAndFeelManager() {
+    return lookAndFeelManager;
+  }
+
+  public void setDefaultLookAndFeelManager(LookAndFeelManager lookAndFeelManager) {
+    this.lookAndFeelManager = lookAndFeelManager;
   }
 
   public void init() {

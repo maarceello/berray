@@ -9,7 +9,7 @@ import com.berray.event.CoreEvents;
 import com.berray.event.PropertyChangeEvent;
 import com.berray.math.Color;
 import com.berray.math.Vec2;
-import com.berray.objects.gui.Slider;
+import com.berray.objects.guiold.Slider;
 
 
 public class SliderTest extends BerrayApplication implements CoreComponentShortcuts, CoreAssetShortcuts {

@@ -31,49 +31,62 @@ public class Quaternion {
   }
 
   public Quaternion mul(Quaternion other) {
-    float x = this.x * other.w + this.y * other.z - this.z * other.y + this.w * other.x;
-    float y = -this.x * other.z + this.y * other.w + this.z * other.x + this.w * other.y;
-    float z = this.x * other.y - this.y * other.x + this.z * other.w + this.w * other.z;
-    float w = -this.x * other.x - this.y * other.y - this.z * other.z + this.w * other.w;
-    return new Quaternion(x, y, z, w);
+    float resultx = this.x * other.w + this.y * other.z - this.z * other.y + this.w * other.x;
+    float resulty = -this.x * other.z + this.y * other.w + this.z * other.x + this.w * other.y;
+    float resultz = this.x * other.y - this.y * other.x + this.z * other.w + this.w * other.z;
+    float resultw = -this.x * other.x - this.y * other.y - this.z * other.z + this.w * other.w;
+    return new Quaternion(resultx, resulty, resultz, resultw);
   }
 
   public Vec3 mul(Vec3 other) {
-    float w = this.w;
-    float x = this.x;
-    float y = this.y;
-    float z = this.z;
-    float Vx = other.x;
-    float Vy = other.y;
-    float Vz = other.z;
-    float ww = w * w;
-    float w2 = w * 2;
-    float wx2 = w2 * x;
-    float wy2 = w2 * y;
-    float wz2 = w2 * z;
-    float xx = x * x;
-    float x2 = x * 2;
-    float xy2 = x2 * y;
-    float xz2 = x2 * z;
-    float yy = y * y;
-    float yz2 = 2 * y * z;
-    float zz = z * z;
+    float thisw = this.w;
+    float thisx = this.x;
+    float thisy = this.y;
+    float thisz = this.z;
+    float otherx = other.x;
+    float othery = other.y;
+    float otherz = other.z;
+    float ww = thisw * thisw;
+    float w2 = thisw * 2;
+    float wx2 = w2 * thisx;
+    float wy2 = w2 * thisy;
+    float wz2 = w2 * thisz;
+    float xx = thisx * thisx;
+    float x2 = thisx * 2;
+    float xy2 = x2 * thisy;
+    float xz2 = x2 * thisz;
+    float yy = thisy * thisy;
+    float yz2 = 2 * thisy * thisz;
+    float zz = thisz * thisz;
     return new Vec3(
-        ww * Vx + wy2 * Vz - wz2 * Vy +
-            xx * Vx + xy2 * Vy + xz2 * Vz -
-            zz * Vx - yy * Vx,
-        xy2 * Vx + yy * Vy + yz2 * Vz +
-            wz2 * Vx - zz * Vy + ww * Vy -
-            wx2 * Vz - xx * Vy,
-        xz2 * Vx + yz2 * Vy +
-            zz * Vz - wy2 * Vx - yy * Vz +
-            wx2 * Vy - xx * Vz + ww * Vz);
+        ww * otherx + wy2 * otherz - wz2 * othery +
+            xx * otherx + xy2 * othery + xz2 * otherz -
+            zz * otherx - yy * otherx,
+        xy2 * otherx + yy * othery + yz2 * otherz +
+            wz2 * otherx - zz * othery + ww * othery -
+            wx2 * otherz - xx * othery,
+        xz2 * otherx + yz2 * othery +
+            zz * otherz - wy2 * otherx - yy * otherz +
+            wx2 * othery - xx * otherz + ww * otherz);
   }
 
   public static Quaternion identity() {
     return new Quaternion(0.0f, 0.0f, 0.0f, 1.0f);
   }
 
+
+  public Quaternion normalize() {
+    Quaternion q1 = this;
+    Quaternion q2 = this;
+    float dot = getDot(q1, q2);
+
+    float n = (float) (1.0 / Math.sqrt(dot));
+    return new Quaternion(x * n, y * n, z * n, w * n);
+  }
+
+  private static float getDot(Quaternion q1, Quaternion q2) {
+    return (q1.x * q2.x) + (q1.y * q2.y) + (q1.z * q2.z) + (q1.w * q2.w);
+  }
 
   public Vec3 toEuler() {
     float t = this.x * this.y + this.z * this.w;
@@ -142,6 +155,94 @@ public class Quaternion {
   }
 
 
+  /**
+   * Interpolates between the specified quaternions and stores the result in
+   * the current instance.
+   *
+   * @param q1 the desired value when interp=0 (not null, unaffected)
+   * @param q2 the desired value when interp=1 (not null, may be modified)
+   * @param t the fractional change amount
+   * @return the (modified) current instance (for chaining)
+   * Note: copied from <a href="https://github.com/jMonkeyEngine/jmonkeyengine/blob/master/jme3-core/src/main/java/com/jme3/math/Quaternion.java">JMonkey Engine</a>
+   */
+  public static Quaternion slerp(Quaternion q1, Quaternion q2, float t) {
+    // Create a local quaternion to store the interpolated quaternion
+    if (q1.x == q2.x && q1.y == q2.y && q1.z == q2.z && q1.w == q2.w) {
+      return q1;
+    }
 
+    float result = getDot(q1, q2);
+
+    float q2x = q2.x;
+    float q2y = q2.y;
+    float q2z = q2.z;
+    float q2w = q2.w;
+    if (result < 0.0f) {
+      // Negate the second quaternion and the result of the dot product
+      q2x = -q2.x;
+      q2y = -q2.y;
+      q2z = -q2.z;
+      q2w = -q2.w;
+      result = -result;
+    }
+
+    // Set the first and second scale for the interpolation
+    float scale0 = 1 - t;
+    float scale1 = t;
+
+    // Check if the angle between the 2 quaternions was big enough to
+    // warrant such calculations
+    if ((1 - result) > 0.1f) {// Get the angle between the 2 quaternions,
+      // and then store the sin() of that angle
+      float theta = (float) Math.acos(result);
+      float invSinTheta = (float) (1f / Math.sin(theta));
+
+      // Calculate the scale for q1 and q2, according to the angle and
+      // its sine
+      scale0 = (float) (Math.sin((1 - t) * theta) * invSinTheta);
+      scale1 = (float) (Math.sin((t * theta)) * invSinTheta);
+    }
+
+    // Calculate the x, y, z and w values for the quaternion by using a
+    // special
+    // form of linear interpolation for quaternions.
+    float x = (scale0 * q1.x) + (scale1 * q2x);
+    float y = (scale0 * q1.y) + (scale1 * q2y);
+    float z = (scale0 * q1.z) + (scale1 * q2z);
+    float w = (scale0 * q1.w) + (scale1 * q2w);
+
+    // Return the interpolated quaternion
+    return new Quaternion(x, y, z, w);
+  }
+
+  /**
+   * Interpolates quickly between the current instance and {@code q2} using
+   * nlerp, and stores the result in the current instance.
+   *
+   * <p>This method is often faster than
+   * {@link #slerp(Quaternion, Quaternion, float)}, but less accurate.
+   *
+   * @param q2    the desired value when blend=1 (not null, unaffected)
+   * @param blend the fractional change amount
+   *              Note: copied from <a href="https://github.com/jMonkeyEngine/jmonkeyengine/blob/master/jme3-core/src/main/java/com/jme3/math/Quaternion.java">JMonkey Engine</a>
+   * @return
+   */
+  public static Quaternion nlerp(Quaternion q1, Quaternion q2, float blend) {
+    float dot = getDot(q1, q2);
+    float blendI = 1.0f - blend;
+    if (dot < 0.0f) {
+      float x = blendI * q1.x - blend * q2.x;
+      float y = blendI * q1.y - blend * q2.y;
+      float z = blendI * q1.z - blend * q2.z;
+      float w = blendI * q1.w - blend * q2.w;
+      return new Quaternion(x,y,z,w).normalize();
+    } else {
+      float x = blendI * q1.x + blend * q2.x;
+      float y = blendI * q1.y + blend * q2.y;
+      float z = blendI * q1.z + blend * q2.z;
+      float w = blendI * q1.w + blend * q2.w;
+      return new Quaternion(x,y,z,w).normalize();
+    }
+  }
 
 }

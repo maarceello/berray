@@ -33,6 +33,14 @@ public class Color {
     this.a = a;
   }
 
+  public static Color linearInterpolate(Color first, Color second, float ratio) {
+    float r = first.r + (second.r - first.r) * ratio;
+    float g = first.g + (second.g - first.g) * ratio;
+    float b = first.b + (second.b - first.b) * ratio;
+    float a = first.a + (second.a - first.a) * ratio;
+    return new Color(r, g, b, a);
+  }
+
   public float getR() {
     return r;
   }
@@ -56,6 +64,33 @@ public class Color {
   public void setB(float b) {
     this.b = b;
   }
+
+  public float getA() {
+    return a;
+  }
+
+  public void setA(float a) {
+    this.a = a;
+  }
+
+  public Color brighter(float factor) {
+    // if we're black...return gray
+    if ( r == 0 && g == 0 && b == 0) {
+      return new Color(factor, factor, factor, a);
+    }
+
+    return new Color(
+        Math.min((r/factor), 1.0f),
+        Math.min((g/factor), 1.0f),
+        Math.min((b/factor), 1.0f),
+        a);
+  }
+
+  public Color darker(float factor) {
+    return new Color(r * factor, g * factor, b * factor, a);
+  }
+
+
 
   public Raylib.Color toRaylibColor() {
     if (raylibColor == null) {

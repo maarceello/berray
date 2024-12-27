@@ -2,6 +2,11 @@ package com.berray.event;
 
 import java.util.List;
 
+/**
+ * Event fired when an animation starts or ends.
+ *
+ * @type event
+ */
 public class AnimationEvent extends Event {
   public static final String EVENT_NAME_ANIMATION_END = "animEnd";
   public static final String EVENT_NAME_ANIMATION_START = "animStart";

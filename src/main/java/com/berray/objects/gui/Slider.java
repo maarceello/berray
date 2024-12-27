@@ -1,221 +1,121 @@
 package com.berray.objects.gui;
 
-import com.berray.GameObject;
 import com.berray.components.CoreComponentShortcuts;
-import com.berray.components.core.AnchorType;
-import com.berray.components.core.Component;
-import com.berray.event.AddEvent;
+import com.berray.event.ActionEvent;
 import com.berray.event.CoreEvents;
 import com.berray.event.MouseEvent;
-import com.berray.math.Color;
+import com.berray.event.SceneGraphEvent;
+import com.berray.math.MathUtil;
 import com.berray.math.Vec2;
+import com.berray.objects.gui.layout.NopLayoutManager;
+import com.berray.objects.gui.model.SliderModel;
 
 import java.util.ArrayList;
 import java.util.List;
 
-/** Test for a horizontal slider.
- *
- * Slider parts:
- * * full edge
- * * full gauge
- * * slider knob
- * * empty gauge
- * * empty edge
- * * maybe more/less buttons
- * * maybe some textual representation of the progress. The text can be
- * ** int the full gauge
- * ** in the empty gauge
- * ** in the knob
- * ** somewhere outside of the slider
- *
- * */
-public class Slider extends GameObject implements CoreComponentShortcuts {
+/** Slider gui component. */
+public class Slider extends Container implements CoreComponentShortcuts {
+  private SliderModel model;
 
-  private Vec2 size;
-  private float min;
-  private float max;
+  private final String actionId;
 
-  private float value;
-
-
-  private GameObject leftBorder;
-  private GameObject rightBorder;
-  private GameObject leftBar;
-  private GameObject rightBar;
-  private GameObject handle;
-
-  private float leftInset;
-  private float rightInset;
-
-
-
-  public Slider(Vec2 size, float min, float max, float value) {
-    this.size = size;
-    this.min = min;
-    this.max = max;
-    this.value = value;
-    on(CoreEvents.ADD, this::onAdd);
+  public Slider(String actionId, Vec2 size, SliderModel model) {
+    super(new NopLayoutManager());
+    setSize(size);
+    this.actionId = actionId;
+    this.model = model;
+    on(CoreEvents.SCENE_GRAPH_ADDED, this::onSceneGraphAdded);
     on(CoreEvents.MOUSE_CLICK, this::onMouseClick);
     on(CoreEvents.DRAGGING, this::onMouseDragging);
-    registerProperty("size", this::getSize, this::setSize);
-    registerProperty("value", this::getValue, this::setValue);
-    registerPropertyGetter("render", () -> true);
+
+    registerBoundProperty("model", this::getModel, this::setModel);
+    // alias value property from model
+    registerBoundProperty("value", this::getValue, this::setValue);
   }
 
-  public Slider leftBorder(GameObject object) {
-    addRequiredComponents(object);
-    this.leftBorder = object;
-    return this;
+  public SliderModel getModel() {
+    return model;
   }
 
-  public Slider rightBorder(GameObject object) {
-    addRequiredComponents(object);
-    this.rightBorder = object;
-    return this;
+  public void setModel(SliderModel model) {
+    this.model = model;
   }
 
-  public Slider leftBar(GameObject object) {
-    addRequiredComponents(object);
-    this.leftBar = object;
-    return this;
-  }
-
-  public Slider leftBar(Component ... components) {
-    return leftBar(makeGameObject(components));
-  }
-
-  public Slider rightBar(GameObject object) {
-    addRequiredComponents(object);
-    this.rightBar = object;
-    return this;
-  }
-
-  public Slider rightBar(Component ... components) {
-    return rightBar(makeGameObject(components));
-  }
-
-
-  public Slider handle(GameObject object) {
-    addRequiredComponents(object);
-    object.set("anchor", AnchorType.CENTER);
-    this.handle = object;
-    return this;
-  }
-
-  public Slider handle(Component ... components) {
-    return handle(makeGameObject(components));
-  }
-
-
-  private void addRequiredComponents(GameObject object) {
-    if (!object.is("pos")) {
-      object.addComponents(pos(Vec2.origin()));
-    }
-    if (!object.is("anchor")) {
-      object.addComponents(anchor(AnchorType.TOP_LEFT));
+  private void assertModelSet() {
+    if (model == null) {
+      throw new IllegalStateException("slider model not set");
     }
   }
 
+  public int getMin() {
+    assertModelSet();
+    Panel panel = findParent(Panel.class);
+    if (panel != null) {
+      return model.getMin(panel.getBoundObject());
+    }
+    return 0;
+  }
+
+  public int getMax() {
+    assertModelSet();
+    Panel panel = findParent(Panel.class);
+    if (panel != null) {
+      return model.getMax(panel.getBoundObject());
+    }
+    return 0;
+  }
+
+  public int getValue() {
+    assertModelSet();
+    Panel panel = findParent(Panel.class);
+    if (panel != null) {
+      return model.getValue(panel.getBoundObject());
+    }
+    return 0;
+  }
+
+  public void setValue(int value) {
+    assertModelSet();
+    Panel panel = findParent(Panel.class);
+    if (panel != null) {
+      model.setValue(panel.getBoundObject(), value);
+      emitSetValueEvent(value);
+    }
+  }
+
+  private void onSceneGraphAdded(SceneGraphEvent e) {
+    getLookAndFeelManager().installToSlider(this);
+  }
 
   private void onMouseDragging(MouseEvent event) {
-    Vec2 relativePos = event.getGameObjectPos();
-    float percent = relativePos.getX() / size.getX();
-    setValue(min + (max - min) * percent);
+    updateSliderPosition(event);
   }
 
   private void onMouseClick(MouseEvent event) {
+    updateSliderPosition(event);
+  }
+
+  private void updateSliderPosition(MouseEvent event) {
+    Vec2 size = getSize();
+    int min = getMin();
+    int max = getMax();
     Vec2 relativePos = event.getGameObjectPos();
-    float percent = relativePos.getX() / size.getX();
-    setValue(min + (max - min) * percent);
-  }
-
-  public float getValue() {
-    return value;
-  }
-
-  private void setValue(float value) {
-    if (value < min) {
-      value = min;
-    }
-    if (value > max) {
-      value = max;
-    }
-    firePropertyChange("value", this.value, value);
-    this.value = value;
-
-    updateChildPositions();
-  }
-
-  public Vec2 getSize() {
-    return size;
-  }
-
-  public void setSize(Vec2 size) {
-    this.size = size;
-    setTransformDirty();
+    float percent = MathUtil.clamp(relativePos.getX() / size.getX(), 0.0f, 1.0f);
+    set("value", (int) (min + (max - min) * percent));
   }
 
 
-  private void updateChildPositions() {
-    if (leftBorder != null) {
-      leftBorder.set("pos", Vec2.origin());
-      leftBorder.set("anchor", AnchorType.TOP_LEFT);
+  /**
+   * Fired when the button was clicked,
+   * @type emit-event
+   */
+  private void emitSetValueEvent(int value) {
+    // send action event to the next panel in the object tree
+    trigger(ActionEvent.EVENT_NAME, this, actionId, value);
+    Panel nextPanelInTree = findParent(Panel.class);
+    if (nextPanelInTree != null) {
+      nextPanelInTree.trigger(ActionEvent.EVENT_NAME, this, actionId, value);
     }
-
-    if (rightBorder != null) {
-      rightBorder.set("pos", new Vec2(size.getX(), 0));
-      rightBorder.set("anchor", AnchorType.TOP_RIGHT);
-    }
-
-    float width = size.getX() - leftInset - rightInset;
-
-    leftBar.set("pos", new Vec2(leftInset, 0));
-    leftBar.set("size", new Vec2(width * value / (max - min), size.getY()));
-    leftBar.set("anchor", AnchorType.TOP_LEFT);
-
-    rightBar.set("size", new Vec2(width * (1 - value / (max - min)), size.getY()));
-    rightBar.set("pos", new Vec2(leftInset + width * (value / (max - min)),0));
-    rightBar.set("anchor", AnchorType.TOP_LEFT);
-
-    if (handle != null) {
-      handle.set("pos", new Vec2(leftInset + width * (value / (max - min)), size.getY() / 2.0f));
-    }
-  }
-
-  private void onAdd(AddEvent event) {
-    GameObject parent = event.getSource();
-    // ignore add event when we're the one the child is added to
-    if (parent != this) {
-      leftInset = 0;
-      rightInset = 0;
-      if (leftBorder != null) {
-        add(leftBorder);
-        leftInset = leftBorder.<Vec2>get("size").getX();
-      }
-      if (rightBorder != null) {
-        add(rightBorder);
-        rightInset = rightBorder.<Vec2>get("size").getX();
-      }
-      if (leftBar != null) {
-        add(leftBar);
-      }
-      if (rightBar != null) {
-        add(rightBar);
-      }
-      if (handle != null) {
-        add(handle);
-      } else {
-        handle = add(
-            rect(size.getY() * 1.2f, size.getY() * 1.2f),
-            pos(size.getX() * (value / (max - min)), size.getY() / 2.0f),
-            anchor(AnchorType.CENTER),
-            color(Color.WHITE)
-        );
-      }
-
-      updateChildPositions();
-    }
-    setTransformDirty();
   }
 
   @Override
@@ -224,20 +124,17 @@ public class Slider extends GameObject implements CoreComponentShortcuts {
     List<Object> existingComponents = new ArrayList<>(this.components.values());
     existingComponents.addAll(components);
 
-    if (!containsComponent(existingComponents, "pos")) {
+    if (!containsComponent(existingComponents, "pos") && !is("pos")) {
       allComponents.add( pos(0,0));
     }
-    if (!containsComponent(existingComponents, "area")) {
+    if (!containsComponent(existingComponents, "area") && !is("area")) {
       allComponents.add(area());
     }
-    if (!containsComponent(existingComponents, "mouse")) {
+    if (!containsComponent(existingComponents, "mouse") && !is("mouse")) {
       allComponents.add(mouse());
     }
     allComponents.addAll(components);
     // then add the supplied components. these may overwrite our own components.
     super.addComponents(allComponents);
   }
-
-
-
 }

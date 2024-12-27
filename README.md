@@ -35,6 +35,23 @@ Events can have parameters, there are event type specific. You can see them in t
 
 # Events
 
+
+## Event types
+
+There are some event types:
+
+1. local event, non propagating. This event is send by a component to its game object. The event does not propagate 
+   through the scene graph. Examples: "propertyChanged"
+2. external event, non propagating. This event is send by another game object (for example the parent or the game). The 
+   event does not propagate through the scene graph. Examples: "collide" 
+3. event bubbling down the scene graph. This event starts at some point in the scene graph and visits the children of the
+   current node. The mechanism by which the event is propagated and the cutoff condition depends on the event.
+   Examples: "sceneGraphAdded", "sceneGraphRemoved"
+4. event bubbling up the scene graph. This event starts at some point in the scene graph and visits the parents of the
+   current node. The mechanism by which the event is propagated and the cutoff condition depends on the event.
+   Examples: "actionPerformed"
+  
+
 Notes about event parameters:
 
 The first event parameter is always the game object which fired the event. This may be null when the event is global, 
@@ -157,7 +174,7 @@ Note: the default coordinate system uses y as the up vector.
 
 ### improvements
 
-- [ ] it should be possible to send event parameters lazy. i.e. add a Supplier as parameter and Events.getParameter()
+- [x] it should be possible to send event parameters lazy. i.e. add a Supplier as parameter and Events.getParameter()
   resolves the suppliers value and caches the result. Motivation: the hover event should calculate the mouse positions
   in object coordinates. This is expensive and maybe there are not even event listeners so the calculation is wasted.
 
@@ -170,9 +187,219 @@ Note: the default coordinate system uses y as the up vector.
 - [x] label
 - [x] button
 - [x] checkbox
-- [ ] slider
+- [x] slider
 - [ ] textarea (static), scrollable or autoremove rows after some time
 - [ ] textarea/inputfield (enter text in input field)
+
+
+Some thoughts on gui architecture:
+
+### Vision
+
+* Berray provides easy and hassle-free gui components with databinding and one default design.
+
+### Goals
+
+notes: a) must have   b) should have    c) may have 
+
+a. creation of the gui is easy (builder pattern?) and can be read from a file. Interaction ist provided by databinding
+  and actions.
+b. base components: 
+  * frames (closeable, movable, minimizeable, resizeable)
+  * panels (programmatically resizeable, scrollable)
+  * button (click button, toggle button, radio button, checkbox)
+  * scrollbar, progressbar 
+  * text display and input (label, text field, text area, no text effects, maybe embedded images)
+b. easy layouting. relayouting in case of resize is simple, but may be provided by custom strategies
+b. databinding and actions: changing one gui element triggers a (panel global) action which may be processed by listeners
+c. custom layout strategies and custom designs are possible and easy
+c. auxiliary components
+  * combo box
+  * tabs
+  * file chooser
+  * color chooser
+
+### Processes
+
+#### Scene Graph  
+
+* [x] set design manager 
+  * game#setDesignManager() - stored in game
+* [x] create panel 
+  * set layout manager (note: layout manager is required)
+  * set size in absolute pixels (note: size is required for outermost panel or frame)
+  * set default insets of zero
+  * set default border: none
+  * set bound object: none
+    
+* [x] add border to panel
+  * set border (name)
+  * set layout dirty flag
+
+* [x] add child to panel
+  * add child via game object
+  * set layout dirty flag
+
+* [x] layout childs in panel according to layout
+  * calculate final insets (insets + border) and final inner size 
+  * call LayoutManager#layout with panel
+
+* [x] draw panel
+  * check layout dirty flag
+    * if not: layout panel and clear layout dirty flag
+  * draw childs
+  * call design manager with panel and border (name) 
+    
+* [x] create frame
+  * create panel as a holder for the frame
+  * add default frame border (from design manager?)
+  * add panel for title bar
+  * create child "content" (panel or game object)
+
+* [x] add border and insets to panel (note: only panels can have borders or insets)
+  * set current border
+  * set layout dirty flag
+
+* [x] create gui component (ie. button) with bound properties
+  * [x] set action id
+  * [ ] set databinding map
+
+#### Actions
+
+* add gui component (with id) to panel
+  * subprocess: "add child to panel"
+  * on "add" event
+    * gui component registers listener for event "bind"
+  * on "add to scene graph" event
+    * parent (panel) sends event "bind" with current databinding object
+    * register property changed listener from databinding map
+    * fire initial property changed event for all source properties
+  * on "remove from scene graph" event
+      * parent (panel) sends event "unbind" with removed databinding object
+      * gui component removes listeners from databinding object
+  * panel adds action performed event listener to child (doesn't matter if it is a gui component or not)
+    * note: if the panel contains non-gui containers, these are responsible for propagating the action performed event
+
+* execute action in gui component
+  * send action performed event 
+    * first parameter is game object
+    * 2nd parameter is action id (null if it does not exist)
+    * other parameter are dependent on the gui component type. Most often this parameter is missing (button) or has the 
+      new value of the component (slider, checkbox)
+  * components may intercept the action performed event and send another event. For example a radio group component
+    may intercept button clicks and translate these to an action performed event with the pressed button index and its 
+    own action id 
+
+#### Data Binding
+
+* Preconditions: there are three ways to create a panel. The type of the panel is fixed after creation:
+  * unbound. This panel is skipped when a parent panel is searched. 
+  * bound to object (this can be changed or removed, even to a completely other object type. But not to the "property bound" panel type )
+  * bound to property (the property can be changed or removed. But the bound object cannot be set directly)
+
+##### bound object 
+
+* add panel with a bound object
+  * set type of panel to "bound to object"
+
+* set bound object
+  * if new object is not equal to the current:
+    * set new bound object
+    * fire property change "bound object"
+
+* set bound property
+  * fail with "wrong panel type" message 
+
+##### bound property
+
+* add panel which captures a property of the outer bound data object
+  * set type of panel to "bound to property"
+  * add event listener "add to scene graph":
+    * find next panel in parent hierarchie with bound object (calculated by property or set directly)
+    * add property listener on panel with property "bound object" (with owner "this")
+    * get (initial) bound object from parent panel und resolve property. set as "bound object" if non null
+  * add event listener "remove from scene graph"
+    * find next panel in parent hierarchie
+    * remove all listeners with owner "this"
+    * if current "bound object" is not null
+      * clear "bound object"
+      * fire property changed "bound object"
+  * event listener "bound object" (on parent object)
+    * get bound object from parent
+    * if it is different from the current object
+      * set "bound object" to new object
+      * fire property change "bound object"
+  * add event listener "update"
+    * get bound object from parent
+    * resolve property against parents bound object
+    * if new object is not equals to the current bound object
+      * set new bound object
+      * fire property changed "bound object"
+    * alternative: instead of updating the property in the update method, we could add a property change listener 
+      to the bound object, if it supports change listener. 
+
+* set bound property name
+  * fire property change "bound property"
+  * find next panel in parent hierarchie with bound object (calculated by property or set directly)
+  * get bound object from parent panel und resolve property. 
+  * if the resolved object is not equal to the current "bound object"
+    * set as "bound object"
+    * fire property changed "bound object"
+
+* set bound object
+  * TODO: this can either fail or it can set the property value of the parents bound object. both would be feasible.
+
+##### lists, arrays, maps
+
+* add sub panel which captures a list property of the outer bound data object. for each list entry another sub panel 
+  with the current list element bound is created  
+    * TODO: describe process
+    * set property of the enclosing data object
+
+
+##### bugs
+
+* Slider: the area where the slider moves is dependent on the width of the knob. This is implemented in draw, but not 
+  in the calculation of the current value (based on the mouse position).
+
+Decisions:
+* the panel is the main store for the bound object
+* when a gui element is added to the scene graph (event "scene graph added"), 
+  * it searches the next panel in the scene graph
+  * it then registers the bind and unbind event listeners in the panel
+  * QUESTION 1: is it possible for the gui element to have a bound object other than the one in the panel?
+  * DECISISION 1: nope. it complicates matters when there are multiple bound object sources possible. 
+    * sub-panels can have a data object which is only part of the outer data object
+    * there should be some kind of loop which iterates though a list and adds panels 
+
+### Entities
+
+* frame: is a panel (with border) and has a title bar. can be moved, minimized, closed, resized
+  * state: normal, minimized, closed
+* panel (containing border)
+  * border
+  * insets
+  * layout dirty flag
+  * bound object
+* border (has size to all sides)
+  * size to all sides
+* gui components
+  * action id 
+  * databinding map
+    * source property
+    * destination property
+    * direction: source->destination, bidirectional
+* design manager (can be applied to game objects to create specific drawings. can add components, actions, listeners, everything )
+  * method: installPanel (panel)
+  * method: installButton (button)
+  * method: installLabel (label)
+  * method: get border (border name)
+
+* layout manager (lays out childs in a panel)
+  * method: layout panel (panel, list of components to layout, rectangle for content)
+
+
+
 
 ## 2d stack
 

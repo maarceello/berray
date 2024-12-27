@@ -8,8 +8,8 @@ import com.berray.components.core.AnchorType;
 import com.berray.math.Color;
 import com.berray.math.Vec2;
 
-import static com.berray.objects.gui.Button.pushButton;
-import static com.berray.objects.gui.Button.toggleButton;
+import static com.berray.objects.guiold.Button.pushButton;
+import static com.berray.objects.guiold.Button.toggleButton;
 
 public class SpriteButtonTest extends BerrayApplication implements CoreComponentShortcuts, CoreAssetShortcuts {
 

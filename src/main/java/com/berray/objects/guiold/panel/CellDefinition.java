@@ -1,4 +1,4 @@
-package com.berray.objects.gui.panel;
+package com.berray.objects.guiold.panel;
 
 import com.berray.GameObject;
 import com.berray.components.core.AnchorType;

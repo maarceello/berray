@@ -6,11 +6,11 @@ import com.berray.components.CoreComponentShortcuts;
 import com.berray.components.core.AnchorType;
 import com.berray.math.Color;
 import com.berray.math.Vec2;
-import com.berray.objects.gui.EventListenerCapable;
-import com.berray.objects.gui.ReflectionDomainObject;
+import com.berray.objects.guiold.EventListenerCapable;
+import com.berray.objects.guiold.ReflectionDomainObject;
 
-import static com.berray.objects.gui.panel.PanelBuilder.makePanel;
-import static com.berray.objects.gui.panel.RowBuilder.makeRow;
+import static com.berray.objects.guiold.panel.PanelBuilder.makePanel;
+import static com.berray.objects.guiold.panel.RowBuilder.makeRow;
 
 
 public class GuiPanelTest extends BerrayApplication implements CoreComponentShortcuts {

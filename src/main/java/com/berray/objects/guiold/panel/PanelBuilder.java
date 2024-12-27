@@ -1,4 +1,4 @@
-package com.berray.objects.gui.panel;
+package com.berray.objects.guiold.panel;
 
 import com.berray.GameObject;
 import com.berray.components.core.AnchorType;
@@ -6,9 +6,9 @@ import com.berray.components.core.ColorComponent;
 import com.berray.event.CoreEvents;
 import com.berray.math.Color;
 import com.berray.math.Vec2;
-import com.berray.objects.gui.Button;
-import com.berray.objects.gui.EventListenerCapable;
-import com.berray.objects.gui.GameObjectBuilder;
+import com.berray.objects.guiold.Button;
+import com.berray.objects.guiold.EventListenerCapable;
+import com.berray.objects.guiold.GameObjectBuilder;
 
 import java.util.ArrayList;
 import java.util.Arrays;

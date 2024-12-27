@@ -6,7 +6,6 @@ import com.berray.components.CoreComponentShortcuts;
 import com.berray.components.core.AnchorType;
 import com.berray.math.Color;
 import com.berray.math.Vec2;
-import com.raylib.Jaylib;
 import com.raylib.Raylib;
 
 public class CollisionTest extends BerrayApplication implements CoreComponentShortcuts {
@@ -29,11 +28,7 @@ public class CollisionTest extends BerrayApplication implements CoreComponentSho
         anchor(AnchorType.TOP_LEFT)
     );
 
-    on("update", (event) -> {
-      second.set("pos", new Vec2(Raylib.GetMouseX(), Raylib.GetMouseY()));
-    });
-
-
+    on("update", event -> second.set("pos", new Vec2(Raylib.GetMouseX(), Raylib.GetMouseY())));
   }
 
   @Override
@@ -41,7 +36,7 @@ public class CollisionTest extends BerrayApplication implements CoreComponentSho
     width(1024);
     height(768);
     background(Color.BLACK);
-    title("Anchor Test");
+    title("Collision Test");
   }
 
   public static void main(String[] args) {

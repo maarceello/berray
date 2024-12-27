@@ -19,8 +19,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import static com.berray.event.CoreEvents.PHYSICS_COLLIDE;
-import static com.berray.event.CoreEvents.SCENE_GRAPH_ADDED;
+import static com.berray.event.CoreEvents.*;
 import static com.raylib.Raylib.*;
 
 public class GameObject {
@@ -34,7 +33,7 @@ public class GameObject {
   /**
    * Components for this game object.
    */
-  protected final Map<Class<?>, Component> components;
+  protected final Map<Class<?>, ComponentHolder> components;
 
   /**
    * registered getter methods from components.
@@ -149,7 +148,7 @@ public class GameObject {
    * `components` is an array of:
    * <p>
    * - a {@link Component}. Components are added to the child gameobject as is.
-   * - a {@link String}. I this case the string will be added as a tag to the child gameObject.
+   * - a {@link String}. In this case the string will be added as a tag to the child gameObject.
    * - the first component may be an instance of {@link GameObject}. In this case this object is
    * uses as the new object and all components and tags are added to this existing game object.
    */
@@ -160,7 +159,6 @@ public class GameObject {
     if (gameObject == null) {
       throw new NullPointerException("gameObject must nor be null");
     }
-    gameObject.setGame(game);
     gameObject.addComponents(Arrays.asList(components));
     // trigger "add" event for all other interested parties
     addChild(gameObject);
@@ -190,8 +188,8 @@ public class GameObject {
   }
 
   public void destroy() {
-    for (Component component : components.values()) {
-      component.destroy();
+    for (ComponentHolder component : components.values()) {
+      component.getComponents().forEach(Component::destroy);
     }
     components.clear();
     // remove all event listeners
@@ -274,11 +272,16 @@ public class GameObject {
         addTag(c.toString());
       } else if (c instanceof Component) {
         Component component = (Component) c;
-        if (this.components.containsKey(component.getClass())) {
-          throw new IllegalArgumentException("Component " + component.getClass() + " is already registered in object with tags " + tags);
+        ComponentHolder componentHolder = this.components.get(component.getClass());
+        if (componentHolder != null && !component.allowMultiple()) {
+          throw new IllegalArgumentException("Component " + component.getClass() + " is already registered in object with tags " + tags, componentHolder.getWhereAdded());
+        }
+        if (componentHolder == null) {
+          componentHolder = new ComponentHolder();
+          this.components.put(component.getClass(), componentHolder);
         }
         component.setId(nextComponentId.incrementAndGet());
-        this.components.put(component.getClass(), component);
+        componentHolder.addComponent(component);
         this.tags.add(component.getTag());
         component.setGameObject(this);
       } else if (c instanceof Property) {
@@ -302,6 +305,14 @@ public class GameObject {
     return parent;
   }
 
+  public <E extends GameObject> E findParent(Class<E> parentType) {
+    GameObject current = getParent();
+    while (current != null && !parentType.isInstance(current)){
+      current = current.getParent();
+    }
+    return (E) current;
+  }
+
   /**
    * Called by the game to get the code, which will be called to render the object.
    */
@@ -316,13 +327,25 @@ public class GameObject {
         {
           ensureTransformCalculated();
           rlMultMatrixf(getWorldTransform().toFloatTransposed());
-          for (Component c : components.values()) {
-            c.draw();
+          preDrawComponents();
+          for (ComponentHolder c : components.values()) {
+            c.getComponents().forEach(Component::draw);
           }
+          postDrawComponents();
         }
         rlPopMatrix();
       });
     }
+  }
+
+  /** Hook for GameObjects which want to do something after the components are drawn but before the children are drawn. */
+  protected void postDrawComponents() {
+    // can be implemented by subclasses
+  }
+
+  /** Hook for GameObjects which want to do something after the transform is applied and before the components are drawn. */
+  protected void preDrawComponents() {
+    // can be implemented by subclasses
   }
 
   /**
@@ -486,6 +509,10 @@ public class GameObject {
     setterMethod.accept(value);
   }
 
+  public boolean isWritable(String property) {
+    return setterMethods.containsKey(property);
+  }
+
   public Set<String> getProperties() {
     Set<String> componentProperties = new HashSet<>();
     componentProperties.addAll(getterMethods.keySet());
@@ -545,7 +572,11 @@ public class GameObject {
 
   @SuppressWarnings("unchecked")
   public <E extends Component> E getComponent(Class<E> type) {
-    return (E) components.get(type);
+    ComponentHolder componentHolder = components.get(type);
+    if (componentHolder == null) {
+      return null;
+    }
+    return (E) componentHolder.getComponents().get(0);
   }
 
   public void addTag(String tag) {
@@ -594,7 +625,7 @@ public class GameObject {
   }
 
   /**
-   * Update all game objects
+   * Sends event when this object is colliding with an object tagged "tag".
    */
   public <E extends PhysicsCollideEvent> void onCollide(String tag, EventListener<E> eventListener) {
     on(PHYSICS_COLLIDE, (E event) -> {
@@ -605,6 +636,26 @@ public class GameObject {
       }
     });
   }
+
+  /**
+   * Sends event when the property "property" is changed
+   */
+  public <E extends PropertyChangeEvent> void onPropertyChange(String property, EventListener<E> eventListener, Object owner) {
+    on(PROPERTY_CHANGED, (E event) -> {
+      // only propagate event when the requested property is changed
+      if (Objects.equals(event.getPropertyName(), property)) {
+        eventListener.onEvent(event);
+      }
+    }, owner);
+  }
+
+  /**
+   * Sends event when the property "property" is changed
+   */
+  public <E extends PropertyChangeEvent> void onPropertyChange(String property, EventListener<E> eventListener) {
+    onPropertyChange(property, eventListener, null);
+  }
+
 
   /**
    * marks the objects that the world transformation should be recalculated .
@@ -659,7 +710,7 @@ public class GameObject {
       Matrix4 posMatrix = getOrDefault("posTransform", Matrix4.identity());
       Matrix4 rotationMatrix = getOrDefault("rotationMatrix", Matrix4.identity());
       Vec2 size = getOrDefault("size", Vec2.origin());
-      AnchorType anchor = getOrDefault("anchor", AnchorType.CENTER);
+      AnchorType anchor = getOrDefault("anchor", AnchorType.TOP_LEFT);
       Vec3 scale = getOrDefault("scale", new Vec3(1.0f, 1.0f, 1.0f));
 
       float w2 = size.getX() / 2.0f;

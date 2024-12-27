@@ -1,4 +1,4 @@
-package com.berray.objects.gui;
+package com.berray.objects.guiold;
 
 import com.berray.event.CoreEvents;
 import com.berray.event.EventListener;

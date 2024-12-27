@@ -2,6 +2,7 @@ package com.berray.components.core;
 
 import com.berray.GameObject;
 import com.berray.math.Color;
+import com.berray.math.Rect;
 import com.berray.math.Vec2;
 import com.raylib.Jaylib;
 
@@ -15,9 +16,9 @@ public class RectComponent extends Component {
   private boolean fill = true;
   private float lineThickness = 1.0f;
 
-  public RectComponent(float width, float height) {
+  public RectComponent(Vec2 size) {
     super("rect");
-    this.size = new Vec2(width, height);
+    this.size = size;
   }
 
 
@@ -124,7 +125,16 @@ public class RectComponent extends Component {
    * @type creator
    */
   public static RectComponent rect(float width, float height) {
-    return new RectComponent(width, height);
+    return rect(new Vec2(width, height));
   }
 
+  /**
+   * creates a new rect component
+   *
+   * @param size size the rectangle
+   * @type creator
+   */
+  public static RectComponent rect(Vec2 size) {
+    return new RectComponent(size);
+  }
 }

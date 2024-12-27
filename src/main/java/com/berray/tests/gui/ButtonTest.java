@@ -7,7 +7,7 @@ import com.berray.components.core.AnchorType;
 import com.berray.math.Color;
 import com.berray.math.Vec2;
 
-import static com.berray.objects.gui.Button.button;
+import static com.berray.objects.guiold.Button.button;
 
 public class ButtonTest extends BerrayApplication implements CoreComponentShortcuts {
   @Override

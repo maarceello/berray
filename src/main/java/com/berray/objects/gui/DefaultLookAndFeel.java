@@ -9,7 +9,6 @@ import com.berray.math.Insets;
 import com.berray.math.Rect;
 import com.berray.math.Vec2;
 import com.berray.objects.gui.layout.NopLayoutManager;
-import com.berray.objects.gui.model.SliderModel;
 import com.raylib.Jaylib;
 
 import static com.raylib.Raylib.*;
@@ -152,15 +151,14 @@ public class DefaultLookAndFeel implements LookAndFeelManager {
       DrawRectangleRec(sliderRect.toRectangle(), foregroundColor.toRaylibColor());
       drawBevelBorder(sliderRect, borderThickness, foregroundColorDark, foregroundColorLight);
 
-      SliderModel model = gameObject.get("model");
-      int min = model.getMin();
-      int max = model.getMax();
-      int value = model.getValue();
+      Slider slider = (Slider) gameObject;
+      int min = slider.getMin();
+      int max = slider.getMax();
+      int value = slider.getValue();
       if (max - min == 0) {
         return;
       }
       float percent = (float) value / (max - min);
-
 
       // calculate center and size of knob
       float innerWidth = size.getX() - borderThickness * 2 - sliderKnobWidth - sliderKnobGap * 2;

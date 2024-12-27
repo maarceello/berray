@@ -5,6 +5,7 @@ import com.berray.event.ActionEvent;
 import com.berray.event.CoreEvents;
 import com.berray.event.MouseEvent;
 import com.berray.event.SceneGraphEvent;
+import com.berray.math.MathUtil;
 import com.berray.math.Vec2;
 import com.berray.objects.gui.layout.NopLayoutManager;
 import com.berray.objects.gui.model.SliderModel;
@@ -48,23 +49,38 @@ public class Slider extends Container implements CoreComponentShortcuts {
 
   public int getMin() {
     assertModelSet();
-    return model.getMin();
+    Panel panel = findParent(Panel.class);
+    if (panel != null) {
+      return model.getMin(panel.getBoundObject());
+    }
+    return 0;
   }
 
   public int getMax() {
     assertModelSet();
-    return model.getMax();
+    Panel panel = findParent(Panel.class);
+    if (panel != null) {
+      return model.getMax(panel.getBoundObject());
+    }
+    return 0;
   }
 
   public int getValue() {
     assertModelSet();
-    return model.getValue();
+    Panel panel = findParent(Panel.class);
+    if (panel != null) {
+      return model.getValue(panel.getBoundObject());
+    }
+    return 0;
   }
 
   public void setValue(int value) {
     assertModelSet();
-    model.setValue(value);
-    emitSetValueEvent(value);
+    Panel panel = findParent(Panel.class);
+    if (panel != null) {
+      model.setValue(panel.getBoundObject(), value);
+      emitSetValueEvent(value);
+    }
   }
 
   private void onSceneGraphAdded(SceneGraphEvent e) {
@@ -72,26 +88,22 @@ public class Slider extends Container implements CoreComponentShortcuts {
   }
 
   private void onMouseDragging(MouseEvent event) {
-    Vec2 size = getSize();
-    int min = getMin();
-    int max = getMax();
-    Vec2 relativePos = event.getGameObjectPos();
-    float percent = clamp(relativePos.getX() / size.getX(), 0.0f, 1.0f);
-    set("value", (int) (min + (max - min) * percent));
+    updateSliderPosition(event);
   }
 
   private void onMouseClick(MouseEvent event) {
+    updateSliderPosition(event);
+  }
+
+  private void updateSliderPosition(MouseEvent event) {
     Vec2 size = getSize();
     int min = getMin();
     int max = getMax();
     Vec2 relativePos = event.getGameObjectPos();
-    float percent = clamp(relativePos.getX() / size.getX(), 0.0f, 1.0f);
+    float percent = MathUtil.clamp(relativePos.getX() / size.getX(), 0.0f, 1.0f);
     set("value", (int) (min + (max - min) * percent));
   }
 
-  private float clamp(float value, float min, float max) {
-    return Math.max(Math.min(value, max), min);
-  }
 
   /**
    * Fired when the button was clicked,

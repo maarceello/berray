@@ -5,17 +5,11 @@ import com.berray.objects.guiold.PropertyResolveService;
 import java.util.function.Function;
 
 public class PropertySliderModel implements SliderModel{
-  private Object modelObject;
   private Function<Object, Integer> minFunction;
   private Function<Object, Integer> maxFunction;
-  private String valueProperty = "value";
+  private String valueProperty;
 
-  public PropertySliderModel(Object modelObject) {
-    this.modelObject = modelObject;
-  }
-
-  public PropertySliderModel(Object modelObject, String valueProperty) {
-    this.modelObject = modelObject;
+  public PropertySliderModel(String valueProperty) {
     this.valueProperty = valueProperty;
   }
 
@@ -41,42 +35,34 @@ public class PropertySliderModel implements SliderModel{
 
 
   @Override
-  public int getValue() {
-    return (Integer) PropertyResolveService.getInstance().getProperty(modelObject, valueProperty);
+  public int getValue(Object boundObject) {
+    return (Integer) PropertyResolveService.getInstance().getProperty(boundObject, valueProperty);
   }
 
   @Override
-  public void setValue(int value) {
-    int min = getMin();
-    int max = getMax();
+  public void setValue(Object boundObject, int value) {
+    int min = getMin(boundObject);
+    int max = getMax(boundObject);
     if (value > max)  {
       value = max;
     }
     if (value < min)  {
       value = min;
     }
-    PropertyResolveService.getInstance().setProperty(modelObject, valueProperty, value);
+    PropertyResolveService.getInstance().setProperty(boundObject, valueProperty, value);
   }
 
   @Override
-  public int getMin() {
-    return toInt(minFunction.apply(modelObject));
+  public int getMin(Object boundObject) {
+    return toInt(minFunction.apply(boundObject));
   }
 
   @Override
-  public int getMax() {
-    return toInt(maxFunction.apply(modelObject));
+  public int getMax(Object boundObject) {
+    return toInt(maxFunction.apply(boundObject));
   }
 
   private int toInt(Integer integer) {
     return integer == null ? 0 : integer;
-  }
-
-  public void setModelObject(Object modelObject) {
-    this.modelObject = modelObject;
-  }
-
-  public void setValueProperty(String valueProperty) {
-    this.valueProperty = valueProperty;
   }
 }

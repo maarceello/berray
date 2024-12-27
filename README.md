@@ -357,6 +357,11 @@ c. auxiliary components
     * set property of the enclosing data object
 
 
+##### bugs
+
+* Slider: the area where the slider moves is dependent on the width of the knob. This is implemented in draw, but not 
+  in the calculation of the current value (based on the mouse position).
+
 Decisions:
 * the panel is the main store for the bound object
 * when a gui element is added to the scene graph (event "scene graph added"), 

@@ -274,7 +274,7 @@ public class GameObject {
         Component component = (Component) c;
         ComponentHolder componentHolder = this.components.get(component.getClass());
         if (componentHolder != null && !component.allowMultiple()) {
-          throw new IllegalArgumentException("Component " + component.getClass() + " is already registered in object with tags " + tags, componentHolder.getWhereAdded());
+          throw new IllegalArgumentException("Component " + component.getClass() + " is already registered in "+getClass().getSimpleName()+" with tags " + tags, componentHolder.getWhereAdded());
         }
         if (componentHolder == null) {
           componentHolder = new ComponentHolder();

@@ -5,6 +5,7 @@ import com.berray.components.CoreComponentShortcuts;
 import com.berray.components.core.AnchorType;
 import com.berray.math.Color;
 import com.berray.math.Vec2;
+import com.berray.objects.gui.laf.DefaultLookAndFeel;
 import com.berray.objects.gui.layout.NopLayoutManager;
 
 public class GuiTest extends BerrayApplication implements CoreComponentShortcuts {

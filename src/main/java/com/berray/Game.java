@@ -9,8 +9,8 @@ import com.berray.math.Collision;
 import com.berray.math.Rect;
 import com.berray.math.Vec2;
 import com.berray.math.Vec3;
-import com.berray.objects.gui.DefaultLookAndFeel;
-import com.berray.objects.gui.LookAndFeelManager;
+import com.berray.objects.gui.laf.DefaultLookAndFeel;
+import com.berray.objects.gui.laf.LookAndFeelManager;
 import com.raylib.Raylib;
 
 import java.nio.file.FileSystems;

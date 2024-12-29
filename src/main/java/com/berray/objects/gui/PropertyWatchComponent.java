@@ -33,7 +33,7 @@ public class PropertyWatchComponent extends Component {
 
     do {
       currentPanel = currentPanel.findParent(Panel.class);
-    } while (currentPanel != null && currentPanel.getPanelType() == Panel.PanelType.UNBOUND);
+    } while (currentPanel != null && currentPanel.getPanelType() == PanelType.UNBOUND);
 
     return currentPanel;
   }

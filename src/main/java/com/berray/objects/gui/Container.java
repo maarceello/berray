@@ -6,7 +6,9 @@ import com.berray.event.CoreEvents;
 import com.berray.math.Insets;
 import com.berray.math.Rect;
 import com.berray.math.Vec2;
+import com.berray.objects.gui.laf.LookAndFeelManager;
 import com.berray.objects.gui.layout.LayoutManager;
+import com.berray.objects.gui.layout.NopLayoutManager;
 
 /** Gui container which can have a border and childs. The childs position and sizes are updated by a layouter. */
 public class Container extends GameObject {
@@ -23,14 +25,15 @@ public class Container extends GameObject {
 
   private LookAndFeelManager lookAndFeelManager;
 
-  public Container(LayoutManager layoutManager) {
-    this.layoutManager = layoutManager;
+  public Container() {
+    this.layoutManager = new NopLayoutManager();
     this.border = null;
     this.layoutDirty = true;
     this.insets = Insets.NONE;
 
     registerBoundProperty("border", this::getBorder, this::setBorder);
     registerBoundProperty("size", this::getSize, this::setSize);
+    registerBoundProperty("layoutManager", this::getLayoutManager, this::setLayoutManager);
     registerPropertyGetter("render", () -> true);
 
     on(CoreEvents.ADD, this::processAddEvent);
@@ -50,6 +53,10 @@ public class Container extends GameObject {
 
   private void processAddEvent(AddEvent event) {
     this.layoutDirty = true;
+  }
+
+  public LayoutManager getLayoutManager() {
+    return layoutManager;
   }
 
   protected void setLayoutManager(LayoutManager layoutManager) {

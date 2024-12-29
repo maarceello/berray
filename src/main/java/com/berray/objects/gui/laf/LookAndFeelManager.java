@@ -1,8 +1,10 @@
-package com.berray.objects.gui;
+package com.berray.objects.gui.laf;
 
 
 import com.berray.GameObject;
 import com.berray.math.Insets;
+import com.berray.objects.gui.Button;
+import com.berray.objects.gui.Slider;
 
 /** Provides a Look and Feel for the panels. */
 public interface LookAndFeelManager {

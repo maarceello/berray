@@ -65,4 +65,8 @@ public class Label extends GameObject {
     }
   }
 
+  public static Label label() {
+    return new Label("");
+  }
+
 }

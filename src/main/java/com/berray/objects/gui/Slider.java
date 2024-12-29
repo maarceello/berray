@@ -7,7 +7,7 @@ import com.berray.event.MouseEvent;
 import com.berray.event.SceneGraphEvent;
 import com.berray.math.MathUtil;
 import com.berray.math.Vec2;
-import com.berray.objects.gui.layout.NopLayoutManager;
+import com.berray.objects.gui.model.PropertySliderModel;
 import com.berray.objects.gui.model.SliderModel;
 
 import java.util.ArrayList;
@@ -17,12 +17,9 @@ import java.util.List;
 public class Slider extends Container implements CoreComponentShortcuts {
   private SliderModel model;
 
-  private final String actionId;
+  private String actionId;
 
-  public Slider(String actionId, Vec2 size, SliderModel model) {
-    super(new NopLayoutManager());
-    setSize(size);
-    this.actionId = actionId;
+  public Slider(SliderModel model) {
     this.model = model;
     on(CoreEvents.SCENE_GRAPH_ADDED, this::onSceneGraphAdded);
     on(CoreEvents.MOUSE_CLICK, this::onMouseClick);
@@ -31,6 +28,13 @@ public class Slider extends Container implements CoreComponentShortcuts {
     registerBoundProperty("model", this::getModel, this::setModel);
     // alias value property from model
     registerBoundProperty("value", this::getValue, this::setValue);
+    registerBoundProperty("actionId", this::getActionId, this::setActionId);
+  }
+
+  public Slider(String actionId, Vec2 size, SliderModel model) {
+    this(model);
+    setSize(size);
+    this.actionId = actionId;
   }
 
   public SliderModel getModel() {
@@ -39,6 +43,14 @@ public class Slider extends Container implements CoreComponentShortcuts {
 
   public void setModel(SliderModel model) {
     this.model = model;
+  }
+
+  public String getActionId() {
+    return actionId;
+  }
+
+  public void setActionId(String actionId) {
+    this.actionId = actionId;
   }
 
   private void assertModelSet() {
@@ -136,5 +148,9 @@ public class Slider extends Container implements CoreComponentShortcuts {
     allComponents.addAll(components);
     // then add the supplied components. these may overwrite our own components.
     super.addComponents(allComponents);
+  }
+
+  public static Slider slider() {
+    return new Slider(new PropertySliderModel());
   }
 }

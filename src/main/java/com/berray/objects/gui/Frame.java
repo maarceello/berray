@@ -17,9 +17,8 @@ public class Frame extends Panel {
   private GameObject titleBar;
   private Panel contentPane;
 
-  public Frame(Vec2 size, LayoutManager layoutManager) {
-    super(PanelType.BOUND_OBJECT, size, null);
-    setLayoutManager(new FrameLayout());
+  public Frame() {
+    super(PanelType.BOUND_OBJECT);
     titleBar = add(
         new Label("title"),
         pos(0,0),
@@ -27,9 +26,30 @@ public class Frame extends Panel {
         "titlebar"
     );
     titleBar.set("color", Color.GOLD);
-    contentPane = add(panel(size, layoutManager), pos(0,0), "contentPane");
+    contentPane = add(panel(), pos(0,0), "contentPane");
+    super.setLayoutManager(new FrameLayout());
 
     registerPropertySetter("title", title -> titleBar.set("label", title));
+  }
+
+  public Frame(Vec2 size, LayoutManager layoutManager) {
+    this();
+    setSize(size);
+    setLayoutManager(new FrameLayout());
+    contentPane.set("layoutManager", layoutManager);
+  }
+
+
+
+  @Override
+  protected void setLayoutManager(LayoutManager layoutManager) {
+    contentPane.setLayoutManager(layoutManager);
+  }
+
+  @Override
+  protected void setSize(Vec2 size) {
+    super.setSize(size);
+    contentPane.set("size", size);
   }
 
   @Override

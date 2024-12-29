@@ -11,15 +11,19 @@ public class Panel extends Container {
   /** Bound object from ourselves. */
   private Object boundObject;
 
-  private PanelType panelType = PanelType.UNBOUND;
+  private final PanelType panelType;
 
-  protected Panel(PanelType panelType, Vec2 size, LayoutManager layoutManager) {
-    super(layoutManager);
-
+  protected Panel(PanelType panelType) {
     this.panelType = panelType;
-    setSize(size);
     registerBoundProperty("boundObject", this::getBoundObject, this::setBoundObject);
     on(CoreEvents.ACTION_PERFORMED, this::forwardActionPerformed);
+  }
+
+
+  protected Panel(PanelType panelType, Vec2 size, LayoutManager layoutManager) {
+    this(panelType);
+    setLayoutManager(layoutManager);
+    setSize(size);
   }
 
   private void forwardActionPerformed(ActionEvent actionEvent) {
@@ -69,10 +73,25 @@ public class Panel extends Container {
     return new Panel(PanelType.UNBOUND, size, layoutManager);
   }
 
+  /** Creates a panel which does not contribute to data binding. */
+  public static Panel panel() {
+    return new Panel(PanelType.UNBOUND);
+  }
+
+
   /** Creates a panel in which the bound object must be set explicitly. */
   public static Panel panelWithBoundObject(Vec2 size, LayoutManager layoutManager, Object boundObject) {
     Panel panel = new Panel(PanelType.BOUND_OBJECT, size, layoutManager);
     panel.set("boundObject", boundObject);
+    return panel;
+  }
+
+  /** Creates a panel in which the bound object must be set explicitly. */
+  public static Panel panelWithBoundProperty() {
+    Panel panel = new Panel(PanelType.BOUND_PROPERTY);
+    panel.addComponents(
+        new PropertyWatchComponent(null)
+    );
     return panel;
   }
 
@@ -86,12 +105,4 @@ public class Panel extends Container {
   }
 
 
-  public enum PanelType {
-    /** Panel is just for grouping, not for data binding. */
-    UNBOUND,
-    /** Bound object is set directly in the panel. */
-    BOUND_OBJECT,
-    /** bound object is calculated from a property in the parents panel game object. */
-    BOUND_PROPERTY
-  }
 }

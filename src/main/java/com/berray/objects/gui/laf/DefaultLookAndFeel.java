@@ -1,4 +1,4 @@
-package com.berray.objects.gui;
+package com.berray.objects.gui.laf;
 
 import com.berray.GameObject;
 import com.berray.components.core.Component;
@@ -8,7 +8,9 @@ import com.berray.math.Color;
 import com.berray.math.Insets;
 import com.berray.math.Rect;
 import com.berray.math.Vec2;
-import com.berray.objects.gui.layout.NopLayoutManager;
+import com.berray.objects.gui.Button;
+import com.berray.objects.gui.ButtonType;
+import com.berray.objects.gui.Slider;
 import com.raylib.Jaylib;
 
 import static com.raylib.Raylib.*;
@@ -114,13 +116,18 @@ public class DefaultLookAndFeel implements LookAndFeelManager {
 
   @Override
   public void installToButton(Button button) {
-    button.setBorder("raised");
-    button.setLayoutManager(new NopLayoutManager());
+    if (button.getButtonType() == ButtonType.CHECKBOX) {
+      button.addComponents(new DrawCheckboxComponent());
+      return;
+    }
+
+
+    button.set("border", "raised");
     button.on(CoreEvents.PROPERTY_CHANGED, (PropertyChangeEvent event) -> {
       if (event.getPropertyName().equals("armed") || event.getPropertyName().equals("pressed")) {
         boolean pressed = button.isPressed();
         boolean armed = button.isArmed();
-        button.setBorder(pressed || armed ? "lowered" : "raised");
+        button.set("border", pressed || armed ? "lowered" : "raised");
       }
     });
   }
@@ -128,6 +135,60 @@ public class DefaultLookAndFeel implements LookAndFeelManager {
   @Override
   public void installToSlider(Slider slider) {
     slider.addComponents(new DrawSliderComponent());
+  }
+
+  public class DrawCheckboxComponent extends Component {
+
+    public DrawCheckboxComponent() {
+      super("drawCheckboxComponent");
+    }
+
+    @Override
+    public void add(GameObject gameObject) {
+      registerGetter("render", () -> true);
+    }
+
+    @Override
+    public void draw() {
+      super.draw();
+
+      Vec2 size = gameObject.get("size");
+      float minSize = Math.min(size.getX(), size.getY());
+      Rect rect = new Rect(Vec2.origin(), new Vec2(minSize, minSize));
+      DrawRectangleRec(rect.toRectangle(), foregroundColor.toRaylibColor());
+      drawBevelBorder(rect, borderThickness, foregroundColorDark, foregroundColorLight);
+
+      Rect crossSize = rect.reduce((float) borderThickness + sliderKnobGap);
+
+      if (gameObject.get("pressed", false) == Boolean.TRUE) {
+        drawCross(crossSize, borderThickness, foregroundColorDark);
+      }
+    }
+
+  }
+
+  private void drawCross(Rect crossSize, int thickness, Color color) {
+    for (int i = 0; i < thickness; i++) {
+      DrawLine(
+          (int) crossSize.getX() + i, (int) crossSize.getY(),
+          (int) (crossSize.getX() + crossSize.getWidth()), (int) (crossSize.getY() + crossSize.getHeight() - i),
+          color.toRaylibColor());
+      DrawLine(
+          (int) crossSize.getX(), (int) crossSize.getY() + i,
+          (int) (crossSize.getX() + crossSize.getWidth() - i), (int) (crossSize.getY() + crossSize.getHeight()),
+          color.toRaylibColor());
+
+      DrawLine(
+          (int) (crossSize.getX() + crossSize.getWidth() - i), (int) crossSize.getY(),
+          (int) (crossSize.getX()), (int) (crossSize.getY() + crossSize.getHeight() - i),
+          color.toRaylibColor());
+
+      DrawLine(
+          (int) (crossSize.getX() + crossSize.getWidth()), (int) crossSize.getY() + i,
+          (int) (crossSize.getX() + i), (int) (crossSize.getY() + crossSize.getHeight()),
+          color.toRaylibColor());
+    }
+
   }
 
 

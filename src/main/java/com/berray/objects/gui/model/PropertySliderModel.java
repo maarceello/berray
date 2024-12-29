@@ -9,9 +9,6 @@ public class PropertySliderModel implements SliderModel{
   private Function<Object, Integer> maxFunction;
   private String valueProperty;
 
-  public PropertySliderModel(String valueProperty) {
-    this.valueProperty = valueProperty;
-  }
 
   public PropertySliderModel minFixed(int value) {
     minFunction = object -> value;
@@ -33,10 +30,18 @@ public class PropertySliderModel implements SliderModel{
     return this;
   }
 
+  public PropertySliderModel valueProperty(String valueProperty) {
+    this.valueProperty = valueProperty;
+    return this;
+  }
 
   @Override
   public int getValue(Object boundObject) {
-    return (Integer) PropertyResolveService.getInstance().getProperty(boundObject, valueProperty);
+    Object property = PropertyResolveService.getInstance().getProperty(boundObject, valueProperty);
+    if (property == null) {
+      return 0;
+    }
+    return (Integer) property;
   }
 
   @Override

@@ -14,6 +14,7 @@ import static com.berray.components.core.MouseComponent.mouse;
 /** Button functionality. */
 public class Button extends Container {
   private String actionId;
+  private String value;
   private ButtonType buttonType;
   private ButtonModel model;
 
@@ -26,6 +27,7 @@ public class Button extends Container {
     registerBoundProperty("armed", this::isArmed, this::setArmed);
     registerBoundProperty("model", this::getModel, this::setModel);
     registerBoundProperty("actionId", this::getActionId, this::setActionId);
+    registerBoundProperty("value", this::getValue, this::setValue);
   }
 
   public Button(String actionId, Vec2 size) {
@@ -50,10 +52,10 @@ public class Button extends Container {
     boolean stillhovered = boundingBox.contains(absoluteMousePos);
     // only accept klick when the mouse is still over the button. Discard mouse click otherwise.
     if (stillhovered) {
-      model.setClicked(boundObject, actionId);
-      emitClickEvent(model.getPressed(boundObject, actionId));
+      model.setClicked(boundObject, value);
+      emitClickEvent(model.getPressed(boundObject, value));
     }
-    firePropertyChange("armed", true, model.getArmed(boundObject, actionId));
+    firePropertyChange("armed", true, model.getArmed(boundObject, value));
   }
 
   /**
@@ -75,9 +77,9 @@ public class Button extends Container {
   private void onMousePress(MouseEvent event) {
     Panel panel = findParent(Panel.class);
     Object boundObject = panel != null ? panel.getBoundObject() : null;
-    model.setArmed(boundObject, actionId, true);
+    model.setArmed(boundObject, value, true);
     event.setProcessed();
-    firePropertyChange("armed", false, model.getArmed(boundObject, actionId));
+    firePropertyChange("armed", false, model.getArmed(boundObject, value));
   }
 
   @Override
@@ -115,28 +117,36 @@ public class Button extends Container {
     this.actionId = actionId;
   }
 
+  public String getValue() {
+    return value;
+  }
+
+  public void setValue(String value) {
+    this.value = value;
+  }
+
   public void setPressed(boolean pressed) {
     Panel panel = findParent(Panel.class);
     Object boundObject = panel != null ? panel.getBoundObject() : null;
-    this.model.setClicked(boundObject, actionId);
+    this.model.setClicked(boundObject, value);
   }
 
   public boolean isPressed() {
     Panel panel = findParent(Panel.class);
     Object boundObject = panel != null ? panel.getBoundObject() : null;
-    return this.model.getPressed(boundObject, actionId);
+    return this.model.getPressed(boundObject, value);
   }
 
   public boolean isArmed() {
     Panel panel = findParent(Panel.class);
     Object boundObject = panel != null ? panel.getBoundObject() : null;
-    return this.model.getArmed(boundObject, actionId);
+    return this.model.getArmed(boundObject, value);
   }
 
   public void setArmed(boolean armed) {
     Panel panel = findParent(Panel.class);
     Object boundObject = panel != null ? panel.getBoundObject() : null;
-    this.model.setArmed(boundObject, actionId, armed);
+    this.model.setArmed(boundObject, value, armed);
   }
 
   public static Button button() {
@@ -145,5 +155,8 @@ public class Button extends Container {
 
   public static Button checkbox() {
     return new Button(ButtonType.CHECKBOX);
+  }
+  public static Button radioButton() {
+    return new Button(ButtonType.RADIO);
   }
 }

@@ -116,8 +116,8 @@ public class DefaultLookAndFeel implements LookAndFeelManager {
 
   @Override
   public void installToButton(Button button) {
-    if (button.getButtonType() == ButtonType.CHECKBOX) {
-      button.addComponents(new DrawCheckboxComponent());
+    if (button.getButtonType() == ButtonType.CHECKBOX || button.getButtonType() == ButtonType.RADIO) {
+      button.addComponents(new DrawCheckboxComponent(button.getButtonType() == ButtonType.RADIO));
       return;
     }
 
@@ -139,8 +139,11 @@ public class DefaultLookAndFeel implements LookAndFeelManager {
 
   public class DrawCheckboxComponent extends Component {
 
-    public DrawCheckboxComponent() {
+    private final boolean radio;
+
+    public DrawCheckboxComponent(boolean radio) {
       super("drawCheckboxComponent");
+      this.radio = radio;
     }
 
     @Override
@@ -161,7 +164,11 @@ public class DefaultLookAndFeel implements LookAndFeelManager {
       Rect crossSize = rect.reduce((float) borderThickness + sliderKnobGap);
 
       if (gameObject.get("pressed", false) == Boolean.TRUE) {
-        drawCross(crossSize, borderThickness, foregroundColorDark);
+        if (radio) {
+          drawBevelBorder(crossSize, borderThickness, foregroundColorLight, foregroundColorDark);
+        } else {
+          drawCross(crossSize, borderThickness, foregroundColorDark);
+        }
       }
     }
 

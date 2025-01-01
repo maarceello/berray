@@ -26,6 +26,9 @@ public class PropertyResolveService {
   }
 
   public String replaceText(String text, Object dataObject) {
+    if (text == null) {
+      return null;
+    }
     // find placeholders
     StringBuilder result = new StringBuilder();
     Matcher matcher = PLACEHOLDER_PATTERN.matcher(text);
@@ -244,7 +247,7 @@ public class PropertyResolveService {
           .findFirst().orElseThrow(() -> new IllegalStateException("no setter for property "+property+" found in "+object.getClass()));
       setter.invoke(object, value);
     } catch (IllegalAccessException | InvocationTargetException e) {
-      throw new IllegalArgumentException("cannot get property "+property+" from object of type "+object.getClass().getName(), e);
+      throw new IllegalArgumentException("cannot set property "+property+" in object of type "+object.getClass().getName(), e);
     }
   }
 

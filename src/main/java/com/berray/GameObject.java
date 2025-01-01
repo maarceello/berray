@@ -173,6 +173,13 @@ public class GameObject {
     gameObject.emitSceneGraphRemovedEvent(this);
   }
 
+  public void removeAll() {
+    for (GameObject child : children) {
+      remove(child);
+    }
+  }
+
+
   /**
    * Fired when the game object or ist subtree was removed from the scene graph
    *
@@ -412,7 +419,6 @@ public class GameObject {
 
   /**
    * Registers a property which triggers a <code>propertyChange</code> event when the property is changed.
-   * The property name is remembered. Upon deletion the properties will be removed.
    */
   public <E> void registerBoundProperty(String name, Supplier<E> getter, Consumer<E> setter) {
     registerProperty(name, getter, newValue ->

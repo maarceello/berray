@@ -51,23 +51,6 @@ public class Panel extends Container {
     this.boundObject = boundObject;
   }
 
-  public void bind(Object dataObject) {
-    // if the new object is exactly the same as the current...don't do anything
-    if (this.boundObject == dataObject) {
-      return;
-    }
-
-    // first unbind current object, if it exists
-    if (this.boundObject != null) {
-      trigger(CoreEvents.UNBIND, this, this.boundObject);
-    }
-    this.boundObject = dataObject;
-
-    if (this.boundObject != null) {
-      trigger(CoreEvents.UNBIND, this, this.boundObject);
-    }
-  }
-
   /** Creates a panel which does not contribute to data binding. */
   public static Panel panel(Vec2 size, LayoutManager layoutManager) {
     return new Panel(PanelType.UNBOUND, size, layoutManager);

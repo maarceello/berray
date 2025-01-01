@@ -16,10 +16,10 @@ public class MultipleButtonModel implements ButtonModel {
   }
 
   @Override
-  public void setClicked(Object boundObject, Object id) {
+  public void setClicked(Object boundObject, Object value) {
     // if toggle, invert current click. otherwise don't persist click
     if (valueProperty != null) {
-      PropertyResolveService.getInstance().setProperty(boundObject, valueProperty, id);
+      PropertyResolveService.getInstance().setProperty(boundObject, valueProperty, value);
     }
     if (armedProperty != null) {
       PropertyResolveService.getInstance().setProperty(boundObject, armedProperty, null);
@@ -27,26 +27,26 @@ public class MultipleButtonModel implements ButtonModel {
   }
 
   @Override
-  public void setArmed(Object boundObject, Object id, boolean armed) {
+  public void setArmed(Object boundObject, Object value, boolean armed) {
     if (armedProperty != null) {
-      PropertyResolveService.getInstance().setProperty(boundObject, armedProperty, armed ? id : null);
+      PropertyResolveService.getInstance().setProperty(boundObject, armedProperty, armed ? value : null);
     }
   }
 
   @Override
-  public boolean getPressed(Object boundObject, Object id) {
+  public boolean getPressed(Object boundObject, Object value) {
     if (valueProperty != null) {
-      Object pressed = PropertyResolveService.getInstance().getProperty(boundObject, valueProperty);
-      return Objects.equals(pressed, id);
+      Object pressedValue = PropertyResolveService.getInstance().getProperty(boundObject, valueProperty);
+      return Objects.equals(pressedValue, value);
     }
     return false;
   }
 
   @Override
-  public boolean getArmed(Object boundObject, Object id) {
+  public boolean getArmed(Object boundObject, Object value) {
     if (armedProperty != null) {
-      Object pressed = PropertyResolveService.getInstance().getProperty(boundObject, armedProperty);
-      return Objects.equals(pressed, id);
+      Object armedValue = PropertyResolveService.getInstance().getProperty(boundObject, armedProperty);
+      return Objects.equals(armedValue, value);
     }
     return false;
   }

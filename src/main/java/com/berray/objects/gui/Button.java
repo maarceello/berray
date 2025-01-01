@@ -4,6 +4,7 @@ import com.berray.event.*;
 import com.berray.math.Rect;
 import com.berray.math.Vec2;
 import com.berray.objects.gui.model.ButtonModel;
+import com.berray.objects.guiold.PropertyResolveService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,8 +14,12 @@ import static com.berray.components.core.MouseComponent.mouse;
 
 /** Button functionality. */
 public class Button extends Container {
+  /** Action Id which is used in {@link ActionEvent}s. */
   private String actionId;
+  /** Value with placeholders. */
   private String value;
+  /** value with resolved placeholders. */
+  private String resolvedValue;
   private ButtonType buttonType;
   private ButtonModel model;
 
@@ -22,6 +27,7 @@ public class Button extends Container {
     this.buttonType = buttonType;
     on(CoreEvents.MOUSE_PRESS, this::onMousePress);
     on(CoreEvents.SCENE_GRAPH_ADDED, this::onSceneGraphAdded);
+    on(CoreEvents.SCENE_GRAPH_REMOVED, this::onSceneGraphRemoved);
     on(CoreEvents.MOUSE_RELEASE, this::onMouseRelease);
     registerBoundProperty("pressed", this::isPressed, this::setPressed);
     registerBoundProperty("armed", this::isArmed, this::setArmed);
@@ -36,8 +42,32 @@ public class Button extends Container {
     setActionId(actionId);
   }
 
+  private void processBoundObjectChange(PropertyChangeEvent event) {
+    resolveValue(event.getNewValue());
+  }
+
   private void onSceneGraphAdded(SceneGraphEvent e) {
     getLookAndFeelManager().installToButton(this);
+    // find next panel with bound object
+    Panel current = findParent(Panel.class);
+    while (current != null) {
+      if (current.getPanelType() != PanelType.UNBOUND) {
+        current.onPropertyChange("boundObject", this::processBoundObjectChange, this);
+      }
+      current = current.findParent(Panel.class);
+    }
+    Panel panel = findParent(Panel.class);
+    Object boundObject = panel != null ? panel.getBoundObject() : null;
+    resolveValue(boundObject);
+  }
+
+  private void onSceneGraphRemoved(SceneGraphEvent e) {
+    // find all panels in hierarchy
+    Panel current = findParent(Panel.class);
+    while (current != null) {
+      current.removeListener(this);
+      current = current.findParent(Panel.class);
+    }
   }
 
 
@@ -52,10 +82,10 @@ public class Button extends Container {
     boolean stillhovered = boundingBox.contains(absoluteMousePos);
     // only accept klick when the mouse is still over the button. Discard mouse click otherwise.
     if (stillhovered) {
-      model.setClicked(boundObject, value);
-      emitClickEvent(model.getPressed(boundObject, value));
+      model.setClicked(boundObject, resolvedValue);
+      emitClickEvent(model.getPressed(boundObject, resolvedValue));
     }
-    firePropertyChange("armed", true, model.getArmed(boundObject, value));
+    firePropertyChange("armed", true, model.getArmed(boundObject, resolvedValue));
   }
 
   /**
@@ -77,9 +107,9 @@ public class Button extends Container {
   private void onMousePress(MouseEvent event) {
     Panel panel = findParent(Panel.class);
     Object boundObject = panel != null ? panel.getBoundObject() : null;
-    model.setArmed(boundObject, value, true);
+    model.setArmed(boundObject, resolvedValue, true);
     event.setProcessed();
-    firePropertyChange("armed", false, model.getArmed(boundObject, value));
+    firePropertyChange("armed", false, model.getArmed(boundObject, resolvedValue));
   }
 
   @Override
@@ -123,30 +153,37 @@ public class Button extends Container {
 
   public void setValue(String value) {
     this.value = value;
+    Panel panel = findParent(Panel.class);
+    Object boundObject = panel != null ? panel.getBoundObject() : null;
+    resolveValue(boundObject);
+  }
+
+  private void resolveValue(Object boundObject) {
+    resolvedValue = PropertyResolveService.getInstance().replaceText(value, boundObject);
   }
 
   public void setPressed(boolean pressed) {
     Panel panel = findParent(Panel.class);
     Object boundObject = panel != null ? panel.getBoundObject() : null;
-    this.model.setClicked(boundObject, value);
+    this.model.setClicked(boundObject, resolvedValue);
   }
 
   public boolean isPressed() {
     Panel panel = findParent(Panel.class);
     Object boundObject = panel != null ? panel.getBoundObject() : null;
-    return this.model.getPressed(boundObject, value);
+    return this.model.getPressed(boundObject, resolvedValue);
   }
 
   public boolean isArmed() {
     Panel panel = findParent(Panel.class);
     Object boundObject = panel != null ? panel.getBoundObject() : null;
-    return this.model.getArmed(boundObject, value);
+    return this.model.getArmed(boundObject, resolvedValue);
   }
 
   public void setArmed(boolean armed) {
     Panel panel = findParent(Panel.class);
     Object boundObject = panel != null ? panel.getBoundObject() : null;
-    this.model.setArmed(boundObject, value, armed);
+    this.model.setArmed(boundObject, resolvedValue, armed);
   }
 
   public static Button button() {

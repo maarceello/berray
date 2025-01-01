@@ -47,7 +47,7 @@ public class GuiTest extends BerrayApplication implements CoreComponentShortcuts
         pos(0, 100)
     );
 
-    frame.bind(new DataObject());
+    frame.set("boundObject", new DataObject());
 
   }
 

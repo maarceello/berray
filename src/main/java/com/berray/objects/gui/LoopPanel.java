@@ -48,11 +48,11 @@ public class LoopPanel extends Panel {
     }
 
     Panel parentPanel = findParent(Panel.class);
-    Object parentBoundObjecet = parentPanel != null ? parentPanel.getBoundObject() : null;
+    Object parentBoundObject = parentPanel != null ? parentPanel.getBoundObject() : null;
 
     for (int i = 0; i < objects.size(); i++) {
       Object item = objects.get(i);
-      LoopItem itemContainer = new LoopItem(new LoopIter(parentBoundObjecet, i, item));
+      LoopItem itemContainer = new LoopItem(new LoopIter(parentBoundObject, i, item));
       itemContainer.add(template.get());
       add(itemContainer, pos(Vec2.origin()));
     }

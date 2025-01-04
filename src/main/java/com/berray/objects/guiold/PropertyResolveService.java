@@ -163,7 +163,7 @@ public class PropertyResolveService {
         throw new IllegalArgumentException("property " + property + " is not an array index.", e);
       }
     }
-    throw new IllegalArgumentException("property " + property + " is not an array index, but current object is a list or an array.");
+    throw new IllegalArgumentException("property '" + property + "' is not an array index, but current object is a list or an array.");
   }
 
   /**

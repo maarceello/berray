@@ -92,7 +92,7 @@ public class Container extends GameObject {
   @Override
   protected void preDrawComponents() {
     if (size == null) {
-      throw new IllegalStateException("cannot layout container '"+this.getClass().getSimpleName()+"' with tags "+getTags()+": size is null 78");
+      throw new IllegalStateException("cannot layout container '"+this.getClass().getSimpleName()+"' with tags "+getTags()+": size is null");
     }
     if (layoutDirty) {
       Insets borderInsets = getLookAndFeelManager().getBorderInsets(this, border);
@@ -101,6 +101,7 @@ public class Container extends GameObject {
       layoutManager.layoutPanel(this, getChildren(), paintArea);
       layoutDirty = false;
     }
+    getLookAndFeelManager().clearBackground(this);
     super.preDrawComponents();
   }
 

@@ -49,7 +49,7 @@ public class OrbitCamera extends GameObject {
     updateCameraPosition();
   }
 
-  private void updateCameraPosition() {
+  public void updateCameraPosition() {
     double yawRadians = Math.toRadians(this.yaw);
     double pitchRadians = Math.toRadians(this.pitch);
 

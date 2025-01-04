@@ -53,6 +53,7 @@ public class Button extends Container {
     while (current != null) {
       if (current.getPanelType() != PanelType.UNBOUND) {
         current.onPropertyChange("boundObject", this::processBoundObjectChange, this);
+        break;
       }
       current = current.findParent(Panel.class);
     }

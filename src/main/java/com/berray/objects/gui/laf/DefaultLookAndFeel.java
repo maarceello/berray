@@ -10,6 +10,7 @@ import com.berray.math.Rect;
 import com.berray.math.Vec2;
 import com.berray.objects.gui.Button;
 import com.berray.objects.gui.ButtonType;
+import com.berray.objects.gui.Container;
 import com.berray.objects.gui.Slider;
 import com.raylib.Jaylib;
 
@@ -110,8 +111,8 @@ public class DefaultLookAndFeel implements LookAndFeelManager {
   }
 
   @Override
-  public void clearBackground(Button button) {
-    DrawRectangleRec(button.getPaintArea().toRectangle(), foregroundColor.toRaylibColor());
+  public void clearBackground(Container container) {
+    DrawRectangleRec(new Rect(Vec2.origin(), container.get("size")).toRectangle(), foregroundColor.toRaylibColor());
   }
 
   @Override

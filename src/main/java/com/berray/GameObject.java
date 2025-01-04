@@ -115,7 +115,7 @@ public class GameObject {
 
   public void setGame(Game game) {
     this.game = game;
-    // tell each childs the game instance
+    // tell each child the game instance
     children.forEach(child -> child.setGame(game));
     if (game != null) {
       // fire event that the object was added to the scene graoh
@@ -174,7 +174,7 @@ public class GameObject {
   }
 
   public void removeAll() {
-    for (GameObject child : children) {
+    for (GameObject child : new ArrayList<>(children)) {
       remove(child);
     }
   }
@@ -314,10 +314,14 @@ public class GameObject {
 
   public <E extends GameObject> E findParent(Class<E> parentType) {
     GameObject current = getParent();
-    while (current != null && !parentType.isInstance(current)){
+    while (current != null) {
+      if (parentType.isAssignableFrom(current.getClass())) {
+        return parentType.cast(current);
+      }
+
       current = current.getParent();
     }
-    return (E) current;
+    return null;
   }
 
   /**

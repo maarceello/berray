@@ -26,7 +26,7 @@ public class NopLayoutManager implements LayoutManager {
         }
         Vec2 size = gameObject.get("size");
         // check if the child is too big so it sticks out to the right or bottom
-        if (size != null) {
+        if (size != null && gameObject.isWritable("size")) {
           float width = size.getX();
           float height = size.getY();
           float childMaxX = pos.getX() + width;

@@ -25,7 +25,7 @@ public class Frame extends Panel {
         anchor(AnchorType.TOP),
         "titlebar"
     );
-    titleBar.set("color", Color.GOLD);
+    titleBar.set("color", Color.BLACK);
     contentPane = add(panel(), pos(0,0), "contentPane");
     super.setLayoutManager(new FrameLayout());
 

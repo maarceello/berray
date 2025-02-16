@@ -12,7 +12,7 @@ import com.berray.objects.gui.Button;
 import com.berray.objects.gui.ButtonType;
 import com.berray.objects.gui.Container;
 import com.berray.objects.gui.Slider;
-import com.raylib.Jaylib;
+import com.raylib.Raylib;
 
 import static com.raylib.Raylib.*;
 
@@ -24,10 +24,17 @@ public class DefaultLookAndFeel implements LookAndFeelManager {
   private int borderThickness = 4;
   private int sliderKnobWidth = 20;
   private int sliderKnobGap = 2;
+  private float fontSize = 20;
 
   public DefaultLookAndFeel() {
     setForegroundColor(Color.GOLD);
     setBackgroundColor(Color.BLACK);
+  }
+
+  @Override
+  public float getFontSize(String type) {
+    // default look and feel only has a single font size.
+    return fontSize;
   }
 
   public void setForegroundColor(Color foregroundColor) {
@@ -67,8 +74,7 @@ public class DefaultLookAndFeel implements LookAndFeelManager {
         break;
       case "solid":
       default:
-        DrawRectangleLinesEx(new Jaylib.Rectangle(0, 0,
-                (int) (size.getX()), (int) (size.getY())),
+        DrawRectangleLinesEx(new Raylib.Rectangle().x(0).y(0).width((int) (size.getX())).height((int) (size.getY())),
             borderThickness, foregroundColor.toRaylibColor());
     }
 

@@ -3,9 +3,7 @@ package com.berray.components.core;
 import com.berray.GameObject;
 import com.berray.math.Color;
 import com.berray.math.Vec2;
-
-import static com.raylib.Jaylib.DrawText;
-import static com.raylib.Jaylib.MeasureText;
+import com.raylib.Raylib;
 
 /**
  * Component which displays some fixed text.
@@ -79,7 +77,7 @@ public class TextComponent extends Component {
   }
 
   private void updateSize() {
-    int newWidth = MeasureText(text, fontHeight);
+    int newWidth = Raylib.MeasureText(text, fontHeight);
     if (newWidth != width && gameObject != null) {
       // when the width of the text changes, recalculate transform (as the component might
       // be moved when center or right aligned)
@@ -91,7 +89,7 @@ public class TextComponent extends Component {
   @Override
   public void draw() {
     Color color = gameObject.getOrDefault("color", Color.BLACK);
-    DrawText(text, 0, 0, fontHeight, color.toRaylibColor());
+    Raylib.DrawText(text, 0, 0, fontHeight, color.toRaylibColor());
   }
 
   /**

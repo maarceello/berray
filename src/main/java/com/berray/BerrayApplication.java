@@ -18,7 +18,7 @@ import static com.berray.components.core.DebugComponent.debug;
 import static com.berray.components.core.LayerComponent.layer;
 import static com.berray.components.core.PosComponent2d.pos;
 import static com.berray.objects.core.Label.label;
-import static com.raylib.Jaylib.*;
+import static com.raylib.Raylib.*;
 
 
 public abstract class BerrayApplication {

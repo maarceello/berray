@@ -1,6 +1,5 @@
 package com.berray.math;
 
-import com.raylib.Jaylib;
 import com.raylib.Raylib;
 
 import java.util.Objects;
@@ -120,7 +119,7 @@ public class Vec2 {
   }
 
   public Raylib.Vector2 toVector2() {
-    return new Jaylib.Vector2(x, y);
+    return new Raylib.Vector2().x(x).y(y);
   }
 
   @Override

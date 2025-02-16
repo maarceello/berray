@@ -1,0 +1,32 @@
+type: frame
+size: [  400, 550  ]
+layoutManager: nop
+border: bevel
+title: Info Model
+children:
+  - type: panel
+    size: [  300, 800  ]
+    layoutManager:
+      type: grid-layout
+      columns: [60, 1000, 80]
+      rows: [ 25, 25,25,25, 25, 25 ]
+      columnSpacing: 5
+      rowSpacing: 5
+    children:
+      - type: label
+        label: "Object:"
+      - type: slider
+        actionId: "model"
+        model:
+          type: property-slider-model
+          min: 0
+          max: "models.#size-minus-1"
+          value: "modelIndex"
+      - type: label
+        label: "${modelIndex} ${modelIndexHex}"
+      - type: label
+        label: "Flags:"
+      - type: label
+        label: "${model.sf3Mesh.flags}"
+      - type: label
+        label: ""

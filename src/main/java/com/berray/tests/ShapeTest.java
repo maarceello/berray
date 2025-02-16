@@ -10,10 +10,7 @@ import com.berray.event.MouseEvent;
 import com.berray.event.UpdateEvent;
 import com.berray.math.Color;
 import com.berray.math.Vec2;
-import com.raylib.Jaylib;
-
-import static com.raylib.Jaylib.RED;
-import static com.raylib.Raylib.GetMouseY;
+import com.raylib.Raylib;
 
 public class ShapeTest  extends BerrayApplication implements CoreComponentShortcuts, CoreAssetShortcuts {
 
@@ -91,7 +88,7 @@ public class ShapeTest  extends BerrayApplication implements CoreComponentShortc
     game.onUpdate("sprite", (UpdateEvent event) -> {
       GameObject gameObject = event.getSource();
       Vec2 pos = gameObject.get("pos");
-      int mouseY = Jaylib.GetMouseY();
+      int mouseY = Raylib.GetMouseY();
       if (pos != null) {
         // Note: this updates the pos inside the component
         gameObject.set("pos", new Vec2(pos.getX(), mouseY));

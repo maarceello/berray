@@ -4,15 +4,17 @@ import com.berray.GameObject;
 import com.berray.event.*;
 import com.berray.math.MathUtil;
 import com.berray.math.Vec2;
+import com.berray.math.Vec3;
 import com.raylib.Raylib;
 
 public class OrbitCamera extends GameObject {
+  private Vec3 lookat;
   /** Angle up/down */
   private float pitch = 45;
   /** Angle around up axis (in this case the y axis) */
   private float yaw;
   /** Distance of the camera from the lookat center. */
-  private float distance = 20;
+  private float distance;
   /** Low Level camera from raylib. */
   private Raylib.Camera3D camera;
 
@@ -22,7 +24,12 @@ public class OrbitCamera extends GameObject {
   private float yawStart;
 
   public OrbitCamera(Raylib.Camera3D camera) {
+    this(camera, new Vec3(), 20);
+  }
+  public OrbitCamera(Raylib.Camera3D camera, Vec3 lookat, float distance) {
     this.camera = camera;
+    this.lookat = lookat;
+    this.distance = distance;
     on(CoreEvents.SCENE_GRAPH_ADDED, this::onSceneGraphAdded);
   }
 
@@ -58,9 +65,9 @@ public class OrbitCamera extends GameObject {
     float y = (float) (Math.sin(-pitchRadians));
     float z = (float) (Math.cos(-pitchRadians) * Math.sin(yawRadians));
 
-    camera._position().x(x * distance);
-    camera._position().y(y * distance);
-    camera._position().z(z * distance);
+    camera._position().x(lookat.getX()+x * distance);
+    camera._position().y(lookat.getY()+y * distance);
+    camera._position().z(lookat.getZ()+z * distance);
   }
 
   private void processMousePress(MouseEvent e) {

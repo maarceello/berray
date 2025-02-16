@@ -35,6 +35,7 @@ public class Label extends GameObject {
    */
   public void setLabel(String label) {
     this.label = label;
+    set("text", label);
   }
 
   /**

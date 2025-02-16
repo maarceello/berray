@@ -11,7 +11,6 @@ import com.berray.math.Quaternion;
 import com.berray.math.Vec3;
 import com.berray.components.core.CameraComponent;
 import com.berray.objects.Root3D;
-import com.raylib.Jaylib;
 import com.raylib.Raylib;
 
 import static com.raylib.Raylib.*;
@@ -58,9 +57,9 @@ public class Render3dTest extends BerrayApplication implements CoreComponentShor
     title("3D Render Mode Test");
 
     this.camera = new Raylib.Camera3D();
-    this.camera._position(new Jaylib.Vector3(0.0f, 10.0f, 10.0f));  // Camera position
-    this.camera.target(new Jaylib.Vector3(0.0f, 0.0f, 0.0f));      // Camera looking at point
-    this.camera.up(new Jaylib.Vector3(0.0f, 1.0f, 0.0f));          // Camera up vector (rotation towards target)
+    this.camera._position(new Raylib.Vector3().x(0.0f).y(10.0f).z( 10.0f));  // Camera position
+    this.camera.target(new Raylib.Vector3().x(0.0f).y( 0.0f).z( 0.0f));      // Camera looking at point
+    this.camera.up(new Raylib.Vector3().x(0.0f).y( 1.0f).z( 0.0f));          // Camera up vector (rotation towards target)
     this.camera.fovy(45.0f);                                // Camera field-of-view Y
     this.camera.projection(Raylib.CAMERA_PERSPECTIVE);             // Camera mode type
   }
@@ -83,7 +82,7 @@ public class Render3dTest extends BerrayApplication implements CoreComponentShor
 
     @Override
     public void draw() {
-      Raylib.DrawCubeWires(new Vector3(), 1.0f,1.0f,1.0f, Jaylib.WHITE);
+      Raylib.DrawCubeWires(new Vector3(), 1.0f,1.0f,1.0f, Color.WHITE.toRaylibColor());
     }
   }
 }

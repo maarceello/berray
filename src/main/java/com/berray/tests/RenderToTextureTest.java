@@ -12,7 +12,6 @@ import com.berray.math.Quaternion;
 import com.berray.math.Vec3;
 import com.berray.objects.RenderToTexture;
 import com.berray.objects.Root3D;
-import com.raylib.Jaylib;
 import com.raylib.Raylib;
 
 import java.util.function.Supplier;
@@ -71,9 +70,9 @@ public class RenderToTextureTest extends BerrayApplication implements CoreCompon
     title("3D Render Mode Test");
 
     this.camera = new Raylib.Camera3D();
-    this.camera._position(new Jaylib.Vector3(0.0f, 10.0f, 10.0f));  // Camera position
-    this.camera.target(new Jaylib.Vector3(0.0f, 0.0f, 0.0f));      // Camera looking at point
-    this.camera.up(new Jaylib.Vector3(0.0f, 1.0f, 0.0f));          // Camera up vector (rotation towards target)
+    this.camera._position(new Raylib.Vector3().x(0.0f).y(10.0f).z( 10.0f));  // Camera position
+    this.camera.target(new Raylib.Vector3().x(0.0f).y( 0.0f).z( 0.0f));      // Camera looking at point
+    this.camera.up(new Raylib.Vector3().x(0.0f).y( 1.0f).z( 0.0f));          // Camera up vector (rotation towards target)
     this.camera.fovy(45.0f);                                // Camera field-of-view Y
     this.camera.projection(Raylib.CAMERA_PERSPECTIVE);             // Camera mode type
   }
@@ -96,7 +95,7 @@ public class RenderToTextureTest extends BerrayApplication implements CoreCompon
 
     @Override
     public void draw() {
-      Raylib.DrawCubeWires(new Raylib.Vector3(), 1.0f, 1.0f, 1.0f, Jaylib.WHITE);
+      Raylib.DrawCubeWires(new Raylib.Vector3(), 1.0f, 1.0f, 1.0f, Color.WHITE.toRaylibColor());
     }
   }
 
@@ -117,7 +116,7 @@ public class RenderToTextureTest extends BerrayApplication implements CoreCompon
 
     @Override
     public void draw() {
-      Raylib.DrawTexture(renderTextureGetter.get().texture(), 0,0, Jaylib.WHITE);
+      Raylib.DrawTexture(renderTextureGetter.get().texture(), 0,0, Color.WHITE.toRaylibColor());
     }
 
   }

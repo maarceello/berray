@@ -1,0 +1,19 @@
+type: panel
+size: [  650, 800  ]
+layoutManager:
+  type: row-layout
+  columns: "50px;5em;2*;3*"
+  height: "1.5em"
+children:
+  - type: sprite
+    texture: "foo"
+  - type: label
+    label: "bar"
+  - type: slider
+    model:
+      type: property-slider-model
+      min: 0
+      max: 100
+      value: "value"
+  - type: sprite
+    texture: "xxx"

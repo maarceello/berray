@@ -5,11 +5,7 @@ import com.berray.assets.AssetType;
 import com.berray.components.core.Component;
 import com.berray.math.Color;
 import com.berray.math.Vec2;
-import com.raylib.Jaylib;
 import com.raylib.Raylib;
-
-import static com.raylib.Jaylib.NPatchInfo;
-import static com.raylib.Jaylib.Texture;
 
 public class Slice9Component extends Component {
   /**
@@ -51,18 +47,18 @@ public class Slice9Component extends Component {
 
   @Override
   public void draw() {
-    Texture texture = getAssetManager().getAsset(this.textureName, AssetType.SPRITE).getAsset();
+    Raylib.Texture texture = getAssetManager().getAsset(this.textureName, AssetType.SPRITE).getAsset();
 
     Color color = gameObject.getOrDefault("color", Color.WHITE);
 
-    NPatchInfo nPatchInfo = new NPatchInfo()
+    Raylib.NPatchInfo nPatchInfo = new Raylib.NPatchInfo()
         .top(top)
         .bottom(bottom)
         .left(left)
         .right(right)
         .layout(Raylib.NPATCH_NINE_PATCH)
-        .source(new Jaylib.Rectangle(0, 0, texture.width(), texture.height()));
-    Raylib.DrawTextureNPatch(texture, nPatchInfo, new Jaylib.Rectangle(0, 0, size.getX(), size.getY()), new Jaylib.Vector2(0, 0), 0, color.toRaylibColor());
+        .source(new Raylib.Rectangle().x(0).y(0).width(texture.width()).height(texture.height()));
+    Raylib.DrawTextureNPatch(texture, nPatchInfo, new Raylib.Rectangle().x(0).y(0).width(size.getX()).height(size.getY()), new Raylib.Vector2().x(0).y(0), 0, color.toRaylibColor());
   }
 
   /**

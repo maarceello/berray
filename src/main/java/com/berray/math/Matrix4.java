@@ -1,5 +1,7 @@
 package com.berray.math;
 
+import com.raylib.Raylib;
+
 /**
  * 4x4 Matrix in row major order.
  */
@@ -144,7 +146,7 @@ public class Matrix4 {
     float y1 = a.e * x + a.f * y + a.g * z + a.h/* * w*/;
     float z1 = a.i * x + a.j * y + a.k * z + a.l/* * w*/;
 //    result.w = a.m * x + a.n * y + a.o * z + a.p/* * w*/;
-    return new Vec3(x1,y1,z1);
+    return new Vec3(x1, y1, z1);
   }
 
   public Matrix4 scale(float x, float y, float z) {
@@ -326,21 +328,92 @@ public class Matrix4 {
     return m;
   }
 
+  /**
+   * Returns a quaternion representing the rotation part of the matrix.
+   *
+   * @see "http://www.j3d.org/matrix_faq/matrfaq_latest.html#Q55"
+   */
+  public Quaternion toQuaternion() {
+    float[] mat = this.toFloat();
+
+    float trace = mat[0] + mat[5] + mat[10];
+
+    // avoid large distortions
+    if (trace > 0.00001) {
+      float s = (float) (Math.sqrt(1.0 + trace) * 2);
+      float x = (mat[9] - mat[6]) / s;
+      float y = (mat[2] - mat[8]) / s;
+      float z = (mat[4] - mat[1]) / s;
+      float w = 0.25f * s;
+      return new Quaternion(x, y, z, w);
+    }
+
+    // Column 0
+    if (mat[0] > mat[5] && mat[0] > mat[10]) {
+      float s = (float) (Math.sqrt(1.0f + mat[0] - mat[5] - mat[10]) * 2);
+      float x = 0.25f * s;
+      float y = (mat[4] + mat[1]) / s;
+      float z = (mat[2] + mat[8]) / s;
+      float w = (mat[9] - mat[6]) / s;
+      return new Quaternion(x, y, z, w);
+    }
+    // Column 1
+    if (mat[5] > mat[10]) {
+      float s = (float) (Math.sqrt(1.0 + mat[5] - mat[0] - mat[10]) * 2);
+      float x = (mat[4] + mat[1]) / s;
+      float y = 0.25f * s;
+      float z = (mat[9] + mat[6]) / s;
+      float w = (mat[2] - mat[8]) / s;
+      return new Quaternion(x, y, z, w);
+    }
+
+    // Column 2
+    float s = (float) Math.sqrt(1.0 + mat[10] - mat[0] - mat[5]) * 2;
+    float x = (mat[2] + mat[8]) / s;
+    float y = (mat[9] + mat[6]) / s;
+    float z = 0.25f * s;
+    float w = (mat[4] - mat[1]) / s;
+
+    return new Quaternion(x, y, z, w);
+  }
+
   public float[] toFloat() {
-    return new float[] {
-        a,b,c,d,
-        e,f,g,h,
-        i,j,k,l,
-        m,n,o,p
+    return new float[]{
+        a, b, c, d,
+        e, f, g, h,
+        i, j, k, l,
+        m, n, o, p
     };
   }
+
   public float[] toFloatTransposed() {
-    return new float[] {
-        a,e,i,m,
-        b,f,j,n,
-        c,g,k,o,
-        d,h,l,p
+    return new float[]{
+        a, e, i, m,
+        b, f, j, n,
+        c, g, k, o,
+        d, h, l, p
     };
+  }
+
+  public Raylib.Matrix toRaylibMatrix() {
+    float[] values = toFloatTransposed();
+    return new Raylib.Matrix()
+        .m0(values[0])
+        .m1(values[1])
+        .m2(values[2])
+        .m3(values[3])
+        .m4(values[4])
+        .m5(values[5])
+        .m6(values[6])
+        .m7(values[7])
+        .m8(values[8])
+        .m9(values[9])
+        .m10(values[10])
+        .m11(values[11])
+        .m12(values[12])
+        .m13(values[13])
+        .m14(values[14])
+        .m15(values[15]);
   }
 
   @Override

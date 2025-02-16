@@ -11,7 +11,6 @@ import com.berray.event.PhysicsEvent;
 import com.berray.math.Color;
 import com.berray.math.Vec2;
 import com.berray.objects.core.Label;
-import com.raylib.Jaylib;
 import com.raylib.Raylib;
 
 import static com.berray.assets.Animation.anim;
@@ -81,7 +80,7 @@ public class SpriteTest extends BerrayApplication implements CoreComponentShortc
       }
     });
 
-    onKeyPress(Jaylib.KEY_SPACE, (KeyEvent event) -> {
+    onKeyPress(Raylib.KEY_SPACE, (KeyEvent event) -> {
       if (player.getOrDefault("grounded", false)) {
         player.doAction("jump", JUMP_FORCE);
         player.doAction("play", "jump");

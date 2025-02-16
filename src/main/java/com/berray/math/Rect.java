@@ -1,6 +1,5 @@
 package com.berray.math;
 
-import com.raylib.Jaylib;
 import com.raylib.Raylib;
 
 import java.util.ArrayList;
@@ -141,7 +140,7 @@ public class Rect {
 
 
   public Raylib.Rectangle toRectangle() {
-    return new Jaylib.Rectangle(x, y, width, height);
+    return new Raylib.Rectangle().x(x).y(y).width(width).height(height);
   }
 
 

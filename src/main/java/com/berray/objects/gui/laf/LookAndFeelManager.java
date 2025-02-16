@@ -13,6 +13,8 @@ public interface LookAndFeelManager {
   void drawBorder(GameObject gameObject, String border);
   /** Draws a border around the game object. */
   Insets getBorderInsets(GameObject gameObject, String border);
+  /** Returns the font size. Type is a layout specific identifier what font size should be returned, ie "default", "title", etc. */
+  float getFontSize(String type);
 
 
   /** Installs the look and feel to the button. */

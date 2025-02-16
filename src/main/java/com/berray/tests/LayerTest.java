@@ -4,7 +4,6 @@ import com.berray.BerrayApplication;
 import com.berray.components.CoreComponentShortcuts;
 import com.berray.components.core.AnchorType;
 import com.berray.math.Color;
-import com.raylib.Jaylib;
 
 public class LayerTest extends BerrayApplication implements CoreComponentShortcuts {
   @Override

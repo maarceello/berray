@@ -1,6 +1,5 @@
 package com.berray.math;
 
-import com.raylib.Jaylib;
 import com.raylib.Raylib;
 
 public class Vec3 {
@@ -23,6 +22,10 @@ public class Vec3 {
     this.x = other.x();
     this.y = other.y();
     this.z = other.z();
+  }
+
+  public static Vec3 fromRaylib(Raylib.Vector3 vector3) {
+    return new Vec3(vector3.x(), vector3.y(), vector3.z());
   }
 
   public float getX() {
@@ -94,7 +97,7 @@ public class Vec3 {
   }
 
   public Raylib.Vector3 toVector3() {
-    return new Jaylib.Vector3(x, y, z);
+    return new Raylib.Vector3().x(x).y(y).z(z);
   }
 
   public static Vec3 origin() {

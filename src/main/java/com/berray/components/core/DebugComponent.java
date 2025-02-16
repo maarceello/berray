@@ -2,10 +2,8 @@ package com.berray.components.core;
 
 import com.berray.GameObject;
 import com.berray.math.*;
-import com.raylib.Jaylib;
 import com.raylib.Raylib;
 
-import static com.raylib.Jaylib.*;
 import static com.raylib.Raylib.DrawLine;
 import static com.raylib.Raylib.DrawText;
 
@@ -24,9 +22,9 @@ public class DebugComponent extends Component {
       Vec3 pos = worldTransform.multiply(Vec3.origin());
       if (pos != null) {
         AnchorType anchor = gameObject.getOrDefault("anchor", AnchorType.CENTER);
-        drawPoint(pos, LIME);
+        drawPoint(pos, Color.GREEN.toRaylibColor());
         int id = gameObject.getId();
-        DrawText("#" + id, (int) pos.getX(), (int) pos.getY() - 25, 15, GOLD);
+        DrawText("#" + id, (int) pos.getX(), (int) pos.getY() - 25, 15, Color.GOLD.toRaylibColor());
 
 
         Vec2 size = gameObject.get("size");
@@ -40,17 +38,17 @@ public class DebugComponent extends Component {
           Vec3 p4 = worldTransform.multiply(anchorPoint.getX() + width, anchorPoint.getY() + height, 0);
 
           // draw transformed rectangle around the shape
-          drawLine(p1, p2, LIME);
-          drawLine(p1, p3, LIME);
-          drawLine(p4, p2, LIME);
-          drawLine(p4, p3, LIME);
+          drawLine(p1, p2, Color.GREEN.toRaylibColor());
+          drawLine(p1, p3, Color.GREEN.toRaylibColor());
+          drawLine(p4, p2, Color.GREEN.toRaylibColor());
+          drawLine(p4, p3, Color.GREEN.toRaylibColor());
 
           Rect bb = gameObject.getBoundingBox();
           if (bb != null) {
-            Raylib.Color color = GOLD;
+            Raylib.Color color = Color.GOLD.toRaylibColor();
             AreaComponent area = gameObject.getComponent(AreaComponent.class);
             if (area != null && area.isColliding()) {
-              color = PINK;
+              color = Color.RED.toRaylibColor();
             }
 
             DrawLine((int) bb.getX(), (int) bb.getY(), (int) (bb.getX() + bb.getWidth()), (int) bb.getY(), color);
@@ -60,7 +58,7 @@ public class DebugComponent extends Component {
 
             for (Collision collision : area.getCollisions()) {
               Vec2 displacement = collision.getDisplacement();
-              DrawLine((int) p1.getX(), (int) p1.getY(), (int) (p1.getX()+displacement.getX()), (int) (p1.getY()+displacement.getY()), GOLD);
+              DrawLine((int) p1.getX(), (int) p1.getY(), (int) (p1.getX()+displacement.getX()), (int) (p1.getY()+displacement.getY()), Color.GOLD.toRaylibColor());
             }
           }
         }
@@ -69,7 +67,7 @@ public class DebugComponent extends Component {
   }
 
   private static void drawPoint(Vec3 pos, Raylib.Color color) {
-    DrawCircleLines((int) pos.getX(), (int) pos.getY(), 10, color);
+    Raylib.DrawCircleLines((int) pos.getX(), (int) pos.getY(), 10, color);
     DrawLine((int) pos.getX() - 10, (int) pos.getY() + 10, (int) pos.getX() + 10, (int) pos.getY() - 10, color);
     DrawLine((int) pos.getX() + 10, (int) pos.getY() + 10, (int) pos.getX() - 10, (int) pos.getY() - 10, color);
   }

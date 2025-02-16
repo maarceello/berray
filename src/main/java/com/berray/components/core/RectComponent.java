@@ -2,11 +2,8 @@ package com.berray.components.core;
 
 import com.berray.GameObject;
 import com.berray.math.Color;
-import com.berray.math.Rect;
 import com.berray.math.Vec2;
-import com.raylib.Jaylib;
-
-import static com.raylib.Jaylib.*;
+import com.raylib.Raylib;
 
 /**
  * Rectangular drawn shape.
@@ -111,9 +108,9 @@ public class RectComponent extends Component {
   public void draw() {
     Color color = gameObject.getOrDefault("color", Color.WHITE);
     if (fill) {
-      DrawRectangle(0, 0, (int) size.getX(), (int) size.getY(), color.toRaylibColor());
+      Raylib.DrawRectangle(0, 0, (int) size.getX(), (int) size.getY(), color.toRaylibColor());
     } else {
-      DrawRectangleLinesEx(new Jaylib.Rectangle(0, 0, (int) size.getX(), (int) size.getY()), lineThickness, color.toRaylibColor());
+      Raylib.DrawRectangleLinesEx(new Raylib.Rectangle().x(0).y(0).width(size.getX()).height(size.getY()), lineThickness, color.toRaylibColor());
     }
   }
 

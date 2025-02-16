@@ -1,6 +1,5 @@
 package com.berray.math;
 
-import com.raylib.Jaylib;
 import com.raylib.Raylib;
 
 public class Color {
@@ -94,7 +93,11 @@ public class Color {
 
   public Raylib.Color toRaylibColor() {
     if (raylibColor == null) {
-      raylibColor = new Jaylib.Color((int) (r * 255), (int) (g * 255), (int) (b * 255), (int) (a * 255));
+      raylibColor = new Raylib.Color()
+          .r((byte) (int) (r * 255))
+          .g((byte) (int) (g * 255))
+          .b((byte) (int) (b * 255))
+          .a((byte) (int) (a * 255));
     }
     return raylibColor;
   }

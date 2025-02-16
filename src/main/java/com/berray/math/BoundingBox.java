@@ -23,6 +23,20 @@ public class BoundingBox {
     return max;
   }
 
+  public BoundingBox add(float x, float y, float z) {
+    Vec3 min = new Vec3(
+        Math.min(this.min.x, x),
+        Math.min(this.min.y, y),
+        Math.min(this.min.z, z)
+    );
+    Vec3 max = new Vec3(
+        Math.max(this.max.x, x),
+        Math.max(this.max.y, y),
+        Math.max(this.max.z, z)
+    );
+    return new BoundingBox(min, max);
+  }
+
   public BoundingBox add(BoundingBox other) {
     Vec3 min = new Vec3(
         Math.min(this.min.x, other.min.x),

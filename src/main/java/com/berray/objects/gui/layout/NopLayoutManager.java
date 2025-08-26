@@ -37,7 +37,7 @@ public class NopLayoutManager implements LayoutManager {
           if (childMaxY > maxY) {
             height = maxY - pos.getY();
           }
-          // yes, it is to big. resize the child.
+          // yes, it is too big. resize the child.
           if (width != size.getX() || height != size.getY()) {
             gameObject.set("size", new Vec2(width, height));
           }

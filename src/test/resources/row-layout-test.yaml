@@ -1,14 +1,18 @@
-type: panel
-size: [  650, 800  ]
+type: frame
+size: [  400, 550  ]
 layoutManager:
   type: row-layout
   columns: "50px;5em;2*;3*"
   height: "1.5em"
+border: bevel
+title: Info Model
 children:
-  - type: sprite
-    texture: "foo"
+  - type: checkbox
+    model:
+      type: checkbox-button-model
+      value: "play"
   - type: label
-    label: "bar"
+    label: "BAR"
   - type: slider
     model:
       type: property-slider-model
@@ -16,4 +20,4 @@ children:
       max: 100
       value: "value"
   - type: sprite
-    texture: "xxx"
+    texture: "berry"

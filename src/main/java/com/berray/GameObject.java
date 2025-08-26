@@ -265,6 +265,14 @@ public class GameObject {
     return children.stream().filter(child -> child.is(tag)).collect(Collectors.toList());
   }
 
+  /**
+   * Returns children with the specified tag. This method checks only the direct children of the game object.
+   *
+   * @see #getTagStream(String)
+   */
+  public GameObject getChild(String tag) {
+    return children.stream().filter(child -> child.is(tag)).findFirst().orElse(null);
+  }
 
   public void addComponents(Object... components) {
     addComponents(Arrays.asList(components));

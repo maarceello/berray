@@ -38,4 +38,21 @@ public class Insets {
         bottom + other.bottom,
         right + other.right);
   }
+
+  public Insets add(float value) {
+    return new Insets(
+        top + value,
+        left + value,
+        bottom + value,
+        right + value);
+  }
+
+  public float getHorizontal() {
+    return left + right;
+  }
+
+  public float getVertical() {
+    return top + bottom;
+  }
+
 }

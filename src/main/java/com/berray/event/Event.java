@@ -57,4 +57,12 @@ public class Event {
   public GameObject getSource() {
     return getParameter(0);
   }
+
+  @Override
+  public String toString() {
+    return this.getClass().getSimpleName()+"{" +
+            "name='" + name + '\'' +
+            ", parameters=" + parameters +
+            '}';
+  }
 }

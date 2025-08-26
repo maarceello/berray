@@ -1,6 +1,7 @@
 package com.berray.objects.gui;
 
 import com.berray.event.*;
+import com.berray.math.Insets;
 import com.berray.math.Rect;
 import com.berray.math.Vec2;
 import com.berray.objects.gui.model.ButtonModel;
@@ -13,7 +14,7 @@ import static com.berray.components.core.AreaComponent.area;
 import static com.berray.components.core.MouseComponent.mouse;
 
 /** Button functionality. */
-public class Button extends Container {
+public class Button extends GuiGameObject {
   /** Action Id which is used in {@link ActionEvent}s. */
   private String actionId;
   /** Value with placeholders. */
@@ -44,6 +45,14 @@ public class Button extends Container {
 
   private void processBoundObjectChange(PropertyChangeEvent event) {
     resolveValue(event.getNewValue());
+  }
+
+  @Override
+  protected Vec2 getMinSize() {
+    // minimum size for buttons is the border plus insets plus the font size
+    Insets insets = getTotalInsets();
+    float fontSize = getLookAndFeelManager().getFontSize(null);
+    return new Vec2(insets.getHorizontal() + fontSize, insets.getVertical() + fontSize);
   }
 
   private void onSceneGraphAdded(SceneGraphEvent e) {

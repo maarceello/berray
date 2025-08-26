@@ -72,7 +72,7 @@ public class MouseCalculationTest extends BerrayApplication implements CoreCompo
     width(1000);
     height(1000);
     background(Color.GRAY);
-    title("Databinding Test");
+    title("MouseCalculationTest");
   }
 
   public static void main(String[] args) {

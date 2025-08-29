@@ -39,6 +39,7 @@ public class Game {
   private DefaultAssetManager assetManager;
   private MouseManager mouseManager;
   private LookAndFeelManager lookAndFeelManager = new DefaultLookAndFeel();
+  private AnimationManager animationManager;
 
 
   // Constructor
@@ -71,6 +72,7 @@ public class Game {
     eventTypeFactory.registerEventType(SceneGraphEvent.EVENT_NAME_REMOVED, SceneGraphEvent::new);
     eventTypeFactory.registerEventType(PhysicsBeforeResolveEvent.EVENT_NAME, PhysicsBeforeResolveEvent::new);
     eventTypeFactory.registerEventType(PhysicsCollideEvent.EVENT_NAME, PhysicsCollideEvent::new);
+    eventTypeFactory.registerEventType(PhysicsCollideEndEvent.EVENT_NAME, PhysicsCollideEndEvent::new);
     eventTypeFactory.registerEventType(PhysicsCollideUpdateEvent.EVENT_NAME, PhysicsCollideUpdateEvent::new);
     eventTypeFactory.registerEventType(PhysicsResolveEvent.EVENT_NAME, PhysicsResolveEvent::new);
     eventTypeFactory.registerEventType(PhysicsEvent.EVENT_NAME_GROUND,  PhysicsEvent::new);
@@ -80,7 +82,12 @@ public class Game {
     eventTypeFactory.registerEventType(ActionEvent.EVENT_NAME, ActionEvent::new);
     eventManager = new EventManager();
     mouseManager = new MouseManager();
+    animationManager = new AnimationManager();
     init();
+  }
+
+  public AnimationManager getAnimationManager() {
+    return animationManager;
   }
 
   public MouseManager getMouseManager() {
@@ -190,7 +197,7 @@ public class Game {
     // insert empty list for each layer in the correct order
     layers.forEach(layerName -> sortedLayers.put(layerName, new ArrayList<>()));
 
-    root.visitDrawChildren((String layer, Runnable drawMethod) -> {
+    root.visitDrawChildren(Game.DEFAULT_LAYER, (String layer, Runnable drawMethod) -> {
       if (layer == null) {
         layer = DEFAULT_LAYER;
       }

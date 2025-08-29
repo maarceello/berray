@@ -14,10 +14,10 @@ import static com.raylib.Raylib.Camera3D;
 public class Root3D extends GameObject {
 
   @Override
-  public void visitDrawChildren(BiConsumer<String, Runnable> visitor) {
-    visitor.accept(get("layer", Game.DEFAULT_LAYER), () -> BeginMode3D(get("camera")));
-    super.visitDrawChildren(visitor);
-    visitor.accept(get("layer", Game.DEFAULT_LAYER), Raylib::EndMode3D);
+  public void visitDrawChildren(String parentLayer, BiConsumer<String, Runnable> visitor) {
+    visitor.accept(get("layer", parentLayer), () -> BeginMode3D(get("camera")));
+    super.visitDrawChildren(parentLayer, visitor);
+    visitor.accept(get("layer", parentLayer), Raylib::EndMode3D);
   }
 
   @Override

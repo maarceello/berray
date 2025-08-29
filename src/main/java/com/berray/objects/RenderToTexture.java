@@ -25,13 +25,13 @@ public class RenderToTexture extends GameObject {
   }
 
   @Override
-  public void visitDrawChildren(BiConsumer<String, Runnable> visitor) {
-    visitor.accept(get("layer", Game.DEFAULT_LAYER), () ->
+  public void visitDrawChildren(String parentLayer, BiConsumer<String, Runnable> visitor) {
+    visitor.accept(get("layer", parentLayer), () ->
     {
       BeginTextureMode(renderTexture);
       ClearBackground(Color.GRAY.toRaylibColor());
     });
-    super.visitDrawChildren(visitor);
-    visitor.accept(get("layer", Game.DEFAULT_LAYER), Raylib::EndTextureMode);
+    super.visitDrawChildren(parentLayer, visitor);
+    visitor.accept(get("layer", parentLayer), Raylib::EndTextureMode);
   }
 }

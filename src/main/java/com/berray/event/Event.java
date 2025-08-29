@@ -36,6 +36,10 @@ public class Event {
 
   @SuppressWarnings("unchecked")
   protected <E> E getParameter(int i) {
+    if (i >= parameters.size()) {
+      throw new IllegalStateException("Event "+getClass().getSimpleName()+" has only "+parameters.size()+" parameters, but parameter with index "+i+" should be returned");
+    }
+
     Object value = parameters.get(i);
     if (value == null) {
       return null;
@@ -50,6 +54,14 @@ public class Event {
     }
     return (E) value;
   }
+
+  protected void setParameter(int i, Object value) {
+    if (i >= parameters.size()) {
+      throw new IllegalStateException("Event "+getClass().getSimpleName()+" has only "+parameters.size()+" parameters, but parameter with index "+i+" should be set");
+    }
+    parameters.set(i, value);
+  }
+
 
   /**
    * Returns the source of the event. May be null when the event is sent by the game.

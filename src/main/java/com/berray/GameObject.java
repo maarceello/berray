@@ -25,11 +25,11 @@ import static com.raylib.Raylib.*;
 public class GameObject {
   private static final AtomicInteger nextComponentId = new AtomicInteger(0);
   private static final AtomicInteger nextGameObjectId = new AtomicInteger(0);
-  private int id;
+  private final int id;
   /**
    * Tags.
    */
-  private Set<String> tags = new HashSet<>();
+  private final Set<String> tags = new HashSet<>();
   /**
    * Components for this game object.
    */
@@ -89,6 +89,13 @@ public class GameObject {
    * Order in which to draw the game objects children.
    */
   protected DrawOrder drawOrder = DrawOrder.DEPTH_FIRST;
+
+  /**
+   * z index in the current layer. An object with a Higher z value overwrites an object with a lower z value. Note that
+   * these z values are integer only as they are needed only for sorting the objects lowest to highest.
+   * Initially all objects have a z index of zero.
+   */
+  private int z = 0;
 
   public GameObject() {
     this.components = new LinkedHashMap<>();
@@ -203,6 +210,7 @@ public class GameObject {
     if (game != null) {
       game.removeListener(this);
     }
+
   }
 
 
@@ -335,13 +343,13 @@ public class GameObject {
   /**
    * Called by the game to get the code, which will be called to render the object.
    */
-  public void visitDraw(BiConsumer<String, Runnable> visitor) {
+  public void visitDraw(String parentLayer, BiConsumer<String, Runnable> visitor) {
     if (paused) {
       return;
     }
 
     if (Boolean.TRUE.equals(get("render", false))) {
-      visitor.accept(get("layer", Game.DEFAULT_LAYER), () -> {
+      visitor.accept(get("layer", parentLayer), () -> {
         rlPushMatrix();
         {
           ensureTransformCalculated();
@@ -370,26 +378,30 @@ public class GameObject {
   /**
    * Called by the game to get the code, which will be called to render the objects children.
    */
-  public void visitDrawChildren(BiConsumer<String, Runnable> visitor) {
+  public void visitDrawChildren(String parentLayer, BiConsumer<String, Runnable> visitor) {
     // don't draw children of paused objects
     if (paused) {
       return;
     }
 
+    String layer = get("layer", parentLayer);
+
+    List<GameObject> children = getChildren();
+    children.sort(Comparator.comparingInt(GameObject::getZ));
     if (drawOrder == DrawOrder.DEPTH_FIRST) {
       // depth first: for each child visit the object, followed by its children.
-      for (GameObject child : getChildren()) {
-        child.visitDraw(visitor);
-        child.visitDrawChildren(visitor);
+      for (GameObject child : children) {
+        child.visitDraw(layer, visitor);
+        child.visitDrawChildren(layer, visitor);
       }
     } else {
       // breath first: for each child draw the object
-      for (GameObject child : getChildren()) {
-        child.visitDraw(visitor);
+      for (GameObject child : children) {
+        child.visitDraw(layer, visitor);
       }
       // then all children are drawn, for each child draw their children
-      for (GameObject child : getChildren()) {
-        child.visitDrawChildren(visitor);
+      for (GameObject child : children) {
+        child.visitDrawChildren(layer, visitor);
       }
     }
   }
@@ -839,6 +851,13 @@ public class GameObject {
         .anyMatch(c -> ((Component) c).getTag().equals(tag));
   }
 
+  public int getZ() {
+    return z;
+  }
+
+  public void setZ(int z) {
+    this.z = z;
+  }
 
   private static class ChildIterator implements Iterator<GameObject> {
     private final List<GameObject> children;

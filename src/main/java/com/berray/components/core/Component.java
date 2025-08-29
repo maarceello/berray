@@ -1,5 +1,6 @@
 package com.berray.components.core;
 
+import com.berray.AnimationManager;
 import com.berray.Game;
 import com.berray.GameObject;
 import com.berray.assets.AssetManager;
@@ -84,6 +85,17 @@ public class Component {
       throw new IllegalStateException("game object is not part of game tree");
     }
     return game.getAssetManager();
+  }
+
+  protected AnimationManager getAnimationManager() {
+    if (gameObject == null) {
+      throw new IllegalStateException("component is not added to game object");
+    }
+    Game game = gameObject.getGame();
+    if (game == null) {
+      throw new IllegalStateException("game object is not part of game tree");
+    }
+    return game.getAnimationManager();
   }
 
   /**

@@ -12,8 +12,8 @@ public class PhysicsCollideEndEvent extends Event {
     super(EVENT_NAME, parameters);
   }
 
-  /** Object Id of collision partner. */
-  public Integer getCollisionPartnerId() {
+  /** Object which does not collide anymore. */
+  public Collision getCollision() {
     return getParameter(1);
   }
 }

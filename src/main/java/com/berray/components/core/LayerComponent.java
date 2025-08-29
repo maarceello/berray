@@ -16,7 +16,7 @@ public class LayerComponent extends Component {
 
   @Override
   public void add(GameObject gameObject) {
-    registerGetter("layer", this::getLayer);
+    registerBoundProperty("layer", this::getLayer, this::setLayer);
   }
 
   /**
@@ -26,6 +26,10 @@ public class LayerComponent extends Component {
    */
   public String getLayer() {
     return layer;
+  }
+
+  public void setLayer(String layer) {
+    this.layer = layer;
   }
 
   /**

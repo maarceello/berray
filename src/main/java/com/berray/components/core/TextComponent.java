@@ -26,6 +26,11 @@ public class TextComponent extends Component {
     registerBoundProperty("fontHeight", this::getFontHeight, this::setFontHeight);
   }
 
+  public TextComponent fontHeight(int fontHeight) {
+    this.fontHeight = fontHeight;
+    return this;
+  }
+
 
   /**
    * Sets the text which should be drawn. Note that this may change the size of the object

@@ -12,6 +12,7 @@ public class RectComponent extends Component {
   private Vec2 size;
   private boolean fill = true;
   private float lineThickness = 1.0f;
+  private int radius;
 
   public RectComponent(Vec2 size) {
     super("rect");
@@ -24,6 +25,7 @@ public class RectComponent extends Component {
     super.add(gameObject);
     registerBoundProperty("size", this::getSize, this::setSize);
     registerBoundProperty("fill", this::getFill, this::setFill);
+    registerBoundProperty("radius", this::getRadius, this::setRadius);
     registerBoundProperty("lineThickness", this::getLineThickness, this::setLineThickness);
     registerGetter("render", () -> true);
   }
@@ -35,6 +37,16 @@ public class RectComponent extends Component {
    */
   public RectComponent fill(boolean fill) {
     this.fill = fill;
+    return this;
+  }
+
+  /**
+   * Sets whether the radius of the corners. Values <= 1 means no round rectangle.
+   *
+   * @type configuration
+   */
+  public RectComponent radius(int radius) {
+    this.radius = radius;
     return this;
   }
 
@@ -84,6 +96,24 @@ public class RectComponent extends Component {
    */
   public void setFill(boolean fill) {
     this.fill = fill;
+  }
+
+  /**
+   * Returns the radius of the corners.
+   *
+   * @type property
+   */
+  public int getRadius() {
+    return radius;
+  }
+
+  /**
+   * Sets the radius of the corners.
+   *
+   * @type property
+   */
+  public void setRadius(int radius) {
+    this.radius = radius;
   }
 
   /**

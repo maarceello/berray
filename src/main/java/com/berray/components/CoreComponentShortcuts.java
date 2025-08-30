@@ -114,4 +114,8 @@ public interface CoreComponentShortcuts {
     return PosComponent3d.pos(pos);
   }
 
+  default ZComponent z(int z) {
+    return ZComponent.z(z);
+  }
+
 }

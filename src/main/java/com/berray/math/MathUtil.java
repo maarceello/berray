@@ -23,4 +23,9 @@ public class MathUtil {
   public static float toRadians(float angle) {
     return (float) Math.toRadians(angle);
   }
+
+  /** float  version of {@link Math#toDegrees(double)} */
+  public static float toDegrees(float angle) {
+    return (float) Math.toDegrees(angle);
+  }
 }

@@ -2,13 +2,43 @@ package com.berray;
 
 import com.berray.event.CoreEvents;
 import com.berray.event.UpdateEvent;
+import com.berray.math.Vec2;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 
 public class AnimationManager {
     private List<GameObject> animatedObjects = new ArrayList<>();
+
+    private Map<Class<?>, AnimationValueType<?>> animationValueTypes = new HashMap<>();
+
+    public AnimationManager() {
+        this.animationValueTypes.put(Integer.class, new AnimationValueType<Integer>(
+                (a, scale) -> (int) (a * scale),
+                (a, b) -> a + b,
+                (a, b) -> a - b));
+        this.animationValueTypes.put(Float.class, new AnimationValueType<Float>(
+                (f, scale) -> f * scale,
+                (a, b) -> a + b,
+                (a, b) -> a - b
+        ));
+        this.animationValueTypes.put(Vec2.class, new AnimationValueType<Vec2>(Vec2::scale, Vec2::add, Vec2::sub));
+    }
+
+    @SuppressWarnings("unchecked")
+    public <E> void addAnimation(GameObject gameObject, String property, E newValue, float duration) {
+        if (newValue == null) {
+            throw new NullPointerException("newValue must not be null");
+        }
+        AnimationValueType<E> newValueType = (AnimationValueType<E>) animationValueTypes.get(newValue.getClass());
+        if (newValueType == null) {
+            throw new IllegalStateException("type of newValue ("+newValue.getClass().getName()+") is not registered. Either register the type or use the AnimationData constructor.");
+        }
+        // get current value from game object
+        E current = gameObject.get(property);
+        addAnimation(gameObject, new AnimationData<>(property,current, newValue, duration,newValueType));
+    }
 
     public void addAnimation(GameObject gameObject, AnimationData<?> animationData) {
         gameObject.setProperty("animation", animationData);
@@ -98,4 +128,6 @@ public class AnimationManager {
         }
         return (float) (Math.pow(2.0f, -10.0f * t) * Math.sin((t * 10.0f - 0.75f) * c4) + 1.0f);
     }
+
+
 }

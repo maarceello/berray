@@ -539,6 +539,16 @@ public class GameObject {
     setterMethod.accept(value);
   }
 
+  /**
+   * animates registered component property
+   */
+  public <E> void animate(String property, E value, float duration) {
+    if (game != null) {
+      game.getAnimationManager().addAnimation(this, property, value, duration);
+    }
+  }
+
+
   public boolean isWritable(String property) {
     return setterMethods.containsKey(property);
   }

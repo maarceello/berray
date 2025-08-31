@@ -31,7 +31,8 @@ public class MouseManager {
       throw new IllegalStateException();
     }
     gameObjectList.add(gameObject);
-    // todo: sort game objects
+    // sort objects by z index (high z index first) so the uppermost object is hovered and hit first
+    gameObjectList.sort((a,b) -> -Integer.compare(a.getZ(), b .getZ()));
   }
 
   public void removeGameObject(GameObject gameObject) {
@@ -56,7 +57,7 @@ public class MouseManager {
     for (GameObject gameObject : gameObjectList) {
       if (gameObject.getBoundingBox().contains(mousePos)) {
         emitMouseWheelEvent(gameObject, mousePos, event.getWheelDelta());
-        if (event.isProcessed()) {
+        if (event.isConsumed()) {
           break;
         }
       }
@@ -81,33 +82,69 @@ public class MouseManager {
   private void processMouseMove(MouseEvent event) {
     Vec2 mousePos = event.getWindowPos();
 
-    // calculate objects which are hovered this frame
-    Set<GameObject> thisFrameHoveredObjects = new HashSet<>();
+    // process of calculating hovered objects
+    // 0. get list objects which were hovered over last frame
+    // 1. get list of (registered) objects where the bounding box contains the mouse cursor
+    // 2. notify new objects with hover enter (note that these objects are sorted by z index descending)
+    //    a. iterate over list of currently hovered objects
+    //    b. is the object in the list of previously hovered objects (step 0)
+    //    c. no, send the current object a hover enter event
+    //    d. send the current object a hover event. if the current object marks the event as consumed, remove all
+    //       remaining objects from the list of currently hovered objects and stop the loop
+    // 3. check which objects are not hovered anymore
+    //    a. iterate over the list of hovered object from last frame (step 0)
+    //    b. if the object is not in the list of hovered objects from this frame (step 1, possibly cut in step 2), remove it from the list
+    //       of hovered object from last frame and send a hover leave event
+
+
+    // step 0: get list objects which were hovered over last frame
+    Set<GameObject> hoveredLastFrame = this.hoveredObjects;
+
+    // 1. get list of (registered) objects where the bounding box contains the mouse cursor
+    Set<GameObject> thisFrameHoveredObjects = new LinkedHashSet<>();
     for (GameObject gameObject : gameObjectList) {
       if (gameObject.getBoundingBox().contains(mousePos)) {
         thisFrameHoveredObjects.add(gameObject);
       }
     }
 
-    Set<GameObject> hoveredLastFrame = this.hoveredObjects;
-    // remove all objects which were hovered last frame and are not hovered this frame. Send these game objects the hoverLeave event
+    // 2. notify new objects with hover enter (note that these objects are sorted by z index descending)
+    //    a. iterate over list of currently hovered objects
+    for (Iterator<GameObject> iterator = thisFrameHoveredObjects.iterator(); iterator.hasNext(); ) {
+        GameObject gameObject = iterator.next();
+        //    b. is the object in the list of previously hovered objects (step 0)
+        if (!hoveredLastFrame.contains(gameObject)) {
+            //    c. no, send the current object a hover enter event
+            emitHoverEnterEvent(gameObject, mousePos);
+        }
+        //    d. send the current object a hover event. if the current object marks the event as consumed, remove all
+        //       remaining objects from the list of currently hovered objects and stop the loop
+        boolean consumed = emitHoverEvent(gameObject, mousePos);
+        if (consumed) {
+          // drain the iterator, removing all remaining elements
+          while (iterator.hasNext()) {
+            iterator.next();
+            iterator.remove();
+          }
+          // as the iterator is drained, the loop is stopped automatically (iterator.hasNext() returns false)
+        }
+    }
+
+
+    // 3. check which objects are not hovered anymore
+    //    a. iterate over the list of hovered object from last frame (step 0)
     Iterator<GameObject> hoveredLastFrameIterator = hoveredLastFrame.iterator();
     while ( hoveredLastFrameIterator.hasNext()) {
       GameObject object = hoveredLastFrameIterator.next();
+      //    b. if the object is not in the list of hovered objects from this frame (step 1, possibly cut in step 2), remove it from the list
+      //       of hovered object from last frame and send a hover leave event
       if (!thisFrameHoveredObjects.contains(object)) {
-        emitHoverLeaveEvent(object, mousePos);
         hoveredLastFrameIterator.remove();
+        emitHoverLeaveEvent(object, mousePos);
       }
     }
 
-    // send the hovered objects a 'hover' event. When the object was not hovered last frame, send a 'hoverEnter' event
-    for (GameObject gameObject : thisFrameHoveredObjects) {
-      if (!hoveredLastFrame.contains(gameObject)) {
-        emitHoverEnterEvent(gameObject, mousePos);
-      }
-      emitHoverEvent(gameObject, mousePos);
-    }
-    // remember the hovered objects for next frame
+    // remember the currently hovered objects for next frame
     this.hoveredObjects = thisFrameHoveredObjects;
 
     // are we dragging at the moment?
@@ -135,7 +172,7 @@ public class MouseManager {
       Vec2 localPos = worldPosToLocalPos(pressedGameObject, mousePos);
       emitMouseReleaseEvent(pressedGameObject, mousePos, localPos);
 
-      // only trigger click wenn the release is also over the game object
+      // only trigger click when the release is also over the game object
       if (pressedGameObject.getBoundingBox().contains(mousePos)) {
         emitMouseClickEvent(pressedGameObject, mousePos, localPos);
       }
@@ -168,7 +205,7 @@ public class MouseManager {
     Vec2 localPos = worldPosToLocalPos(gameObject, mousePos);
     MouseEvent event = MouseEvent.createMouseEvent(MouseEvent.EVENT_NAME_MOUSE_PRESS, Arrays.asList(gameObject, mousePos, localPos));
     gameObject.trigger(event);
-    return event.isProcessed();
+    return event.isConsumed();
   }
 
   /**
@@ -192,11 +229,14 @@ public class MouseManager {
   /**
    * Fired then the mouse is hovered over the object. Note that there may also be be a mouse press and/or a dragging operation.
    *
+   * @return true when the event is consumed, false otherwise
    * @type emit-event
    */
-  private void emitHoverEvent(GameObject gameObject, Vec2 mousePos) {
+  private boolean emitHoverEvent(GameObject gameObject, Vec2 mousePos) {
     Vec2 localPos = worldPosToLocalPos(gameObject, mousePos);
-    gameObject.trigger(CoreEvents.HOVER, gameObject, mousePos, localPos);
+    MouseEvent event = MouseEvent.createMouseEvent(CoreEvents.HOVER, Arrays.asList(gameObject, mousePos, localPos));
+    gameObject.trigger(event);
+    return event.isConsumed();
   }
 
   /**

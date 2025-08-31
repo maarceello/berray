@@ -40,7 +40,7 @@ public class MouseEvent extends Event {
    * true when this event is processed an no other (game object) listener should be
    * notified of the event.
    */
-  private boolean processed = false;
+  private boolean consumed = false;
 
 
   public MouseEvent(String name, List<Object> parameters) {
@@ -55,12 +55,12 @@ public class MouseEvent extends Event {
     return getParameter(2);
   }
 
-  public void setProcessed() {
-    this.processed = true;
+  public void consume() {
+    this.consumed = true;
   }
 
-  public boolean isProcessed() {
-    return processed;
+  public boolean isConsumed() {
+    return consumed;
   }
 
   public ButtonState getButtonState(Button button) {

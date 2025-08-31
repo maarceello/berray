@@ -20,6 +20,7 @@ public class ScaleComponent extends Component {
   public void add(GameObject gameObject) {
     super.add(gameObject);
     registerBoundProperty("scale", this::getScale, this::setScale);
+    registerBoundProperty("scale2d", this::getScale2d, this::setScale);
   }
 
   /**
@@ -29,6 +30,15 @@ public class ScaleComponent extends Component {
    */
   public Object getScale() {
     return scale;
+  }
+
+  /**
+   * Returns the scale factors for each axis.
+   *
+   * @type property
+   */
+  public Vec2 getScale2d() {
+    return scale.toVec2();
   }
 
   /**

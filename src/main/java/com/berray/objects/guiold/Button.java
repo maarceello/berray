@@ -114,7 +114,7 @@ public class Button extends GameObject implements CoreComponentShortcuts {
   private void onMousePress(MouseEvent event) {
     replaceChild(0, getArmedGameObject());
     armed = true;
-    event.setProcessed();
+    event.consume();
   }
 
   private void onHoverLeave(Event event) {

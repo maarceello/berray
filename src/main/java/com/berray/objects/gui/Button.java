@@ -118,7 +118,7 @@ public class Button extends GuiGameObject {
     Panel panel = findParent(Panel.class);
     Object boundObject = panel != null ? panel.getBoundObject() : null;
     model.setArmed(boundObject, resolvedValue, true);
-    event.setProcessed();
+    event.consume();
     firePropertyChange("armed", false, model.getArmed(boundObject, resolvedValue));
   }
 

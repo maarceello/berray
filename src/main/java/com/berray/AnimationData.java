@@ -9,7 +9,7 @@ public class AnimationData<T> {
     private final T delta;
     private final String property;
 
-    private final Function<Float, Float> easingFunction = EasingFunctions.LINEAR;
+    private final Function<Float, Float> easingFunction;
     private final AnimationValueType<T> valueType;
 
     private float elapsedTime;
@@ -17,19 +17,20 @@ public class AnimationData<T> {
     private T currentDelta;
     private T currentValue;
 
-    public AnimationData(String property, T start, T end, float duration, AnimationValueType<T> valueType) {
+    public AnimationData(String property, T start, T end, float duration, Function<Float, Float> easingFunction, AnimationValueType<T> valueType) {
         this.start = start;
         this.valueType = valueType;
         this.delta = valueType.getSub().apply(end, start);
         this.duration = duration;
         this.property = property;
+        this.easingFunction = easingFunction;
 
         this.elapsedTime = 0;
     }
 
 
-    public AnimationData(String property, T start, T end, float duration, BiFunction<T, Float, T> scale, BiFunction<T, T, T> add, BiFunction<T, T, T> sub) {
-        this(property, start, end, duration, new AnimationValueType<>(scale, add, sub));
+    public AnimationData(String property, T start, T end, float duration, Function<Float, Float> easingFunction, BiFunction<T, Float, T> scale, BiFunction<T, T, T> add, BiFunction<T, T, T> sub) {
+        this(property, start, end, duration, easingFunction, new AnimationValueType<>(scale, add, sub));
     }
 
     public void update(float frameTime) {
@@ -46,6 +47,14 @@ public class AnimationData<T> {
 
     public float getProgress() {
         return progress;
+    }
+
+    public float getElapsedTime() {
+        return elapsedTime;
+    }
+
+    public float getDuration() {
+        return duration;
     }
 
     public T getCurrentDelta() {

@@ -27,7 +27,7 @@ public class AnimationManager {
     }
 
     @SuppressWarnings("unchecked")
-    public <E> void addAnimation(GameObject gameObject, String property, E newValue, float duration) {
+    public <E> void addAnimation(GameObject gameObject, String property, E newValue, float duration, Function<Float, Float> easingFunction) {
         if (newValue == null) {
             throw new NullPointerException("newValue must not be null");
         }
@@ -37,7 +37,7 @@ public class AnimationManager {
         }
         // get current value from game object
         E current = gameObject.get(property);
-        addAnimation(gameObject, new AnimationData<>(property,current, newValue, duration,newValueType));
+        addAnimation(gameObject, new AnimationData<>(property,current, newValue, duration, easingFunction, newValueType));
     }
 
     public void addAnimation(GameObject gameObject, AnimationData<?> animationData) {
@@ -65,7 +65,7 @@ public class AnimationManager {
             gameObject.set(animationData.getProperty(), currentValue);
 
             // when the animation is done, remove the animation from the object and the object from the animation manager
-            if (animationData.getProgress() == 1.0f) {
+            if (animationData.getElapsedTime() / animationData.getDuration() >= 1.0f) {
                 gameObject.removeProperty("animation");
                 gameObject.trigger(CoreEvents.ANIMATION_END, gameObject, animationData.getProperty());
                 iterator.remove();
@@ -73,61 +73,9 @@ public class AnimationManager {
         }
     }
 
-    private float easeOutQuadratic(float t) {
-        return 1 - (1 - t) * (1 - t);
-    }
 
-    float simplePow(float x, int p)
-    {
-        float res = 1.0f;
-        for (int i = p; i > 0; i--) {
-            res *= x;
-        }
-        return res;
-    }
 
-    float easeInOutExponential(float t)
-    {
-        if (t < 0.5f) {
-            return (float) Math.pow(2.0f, 20.0f * t - 10.0f) * 0.5f;
-        }
-        return (float) (2.0f - Math.pow(2.0f, -20.0f * t + 10.0f)) * 0.5f;
-    }
 
-    float easeOutBack(float t)
-    {
-        final float c1 = 1.70158f;
-        final float c3 = c1 + 1.0f;
-        return 1.0f + c3 * simplePow(t - 1.0f, 3) + c1 * simplePow(t - 1.0f, 2);
-    }
-
-    float easeInOutQuint(float t)
-    {
-        if (t < 0.5f) {
-            return  16.0f * simplePow(t, 5);
-        }
-        return 1.0f - simplePow(-2.0f * t + 2, 5) * 0.5f;
-    }
-
-    float easeInBack(float t)
-    {
-        final float  c1 = 1.70158f;
-        final float  c3 = c1 + 1.0f;
-        return c3 * t * t * t - c1 * t * t;
-    }
-
-    float easeOutElastic(float t)
-    {
-        final float  two_pi = 2.0f * 3.14159265359f;
-        final float  c4 = two_pi / 3.0f;
-        if (t == 0.0f) {
-            return 0.0f;
-        }
-        if (t == 1.0f) {
-            return 1.0f;
-        }
-        return (float) (Math.pow(2.0f, -10.0f * t) * Math.sin((t * 10.0f - 0.75f) * c4) + 1.0f);
-    }
 
 
 }

@@ -542,9 +542,11 @@ public class GameObject {
   /**
    * animates registered component property
    */
-  public <E> void animate(String property, E value, float duration) {
+  public <E> void animate(String property, E value, float duration, Function<Float, Float> easingFunction) {
+    // todo: maybe supply default easing and duration for each property. this way the method can be
+    // animate(property, newValue);
     if (game != null) {
-      game.getAnimationManager().addAnimation(this, property, value, duration);
+      game.getAnimationManager().addAnimation(this, property, value, duration, easingFunction);
     }
   }
 

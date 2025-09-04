@@ -6,6 +6,7 @@ import java.util.function.Function;
 public class AnimationData<T> {
     private final float duration;
     private final T start;
+    private final T end;
     private final T delta;
     private final String property;
 
@@ -19,6 +20,7 @@ public class AnimationData<T> {
 
     public AnimationData(String property, T start, T end, float duration, Function<Float, Float> easingFunction, AnimationValueType<T> valueType) {
         this.start = start;
+        this.end = end;
         this.valueType = valueType;
         this.delta = valueType.getSub().apply(end, start);
         this.duration = duration;
@@ -35,7 +37,7 @@ public class AnimationData<T> {
 
     public void update(float frameTime) {
         // add frame time to elapsed time. Clamp at 1.0f, which is the end of the animation.
-        this.elapsedTime = Math.min(1.0f, this.elapsedTime + frameTime);
+        this.elapsedTime = this.elapsedTime + frameTime;
         this.progress = easingFunction.apply(Math.min(1f, elapsedTime / duration));
         this.currentDelta = valueType.getScale().apply(delta, getProgress());
         this.currentValue = valueType.getAdd().apply(start, currentDelta);
@@ -65,4 +67,7 @@ public class AnimationData<T> {
         return currentValue;
     }
 
+    public T getEnd() {
+        return end;
+    }
 }

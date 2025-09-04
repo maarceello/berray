@@ -555,7 +555,7 @@ public class GameObject {
     return setterMethods.containsKey(property);
   }
 
-  public Set<String> getProperties() {
+  public Set<String> getComponentProperties() {
     Set<String> componentProperties = new HashSet<>();
     componentProperties.addAll(getterMethods.keySet());
     componentProperties.addAll(setterMethods.keySet());
@@ -611,6 +611,11 @@ public class GameObject {
   public <E> E getProperty(String property) {
     return (E) properties.get(property);
   }
+
+  public Set<String> getPropertyNames() {
+    return properties.keySet();
+  }
+
 
   @SuppressWarnings("unchecked")
   public <E extends Component> E getComponent(Class<E> type) {

@@ -5,8 +5,8 @@ import com.berray.event.UpdateEvent;
 import com.berray.math.Vec2;
 
 import java.util.*;
-import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class AnimationManager {
     private List<GameObject> animatedObjects = new ArrayList<>();
@@ -41,7 +41,7 @@ public class AnimationManager {
     }
 
     public void addAnimation(GameObject gameObject, AnimationData<?> animationData) {
-        gameObject.setProperty("animation", animationData);
+        gameObject.setProperty("animation_"+animationData.getProperty(), animationData);
         animatedObjects.add(gameObject);
     }
 
@@ -50,32 +50,40 @@ public class AnimationManager {
         Iterator<GameObject> iterator = animatedObjects.iterator();
         while (iterator.hasNext()) {
             GameObject gameObject = iterator.next();
-            // get animation data from current game object
-            AnimationData<?> animationData = gameObject.getProperty("animation");
-            if (animationData == null)  {
-                // if the animation data is null, the object is not animated (anymore)
+            Set<String> animations = gameObject.getPropertyNames().stream().filter(name -> name.startsWith("animation_")).collect(Collectors.toSet());
+            // check if the animation is done
+            if (animations.isEmpty()) {
+                // yes. remove the game object from the animation manager and continue with the next game object
                 iterator.remove();
                 continue;
             }
+            for (String animationProperty : animations) {
+                // get animation data from current game object
+                AnimationData<?> animationData = gameObject.getProperty(animationProperty);
+                if (animationData == null) {
+                    // if the animation data is null, the object is not animated (anymore)
+                    iterator.remove();
+                    continue;
+                }
 
-            // add frametime to already elapsed time for this animation
-            animationData.update(event.getFrametime());
+                // add frametime to already elapsed time for this animation
+                animationData.update(event.getFrametime());
 
-            Object currentValue = animationData.getCurrentValue();
-            gameObject.set(animationData.getProperty(), currentValue);
+                Object currentValue = animationData.getCurrentValue();
+                gameObject.set(animationData.getProperty(), currentValue);
 
-            // when the animation is done, remove the animation from the object and the object from the animation manager
-            if (animationData.getElapsedTime() / animationData.getDuration() >= 1.0f) {
-                gameObject.removeProperty("animation");
-                gameObject.trigger(CoreEvents.ANIMATION_END, gameObject, animationData.getProperty());
-                iterator.remove();
+                // when the animation is done, remove the animation from the object
+                if (animationData.getElapsedTime() / animationData.getDuration() >= 1.0f) {
+                    // remove the animation property from the game object
+                    gameObject.removeProperty(animationProperty);
+                    // make sure that the property has exactly the end value
+                    gameObject.set(animationData.getProperty(), animationData.getEnd());
+                    // notify the game object that the animation is done
+                    gameObject.trigger(CoreEvents.ANIMATION_END, gameObject, animationData.getProperty());
+                    // Note: when this is the last animation of the game object, the update in the next frame removes the
+                    // game object from the animation manager
+                }
             }
         }
     }
-
-
-
-
-
-
 }

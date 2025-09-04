@@ -48,8 +48,8 @@ public class ObjectDebug extends GameObject {
     if (objectToMonitor == null) {
       return "?";
     }
-    Set<String> propierties = objectToMonitor.getProperties();
-    List<String> sortedProperties = new ArrayList<>(propierties);
+    Set<String> properties = objectToMonitor.getComponentProperties();
+    List<String> sortedProperties = new ArrayList<>(properties);
     Collections.sort(sortedProperties);
     StringBuilder result = new StringBuilder();
     for (String property : sortedProperties) {

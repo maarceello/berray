@@ -70,4 +70,12 @@ public class AnimationData<T> {
     public T getEnd() {
         return end;
     }
+
+    public T getStart() {
+        return start;
+    }
+
+    public T getDelta() {
+        return delta;
+    }
 }

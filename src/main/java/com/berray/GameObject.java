@@ -534,7 +534,7 @@ public class GameObject {
   public <E> void set(String property, E value) {
     Consumer<E> setterMethod = (Consumer<E>) setterMethods.get(property);
     if (setterMethod == null) {
-      throw new IllegalStateException("cannot find setter for property " + property + " in gameobject " + getClass().getSimpleName() + " with tags " + tags);
+      throw new IllegalStateException("cannot find setter for property " + property + " in gameobject " + getClass().getSimpleName() + " with tags " + tags+". Available setters: "+setterMethods.keySet());
     }
     setterMethod.accept(value);
   }

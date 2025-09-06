@@ -77,10 +77,11 @@ public class SpriteComponent extends Component {
       // DrawTextureRec(@ByVal @Cast("Texture2D*") Texture texture, @ByVal Rectangle source, @ByVal Vector2 _position, @ByVal Color tint);            // Draw a part of a texture defined by a rectangle
       // DrawTexturePro(@ByVal @Cast("Texture2D*") Texture texture, @ByVal Rectangle source, @ByVal Rectangle dest, @ByVal Vector2 origin, float rotation, @ByVal Color tint); // Draw a part of a texture defined by a rectangle with 'pro' parameters
 
+      Color color = gameObject.get("color", Color.WHITE);
       if (size == null) {
-        DrawTextureRec(spriteSheet.getTexture(), rectangle, Vec2.origin().toVector2(), Color.WHITE.toRaylibColor());
+        DrawTextureRec(spriteSheet.getTexture(), rectangle, Vec2.origin().toVector2(), color.toRaylibColor());
       } else {
-        DrawTexturePro(spriteSheet.getTexture(), rectangle, new Raylib.Rectangle().x(0).y(0).width(size.getX()).height(size.getY()), Vec2.origin().toVector2(), 0, Color.WHITE.toRaylibColor());
+        DrawTexturePro(spriteSheet.getTexture(), rectangle, new Raylib.Rectangle().x(0).y(0).width(size.getX()).height(size.getY()), Vec2.origin().toVector2(), 0, color.toRaylibColor());
       }
     } else {
       throw new IllegalStateException("Illegal asset type for " + textureName + ": " + asset.getType());

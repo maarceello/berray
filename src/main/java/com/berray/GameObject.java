@@ -847,16 +847,34 @@ public class GameObject {
     return new Rect(x1, y1, x2 - x1, y2 - y1);
   }
 
+  /** Transforms the position from the world coordinate system to this game objects coordinate system. */
   public Vec3 worldPosToLocalPos(Vec3 worldPos) {
     Matrix4 inverseTransform = getWorldTransform().inverse();
     return inverseTransform.multiply(worldPos);
   }
 
+  /** Transforms the position from the world coordinate system to this game objects coordinate system. */
   public Vec2 worldPosToLocalPos(Vec2 worldPos) {
     Matrix4 inverseTransform = getWorldTransform().inverse();
     return inverseTransform.multiply(worldPos.getX(), worldPos.getY(), 0).toVec2();
   }
 
+  /** Transforms the position from this game objects coordinate system to the world coordinate system. */
+  public Vec2 localPosToWorldPos(Vec2 localPos) {
+    Matrix4 transform = getWorldTransform();
+    return transform.multiply(localPos.getX(), localPos.getY(), 0).toVec2();
+  }
+
+  /** Transforms the position from this game objects coordinate system to the coordinate system of the other game object. */
+  public Vec2 localPosToOtherLocalPos(GameObject other, Vec2 localPos) {
+    // Note: multiply matrices?
+    // Matrix4 ourToWorldTransform = getWorldTransform().inverse();
+    // Matrix4 otherToLocalTransform = other.getWorldTransform();
+    // Matrix4 combinedTransform = otherToLocalTransform.multiply(ourToWorldTransform); ?
+
+    Vec2 worldPos = localPosToWorldPos(localPos);
+    return other.worldPosToLocalPos(worldPos);
+  }
 
   public boolean exists() {
     return parent != null;

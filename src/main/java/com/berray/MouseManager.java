@@ -4,9 +4,7 @@ package com.berray;
 import com.berray.event.CoreEvents;
 import com.berray.event.MouseEvent;
 import com.berray.event.MouseWheelEvent;
-import com.berray.math.Matrix4;
 import com.berray.math.Vec2;
-import com.berray.math.Vec3;
 
 import java.util.*;
 
@@ -153,7 +151,7 @@ public class MouseManager {
       Vec2 delta = mousePressedPosition.sub(mousePos);
       // dragging only starts then the mouse actually moves while the button is pressed
       if (delta.lengthSquared() > 0.0f) {
-        Vec2 localPos = worldPosToLocalPos(pressedGameObject, mousePos);
+        Vec2 localPos = pressedGameObject.worldPosToLocalPos(mousePos);
         if (!dragging) {
           emitDragStartEvent(pressedGameObject, mousePos, localPos);
           dragging = true;
@@ -169,7 +167,7 @@ public class MouseManager {
     if (pressed && pressedGameObject != null) {
       Vec2 mousePos = event.getWindowPos();
 
-      Vec2 localPos = worldPosToLocalPos(pressedGameObject, mousePos);
+      Vec2 localPos = pressedGameObject.worldPosToLocalPos(mousePos);
       emitMouseReleaseEvent(pressedGameObject, mousePos, localPos);
 
       // only trigger click when the release is also over the game object
@@ -192,7 +190,7 @@ public class MouseManager {
    * @type emit-event
    */
   private void emitMouseWheelEvent(GameObject gameObject, Vec2 mousePos, float wheelDelta) {
-    Vec2 localPos = worldPosToLocalPos(gameObject, mousePos);
+    Vec2 localPos = gameObject.worldPosToLocalPos(mousePos);
     gameObject.trigger(CoreEvents.MOUSE_WHEEL_MOVE, gameObject, mousePos, localPos, wheelDelta);
   }
 
@@ -202,7 +200,7 @@ public class MouseManager {
    * @type emit-event
    */
   private boolean emitMousePressEvent(GameObject gameObject, Vec2 mousePos) {
-    Vec2 localPos = worldPosToLocalPos(gameObject, mousePos);
+    Vec2 localPos = gameObject.worldPosToLocalPos(mousePos);
     MouseEvent event = MouseEvent.createMouseEvent(MouseEvent.EVENT_NAME_MOUSE_PRESS, Arrays.asList(gameObject, mousePos, localPos));
     gameObject.trigger(event);
     return event.isConsumed();
@@ -233,7 +231,7 @@ public class MouseManager {
    * @type emit-event
    */
   private boolean emitHoverEvent(GameObject gameObject, Vec2 mousePos) {
-    Vec2 localPos = worldPosToLocalPos(gameObject, mousePos);
+    Vec2 localPos = gameObject.worldPosToLocalPos(mousePos);
     MouseEvent event = MouseEvent.createMouseEvent(CoreEvents.HOVER, Arrays.asList(gameObject, mousePos, localPos));
     gameObject.trigger(event);
     return event.isConsumed();
@@ -245,7 +243,7 @@ public class MouseManager {
    * @type emit-event
    */
   private void emitHoverEnterEvent(GameObject gameObject, Vec2 mousePos) {
-    Vec2 localPos = worldPosToLocalPos(gameObject, mousePos);
+    Vec2 localPos = gameObject.worldPosToLocalPos(mousePos);
     gameObject.trigger(CoreEvents.HOVER_ENTER, gameObject, mousePos, localPos);
   }
 
@@ -255,7 +253,7 @@ public class MouseManager {
    * @type emit-event
    */
   private void emitHoverLeaveEvent(GameObject gameObject, Vec2 mousePos) {
-    Vec2 localPos = worldPosToLocalPos(gameObject, mousePos);
+    Vec2 localPos = gameObject.worldPosToLocalPos(mousePos);
     gameObject.trigger(CoreEvents.HOVER_LEAVE, gameObject, mousePos, localPos);
   }
 
@@ -284,12 +282,5 @@ public class MouseManager {
    */
   private void emitDragFinishEvent(GameObject gameObject, Vec2 mousePos, Vec2 localPos) {
     gameObject.trigger(CoreEvents.DRAG_FINISH, gameObject, mousePos, localPos);
-  }
-
-
-  private Vec2 worldPosToLocalPos(GameObject gameObject, Vec2 mousePos) {
-    Matrix4 inverseTransform = gameObject.getWorldTransform().inverse();
-    Vec3 localVec3 = inverseTransform.multiply(mousePos.getX(), mousePos.getY(), 0);
-    return new Vec2(localVec3.getX(), localVec3.getY());
   }
 }
